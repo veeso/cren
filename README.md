@@ -1,5 +1,9 @@
 # Cren – A Modern Build and Package Manager for C
 
+![CI state](https://github.com/veeso/cren/workflows/CI/badge.svg)
+[![License-MIT](https://img.shields.io/badge/License-MIT-teal.svg)](https://opensource.org/licenses/MIT)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
+
 Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed to modernize and simplify **C development**. With its modular approach and built-in features, Cren allows developers to focus on writing code by automating repetitive tasks like dependency management, building, testing, and formatting.
 
 ## 🚀 Key Features
@@ -14,6 +18,7 @@ Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed t
 
 - `cren init`: Initialize a new project with a predefined directory structure.
 - `cren build`: Compile your project effortlessly.
+- `cren run`: Run compiled project.
 - `cren test`: Run integrated tests written directly in your source code.
 - `cren lint`: Analyze your code for potential issues.
 - `cren format`: Automatically format your code based on specified guidelines.
@@ -38,9 +43,8 @@ Cren is built for developers who want a streamlined workflow for C projects. By 
 
 1. Install Cren (instructions coming soon).
 2. Create a new project:
-   
+
    ```bash
    cren init my_project
    cd my_project
    ```
-

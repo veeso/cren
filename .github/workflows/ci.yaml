@@ -1,0 +1,39 @@
+name: CI
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        cmake-generator: [Ninja, "Unix Makefiles"]
+
+    steps:
+      # Checkout repository
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # Install dependencies (Linux and macOS)
+      - name: Install dependencies (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          sudo apt-get update || true
+          sudo apt-get install -y cmake ninja-build gcc g++ || true
+
+      # Install dependencies (Windows)
+      - name: Install dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+          choco install ninja -y
+          choco install mingw -y
+          echo "Using GCC from MinGW"
+          set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin;%PATH%
+
+      # Create build directory
+      - name: Create build directory
+        run: cmake -B build -S . -G "${{ matrix.cmake-generator }}" -DCMAKE_BUILD_TYPE=Release
+
+      # Build project
+      - name: Build
+        run: cmake --build build --config Release
