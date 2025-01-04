@@ -17,12 +17,18 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # Install dependencies (Linux and macOS)
-      - name: Install dependencies (Linux/macOS)
-        if: matrix.os != 'windows-latest'
+      # Install dependencies (Linux)
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update || true
           sudo apt-get install -y cmake ninja-build gcc g++ || true
+
+      # Install dependencies (macOS)
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install cmake ninja
 
       # Install dependencies (Windows)
       - name: Install dependencies (Windows)
