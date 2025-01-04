@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        cmake-generator: [Ninja, "Unix Makefiles"]
+        cmake-generator: [Ninja]
 
     steps:
       # Checkout repository
@@ -35,13 +35,15 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-          choco install ninja -y
-          choco install mingw -y
-          echo "Using GCC from MinGW"
-          export PATH="/c/Program Files/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin:$PATH"
 
       # Create build directory
-      - name: Create build directory
+      - name: Setup build directory (Windows)
+        if: matrix.os == 'windows-latest'
+        run: cmake -B build -S . -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
+
+      # Create build directory
+      - name: Setup build directory (Linux/macOS)
+        if: matrix.os != 'windows-latest'
         run: cmake -B build -S . -G "${{ matrix.cmake-generator }}" -DCMAKE_BUILD_TYPE=Release
 
       # Build project
