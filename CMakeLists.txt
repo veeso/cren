@@ -13,4 +13,4 @@ file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.c)
 
 add_executable(cren ${SOURCES})
 
-target_compile_options(cren PRIVATE -Wall -Wextra -pedantic)
+target_compile_options(cren PRIVATE -Wall -pedantic)
