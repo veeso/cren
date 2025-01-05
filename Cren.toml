@@ -1,0 +1,17 @@
+[package]
+name = "cren"
+version = "0.1.0"
+description = "Cren is a tool inspired by Cargo, designed to modernize and simplify C development"
+edition = "1"
+language = "c11"
+authors = ["Christian Visintin <christian.visintin@veeso.dev>"]
+repository = "https://github.com/veeso/cren"
+license = "MIT"
+
+[[bin]]
+name = "cren"
+path = "src/cren.c"
+
+[dependencies]
+
+[features]
