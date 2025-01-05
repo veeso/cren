@@ -5,7 +5,8 @@
 
 #include <stdlib.h>
 
-#include <utils/char_list.h>
+#include <utils/string_list.h>
+#include <utils/string.h>
 
 /// manifest targets
 typedef struct cren_manifest_targets cren_manifest_targets;
@@ -24,11 +25,9 @@ typedef struct cren_manifest_target_cfg cren_manifest_target_cfg;
 
 struct cren_manifest_target_cfg
 {
-    char *name;
-    size_t name_len;
-    char *path;
-    size_t path_len;
-    char_list_t *required_features;
+    string_t *name;
+    string_t *path;
+    string_list_t *required_features;
 };
 
 /// @brief initializes a new cren_manifest_targets

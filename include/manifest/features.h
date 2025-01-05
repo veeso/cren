@@ -5,14 +5,14 @@
 
 #include <stdlib.h>
 
-#include <utils/char_list.h>
+#include <utils/string_list.h>
 
 /// Cren manifest features
 typedef struct cren_manifest_features cren_manifest_features;
 
 struct cren_manifest_features
 {
-    char_list_t *default_features;
+    string_list_t *default_features;
     cren_manifest_feature **features;
     size_t features_len;
 };
@@ -22,10 +22,9 @@ typedef struct cren_manifest_feature cren_manifest_feature;
 
 struct cren_manifest_feature
 {
-    char *name;
-    size_t name_len;
-    char_list_t *dependencies;
-    char_list_t *defines;
+    string_t *name;
+    string_list_t *dependencies;
+    string_list_t *defines;
 };
 
 /// @brief init cren manifest features

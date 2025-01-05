@@ -16,7 +16,7 @@ Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed t
 
 ## 🛠️ Available Commands
 
-- `cren init`: Initialize a new project with a predefined directory structure.
+- `cren new`: Initialize a new project with a predefined directory structure.
 - `cren build`: Compile your project effortlessly.
 - `cren run`: Run compiled project.
 - `cren test`: Run integrated tests written directly in your source code.
@@ -39,12 +39,6 @@ Cren is built for developers who want a streamlined workflow for C projects. By 
 - A modern C compiler (e.g., GCC, Clang).
 - Make or CMake (optional for advanced builds).
 
-## 🌟 Get Started
+## 🌟 Cren Book
 
-1. Install Cren (instructions coming soon).
-2. Create a new project:
-
-   ```bash
-   cren init my_project
-   cd my_project
-   ```
+See [Cren Book](./doc/index.md) for detailed documentation and usage examples.

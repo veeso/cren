@@ -9,38 +9,33 @@
 #include <manifest/package/language.h>
 #include <manifest/package/license.h>
 #include <manifest/package/semver.h>
-#include <utils/char_list.h>
+#include <utils/string_list.h>
+#include <utils/string.h>
 
 /// manifest package
-typedef struct cren_manifest_package cren_manifest_package;
+typedef struct cren_manifest_package_t cren_manifest_package_t;
 
-struct cren_manifest_package
+struct cren_manifest_package_t
 {
-  char *name;
-  size_t name_len;
-  char *description;
-  size_t description_len;
-  semver version;
-  edition edition;
-  language language;
-  char_list_t *authors;
-  char *documentation;
-  size_t documentation_len;
-  char *homepage;
-  size_t homepage_len;
-  char *repository;
-  size_t repository_len;
-  license license;
-  char *license_file;
-  size_t license_file_len;
+    string_t *name;
+    string_t *description;
+    semver_t version;
+    edition_t edition;
+    language_t language;
+    string_list_t *authors;
+    string_t *documentation;
+    string_t *homepage;
+    string_t *repository;
+    license license;
+    string_t *license_file;
 };
 
 /// @brief initializes a new cren_manifest_package
 /// @return pointer to manifest_package
-cren_manifest_package *cren_manifest_package_init();
+cren_manifest_package_t *cren_manifest_package_init();
 
 /// @brief free cren manifest package
 /// @param package
-void cren_manifest_package_free(cren_manifest_package *package);
+void cren_manifest_package_free(cren_manifest_package_t *package);
 
 #endif // CREN_MANIFEST_PACKAGE_H

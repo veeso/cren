@@ -3,10 +3,10 @@
 #ifndef CREN_MANIFEST_LANGUAGE_H
 #define CREN_MANIFEST_LANGUAGE_H
 
-typedef enum language language;
+typedef enum language_t language_t;
 
 /// @brief Language variants
-enum language
+enum language_t
 {
     UNKNOWN = -1,
     C89,
@@ -27,11 +27,11 @@ enum language
 /// @brief convert string into language. In case of error returns `UNKNOWN`
 /// @param str
 /// @return language
-language language_from_str(const char *str);
+language_t language_from_str(const char *str);
 
 /// @brief convert language into string.
 /// @param language
 /// @return string
-const char *language_to_string(language language);
+const char *language_to_string(language_t language);
 
 #endif // CREN_MANIFEST_LANGUAGE_H

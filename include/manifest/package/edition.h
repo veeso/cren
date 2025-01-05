@@ -4,9 +4,9 @@
 #define CREN_MANIFEST_EDITION_H
 
 /// @brief edition enum type
-typedef enum edition edition;
+typedef enum edition_t edition_t;
 
-enum edition
+enum edition_t
 {
     /// @brief unknown edition (error)
     UNKNOWN = -1,
@@ -17,11 +17,11 @@ enum edition
 /// @brief parse `edition` from a string.
 /// @param str
 /// @return edition
-edition edition_from_str(const char *str);
+edition_t edition_from_str(const char *str);
 
 /// @brief convert edition to string
 /// @param edition edition to convert
 /// @return string repr
-const char *edition_to_string(edition edition);
+const char *edition_to_string(edition_t edition);
 
 #endif // CREN_MANIFEST_EDITION_H

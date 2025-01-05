@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include <utils/char_list.h>
+#include <utils/string_list.h>
+#include <utils/string.h>
 
 /// Cren manifest dependencies
 typedef struct cren_manifest_dependencies cren_manifest_dependencies;
@@ -21,14 +22,11 @@ typedef struct cren_manifest_dependency cren_manifest_dependency;
 
 struct cren_manifest_dependency
 {
-    char *name;
-    size_t name_len;
-    char *git;
-    size_t git_len;
-    char *link;
-    size_t link_len;
+    string_t *name;
+    string_t *git;
+    string_t *link;
     bool optional;
-    char_list_t *defines;
+    string_list_t *defines;
 };
 
 /// @brief init cren manifest dependencies
