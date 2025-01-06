@@ -1,5 +1,9 @@
 # Cren – A Modern Build and Package Manager for C
 
+<p align="center">
+  <img src="./doc/cren.png" alt="cren logo" width="256" />
+</p>
+
 [![.github/workflows/ci.yaml](https://github.com/veeso/cren/actions/workflows/ci.yaml/badge.svg)](https://github.com/veeso/cren/actions/workflows/ci.yaml)
 [![License-MIT](https://img.shields.io/badge/License-MIT-teal.svg)](https://opensource.org/licenses/MIT)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
