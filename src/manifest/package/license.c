@@ -688,1365 +688,2725 @@ license_t license_from_str(const char *str)
     size_t len = strlen(str);
 
     if (strncmp(str, L0BSD, len) == 0)
+    {
         return LICENSE_0BSD;
+    }
     if (strncmp(str, L3D_SLICER_1_0, len) == 0)
+    {
         return LICENSE_3D_SLICER_1_0;
+    }
     if (strncmp(str, AAL, len) == 0)
+    {
         return LICENSE_AAL;
+    }
     if (strncmp(str, ABSTYLES, len) == 0)
+    {
         return LICENSE_ABSTYLES;
+    }
     if (strncmp(str, ADACORE_DOC, len) == 0)
+    {
         return LICENSE_ADACORE_DOC;
+    }
     if (strncmp(str, ADOBE_2006, len) == 0)
+    {
         return LICENSE_ADOBE_2006;
+    }
     if (strncmp(str, ADOBE_DISPLAY_POSTSCRIPT, len) == 0)
+    {
         return LICENSE_ADOBE_DISPLAY_POSTSCRIPT;
+    }
     if (strncmp(str, ADOBE_GLYPH, len) == 0)
+    {
         return LICENSE_ADOBE_GLYPH;
+    }
     if (strncmp(str, ADOBE_UTOPIA, len) == 0)
+    {
         return LICENSE_ADOBE_UTOPIA;
+    }
     if (strncmp(str, ADSL, len) == 0)
+    {
         return LICENSE_ADSL;
+    }
     if (strncmp(str, AFL_1_1, len) == 0)
+    {
         return LICENSE_AFL_1_1;
+    }
     if (strncmp(str, AFL_1_2, len) == 0)
+    {
         return LICENSE_AFL_1_2;
+    }
     if (strncmp(str, AFL_2_0, len) == 0)
+    {
         return LICENSE_AFL_2_0;
+    }
     if (strncmp(str, AFL_2_1, len) == 0)
+    {
         return LICENSE_AFL_2_1;
+    }
     if (strncmp(str, AFL_3_0, len) == 0)
+    {
         return LICENSE_AFL_3_0;
+    }
     if (strncmp(str, AFMPARSE, len) == 0)
+    {
         return LICENSE_AFMPARSE;
+    }
     if (strncmp(str, AGPL_1_0, len) == 0)
+    {
         return LICENSE_AGPL_1_0;
+    }
     if (strncmp(str, AGPL_1_0_ONLY, len) == 0)
+    {
         return LICENSE_AGPL_1_0_ONLY;
+    }
     if (strncmp(str, AGPL_1_0_OR_LATER, len) == 0)
+    {
         return LICENSE_AGPL_1_0_OR_LATER;
+    }
     if (strncmp(str, AGPL_3_0, len) == 0)
+    {
         return LICENSE_AGPL_3_0;
+    }
     if (strncmp(str, AGPL_3_0_ONLY, len) == 0)
+    {
         return LICENSE_AGPL_3_0_ONLY;
+    }
     if (strncmp(str, AGPL_3_0_OR_LATER, len) == 0)
+    {
         return LICENSE_AGPL_3_0_OR_LATER;
+    }
     if (strncmp(str, ALADDIN, len) == 0)
+    {
         return LICENSE_ALADDIN;
+    }
     if (strncmp(str, AMD_NEWLIB, len) == 0)
+    {
         return LICENSE_AMD_NEWLIB;
+    }
     if (strncmp(str, AMDPLPA, len) == 0)
+    {
         return LICENSE_AMDPLPA;
+    }
     if (strncmp(str, AML, len) == 0)
+    {
         return LICENSE_AML;
+    }
     if (strncmp(str, AML_GLSLANG, len) == 0)
+    {
         return LICENSE_AML_GLSLANG;
+    }
     if (strncmp(str, AMPAS, len) == 0)
+    {
         return LICENSE_AMPAS;
+    }
     if (strncmp(str, ANTLR_PD, len) == 0)
+    {
         return LICENSE_ANTLR_PD;
+    }
     if (strncmp(str, ANTLR_PD_FALLBACK, len) == 0)
+    {
         return LICENSE_ANTLR_PD_FALLBACK;
+    }
     if (strncmp(str, ANY_OSI, len) == 0)
+    {
         return LICENSE_ANY_OSI;
+    }
     if (strncmp(str, ANY_OSI_PERL_MODULES, len) == 0)
+    {
         return LICENSE_ANY_OSI_PERL_MODULES;
+    }
     if (strncmp(str, APACHE_1_0, len) == 0)
+    {
         return LICENSE_APACHE_1_0;
+    }
     if (strncmp(str, APACHE_1_1, len) == 0)
+    {
         return LICENSE_APACHE_1_1;
+    }
     if (strncmp(str, APACHE_2_0, len) == 0)
+    {
         return LICENSE_APACHE_2_0;
+    }
     if (strncmp(str, APAFML, len) == 0)
+    {
         return LICENSE_APAFML;
+    }
     if (strncmp(str, APL_1_0, len) == 0)
+    {
         return LICENSE_APL_1_0;
+    }
     if (strncmp(str, APP_S2P, len) == 0)
+    {
         return LICENSE_APP_S2P;
+    }
     if (strncmp(str, APSL_1_0, len) == 0)
+    {
         return LICENSE_APSL_1_0;
+    }
     if (strncmp(str, APSL_1_1, len) == 0)
+    {
         return LICENSE_APSL_1_1;
+    }
     if (strncmp(str, APSL_1_2, len) == 0)
+    {
         return LICENSE_APSL_1_2;
+    }
     if (strncmp(str, APSL_2_0, len) == 0)
+    {
         return LICENSE_APSL_2_0;
+    }
     if (strncmp(str, ARPHIC_1999, len) == 0)
+    {
         return LICENSE_ARPHIC_1999;
+    }
     if (strncmp(str, ARTISTIC_1_0, len) == 0)
+    {
         return LICENSE_ARTISTIC_1_0;
+    }
     if (strncmp(str, ARTISTIC_1_0_CL8, len) == 0)
+    {
         return LICENSE_ARTISTIC_1_0_CL8;
+    }
     if (strncmp(str, ARTISTIC_1_0_PERL, len) == 0)
+    {
         return LICENSE_ARTISTIC_1_0_PERL;
+    }
     if (strncmp(str, ARTISTIC_2_0, len) == 0)
+    {
         return LICENSE_ARTISTIC_2_0;
+    }
     if (strncmp(str, ASWF_DIGITAL_ASSETS_1_0, len) == 0)
+    {
         return LICENSE_ASWF_DIGITAL_ASSETS_1_0;
+    }
     if (strncmp(str, ASWF_DIGITAL_ASSETS_1_1, len) == 0)
+    {
         return LICENSE_ASWF_DIGITAL_ASSETS_1_1;
+    }
     if (strncmp(str, BAEKMUK, len) == 0)
+    {
         return LICENSE_BAEKMUK;
+    }
     if (strncmp(str, BAHYPH, len) == 0)
+    {
         return LICENSE_BAHYPH;
+    }
     if (strncmp(str, BARR, len) == 0)
+    {
         return LICENSE_BARR;
+    }
     if (strncmp(str, BCRYPT_SOLAR_DESIGNER, len) == 0)
+    {
         return LICENSE_BCRYPT_SOLAR_DESIGNER;
+    }
     if (strncmp(str, BEERWARE, len) == 0)
+    {
         return LICENSE_BEERWARE;
+    }
     if (strncmp(str, BITSTREAM_CHARTER, len) == 0)
+    {
         return LICENSE_BITSTREAM_CHARTER;
+    }
     if (strncmp(str, BITSTREAM_VERA, len) == 0)
+    {
         return LICENSE_BITSTREAM_VERA;
+    }
     if (strncmp(str, BITTORRENT_1_0, len) == 0)
+    {
         return LICENSE_BITTORRENT_1_0;
+    }
     if (strncmp(str, BITTORRENT_1_1, len) == 0)
+    {
         return LICENSE_BITTORRENT_1_1;
+    }
     if (strncmp(str, BLESSING, len) == 0)
+    {
         return LICENSE_BLESSING;
+    }
     if (strncmp(str, BLUEOAK_1_0_0, len) == 0)
+    {
         return LICENSE_BLUEOAK_1_0_0;
+    }
     if (strncmp(str, BOEHM_GC, len) == 0)
+    {
         return LICENSE_BOEHM_GC;
+    }
     if (strncmp(str, BOEHM_GC_WITHOUT_FEE, len) == 0)
+    {
         return LICENSE_BOEHM_GC_WITHOUT_FEE;
+    }
     if (strncmp(str, BORCEUX, len) == 0)
+    {
         return LICENSE_BORCEUX;
+    }
     if (strncmp(str, BRIAN_GLADMAN_2_CLAUSE, len) == 0)
+    {
         return LICENSE_BRIAN_GLADMAN_2_CLAUSE;
+    }
     if (strncmp(str, BRIAN_GLADMAN_3_CLAUSE, len) == 0)
+    {
         return LICENSE_BRIAN_GLADMAN_3_CLAUSE;
+    }
     if (strncmp(str, BSD_1_CLAUSE, len) == 0)
+    {
         return LICENSE_BSD_1_CLAUSE;
+    }
     if (strncmp(str, BSD_2_CLAUSE, len) == 0)
+    {
         return LICENSE_BSD_2_CLAUSE;
+    }
     if (strncmp(str, BSD_2_CLAUSE_DARWIN, len) == 0)
+    {
         return LICENSE_BSD_2_CLAUSE_DARWIN;
+    }
     if (strncmp(str, BSD_2_CLAUSE_FIRST_LINES, len) == 0)
+    {
         return LICENSE_BSD_2_CLAUSE_FIRST_LINES;
+    }
     if (strncmp(str, BSD_2_CLAUSE_FREEBSD, len) == 0)
+    {
         return LICENSE_BSD_2_CLAUSE_FREEBSD;
+    }
     if (strncmp(str, BSD_2_CLAUSE_NETBSD, len) == 0)
+    {
         return LICENSE_BSD_2_CLAUSE_NETBSD;
+    }
     if (strncmp(str, BSD_2_CLAUSE_PATENT, len) == 0)
+    {
         return LICENSE_BSD_2_CLAUSE_PATENT;
+    }
     if (strncmp(str, BSD_2_CLAUSE_VIEWS, len) == 0)
+    {
         return LICENSE_BSD_2_CLAUSE_VIEWS;
+    }
     if (strncmp(str, BSD_3_CLAUSE, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE;
+    }
     if (strncmp(str, BSD_3_CLAUSE_ACPICA, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_ACPICA;
+    }
     if (strncmp(str, BSD_3_CLAUSE_ATTRIBUTION, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_ATTRIBUTION;
+    }
     if (strncmp(str, BSD_3_CLAUSE_CLEAR, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_CLEAR;
+    }
     if (strncmp(str, BSD_3_CLAUSE_FLEX, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_FLEX;
+    }
     if (strncmp(str, BSD_3_CLAUSE_HP, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_HP;
+    }
     if (strncmp(str, BSD_3_CLAUSE_LBNL, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_LBNL;
+    }
     if (strncmp(str, BSD_3_CLAUSE_MODIFICATION, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_MODIFICATION;
+    }
     if (strncmp(str, BSD_3_CLAUSE_NO_MILITARY_LICENSE, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_NO_MILITARY_LICENSE;
+    }
     if (strncmp(str, BSD_3_CLAUSE_NO_NUCLEAR_LICENSE, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_NO_NUCLEAR_LICENSE;
+    }
     if (strncmp(str, BSD_3_CLAUSE_NO_NUCLEAR_LICENSE_2014, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_NO_NUCLEAR_LICENSE_2014;
+    }
     if (strncmp(str, BSD_3_CLAUSE_NO_NUCLEAR_WARRANTY, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_NO_NUCLEAR_WARRANTY;
+    }
     if (strncmp(str, BSD_3_CLAUSE_OPEN_MPI, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_OPEN_MPI;
+    }
     if (strncmp(str, BSD_3_CLAUSE_SUN, len) == 0)
+    {
         return LICENSE_BSD_3_CLAUSE_SUN;
+    }
     if (strncmp(str, BSD_4_CLAUSE, len) == 0)
+    {
         return LICENSE_BSD_4_CLAUSE;
+    }
     if (strncmp(str, BSD_4_CLAUSE_SHORTENED, len) == 0)
+    {
         return LICENSE_BSD_4_CLAUSE_SHORTENED;
+    }
     if (strncmp(str, BSD_4_CLAUSE_UC, len) == 0)
+    {
         return LICENSE_BSD_4_CLAUSE_UC;
+    }
     if (strncmp(str, BSD_4_3RENO, len) == 0)
+    {
         return LICENSE_BSD_4_3RENO;
+    }
     if (strncmp(str, BSD_4_3TAHOE, len) == 0)
+    {
         return LICENSE_BSD_4_3TAHOE;
+    }
     if (strncmp(str, BSD_ADVERTISING_ACKNOWLEDGEMENT, len) == 0)
+    {
         return LICENSE_BSD_ADVERTISING_ACKNOWLEDGEMENT;
+    }
     if (strncmp(str, BSD_ATTRIBUTION_HPND_DISCLAIMER, len) == 0)
+    {
         return LICENSE_BSD_ATTRIBUTION_HPND_DISCLAIMER;
+    }
     if (strncmp(str, BSD_INFERNO_NETTVERK, len) == 0)
+    {
         return LICENSE_BSD_INFERNO_NETTVERK;
+    }
     if (strncmp(str, BSD_PROTECTION, len) == 0)
+    {
         return LICENSE_BSD_PROTECTION;
+    }
     if (strncmp(str, BSD_SOURCE_BEGINNING_FILE, len) == 0)
+    {
         return LICENSE_BSD_SOURCE_BEGINNING_FILE;
+    }
     if (strncmp(str, BSD_SOURCE_CODE, len) == 0)
+    {
         return LICENSE_BSD_SOURCE_CODE;
+    }
     if (strncmp(str, BSD_SYSTEMICS, len) == 0)
+    {
         return LICENSE_BSD_SYSTEMICS;
+    }
     if (strncmp(str, BSD_SYSTEMICS_W3WORKS, len) == 0)
+    {
         return LICENSE_BSD_SYSTEMICS_W3WORKS;
+    }
     if (strncmp(str, BSL_1_0, len) == 0)
+    {
         return LICENSE_BSL_1_0;
+    }
     if (strncmp(str, BUSL_1_1, len) == 0)
+    {
         return LICENSE_BUSL_1_1;
+    }
     if (strncmp(str, BZIP2_1_0_5, len) == 0)
+    {
         return LICENSE_BZIP2_1_0_5;
+    }
     if (strncmp(str, BZIP2_1_0_6, len) == 0)
+    {
         return LICENSE_BZIP2_1_0_6;
+    }
     if (strncmp(str, C_UDA_1_0, len) == 0)
+    {
         return LICENSE_C_UDA_1_0;
+    }
     if (strncmp(str, CAL_1_0, len) == 0)
+    {
         return LICENSE_CAL_1_0;
+    }
     if (strncmp(str, CAL_1_0_COMBINED_WORK_EXCEPTION, len) == 0)
+    {
         return LICENSE_CAL_1_0_COMBINED_WORK_EXCEPTION;
+    }
     if (strncmp(str, CALDERA, len) == 0)
+    {
         return LICENSE_CALDERA;
+    }
     if (strncmp(str, CALDERA_NO_PREAMBLE, len) == 0)
+    {
         return LICENSE_CALDERA_NO_PREAMBLE;
+    }
     if (strncmp(str, CATHARON, len) == 0)
+    {
         return LICENSE_CATHARON;
+    }
     if (strncmp(str, CATOSL_1_1, len) == 0)
+    {
         return LICENSE_CATOSL_1_1;
+    }
     if (strncmp(str, CC_BY_1_0, len) == 0)
+    {
         return LICENSE_CC_BY_1_0;
+    }
     if (strncmp(str, CC_BY_2_0, len) == 0)
+    {
         return LICENSE_CC_BY_2_0;
+    }
     if (strncmp(str, CC_BY_2_5, len) == 0)
+    {
         return LICENSE_CC_BY_2_5;
+    }
     if (strncmp(str, CC_BY_2_5_AU, len) == 0)
+    {
         return LICENSE_CC_BY_2_5_AU;
+    }
     if (strncmp(str, CC_BY_3_0, len) == 0)
+    {
         return LICENSE_CC_BY_3_0;
+    }
     if (strncmp(str, CC_BY_3_0_AT, len) == 0)
+    {
         return LICENSE_CC_BY_3_0_AT;
+    }
     if (strncmp(str, CC_BY_3_0_AU, len) == 0)
+    {
         return LICENSE_CC_BY_3_0_AU;
+    }
     if (strncmp(str, CC_BY_3_0_DE, len) == 0)
+    {
         return LICENSE_CC_BY_3_0_DE;
+    }
     if (strncmp(str, CC_BY_3_0_IGO, len) == 0)
+    {
         return LICENSE_CC_BY_3_0_IGO;
+    }
     if (strncmp(str, CC_BY_3_0_NL, len) == 0)
+    {
         return LICENSE_CC_BY_3_0_NL;
+    }
     if (strncmp(str, CC_BY_3_0_US, len) == 0)
+    {
         return LICENSE_CC_BY_3_0_US;
+    }
     if (strncmp(str, CC_BY_4_0, len) == 0)
+    {
         return LICENSE_CC_BY_4_0;
+    }
     if (strncmp(str, CC_BY_NC_1_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_1_0;
+    }
     if (strncmp(str, CC_BY_NC_2_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_2_0;
+    }
     if (strncmp(str, CC_BY_NC_2_5, len) == 0)
+    {
         return LICENSE_CC_BY_NC_2_5;
+    }
     if (strncmp(str, CC_BY_NC_3_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_3_0;
+    }
     if (strncmp(str, CC_BY_NC_3_0_DE, len) == 0)
+    {
         return LICENSE_CC_BY_NC_3_0_DE;
+    }
     if (strncmp(str, CC_BY_NC_4_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_4_0;
+    }
     if (strncmp(str, CC_BY_NC_ND_1_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_ND_1_0;
+    }
     if (strncmp(str, CC_BY_NC_ND_2_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_ND_2_0;
+    }
     if (strncmp(str, CC_BY_NC_ND_2_5, len) == 0)
+    {
         return LICENSE_CC_BY_NC_ND_2_5;
+    }
     if (strncmp(str, CC_BY_NC_ND_3_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_ND_3_0;
+    }
     if (strncmp(str, CC_BY_NC_ND_3_0_DE, len) == 0)
+    {
         return LICENSE_CC_BY_NC_ND_3_0_DE;
+    }
     if (strncmp(str, CC_BY_NC_ND_3_0_IGO, len) == 0)
+    {
         return LICENSE_CC_BY_NC_ND_3_0_IGO;
+    }
     if (strncmp(str, CC_BY_NC_ND_4_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_ND_4_0;
+    }
     if (strncmp(str, CC_BY_NC_SA_1_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_1_0;
+    }
     if (strncmp(str, CC_BY_NC_SA_2_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_2_0;
+    }
     if (strncmp(str, CC_BY_NC_SA_2_0_DE, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_2_0_DE;
+    }
     if (strncmp(str, CC_BY_NC_SA_2_0_FR, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_2_0_FR;
+    }
     if (strncmp(str, CC_BY_NC_SA_2_0_UK, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_2_0_UK;
+    }
     if (strncmp(str, CC_BY_NC_SA_2_5, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_2_5;
+    }
     if (strncmp(str, CC_BY_NC_SA_3_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_3_0;
+    }
     if (strncmp(str, CC_BY_NC_SA_3_0_DE, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_3_0_DE;
+    }
     if (strncmp(str, CC_BY_NC_SA_3_0_IGO, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_3_0_IGO;
+    }
     if (strncmp(str, CC_BY_NC_SA_4_0, len) == 0)
+    {
         return LICENSE_CC_BY_NC_SA_4_0;
+    }
     if (strncmp(str, CC_BY_ND_1_0, len) == 0)
+    {
         return LICENSE_CC_BY_ND_1_0;
+    }
     if (strncmp(str, CC_BY_ND_2_0, len) == 0)
+    {
         return LICENSE_CC_BY_ND_2_0;
+    }
     if (strncmp(str, CC_BY_ND_2_5, len) == 0)
+    {
         return LICENSE_CC_BY_ND_2_5;
+    }
     if (strncmp(str, CC_BY_ND_3_0, len) == 0)
+    {
         return LICENSE_CC_BY_ND_3_0;
+    }
     if (strncmp(str, CC_BY_ND_3_0_DE, len) == 0)
+    {
         return LICENSE_CC_BY_ND_3_0_DE;
+    }
     if (strncmp(str, CC_BY_ND_4_0, len) == 0)
+    {
         return LICENSE_CC_BY_ND_4_0;
+    }
     if (strncmp(str, CC_BY_SA_1_0, len) == 0)
+    {
         return LICENSE_CC_BY_SA_1_0;
+    }
     if (strncmp(str, CC_BY_SA_2_0, len) == 0)
+    {
         return LICENSE_CC_BY_SA_2_0;
+    }
     if (strncmp(str, CC_BY_SA_2_0_UK, len) == 0)
+    {
         return LICENSE_CC_BY_SA_2_0_UK;
+    }
     if (strncmp(str, CC_BY_SA_2_1_JP, len) == 0)
+    {
         return LICENSE_CC_BY_SA_2_1_JP;
+    }
     if (strncmp(str, CC_BY_SA_2_5, len) == 0)
+    {
         return LICENSE_CC_BY_SA_2_5;
+    }
     if (strncmp(str, CC_BY_SA_3_0, len) == 0)
+    {
         return LICENSE_CC_BY_SA_3_0;
+    }
     if (strncmp(str, CC_BY_SA_3_0_AT, len) == 0)
+    {
         return LICENSE_CC_BY_SA_3_0_AT;
+    }
     if (strncmp(str, CC_BY_SA_3_0_DE, len) == 0)
+    {
         return LICENSE_CC_BY_SA_3_0_DE;
+    }
     if (strncmp(str, CC_BY_SA_3_0_IGO, len) == 0)
+    {
         return LICENSE_CC_BY_SA_3_0_IGO;
+    }
     if (strncmp(str, CC_BY_SA_4_0, len) == 0)
+    {
         return LICENSE_CC_BY_SA_4_0;
+    }
     if (strncmp(str, CC_PDDC, len) == 0)
+    {
         return LICENSE_CC_PDDC;
+    }
     if (strncmp(str, CC_PDM_1_0, len) == 0)
+    {
         return LICENSE_CC_PDM_1_0;
+    }
     if (strncmp(str, CC_SA_1_0, len) == 0)
+    {
         return LICENSE_CC_SA_1_0;
+    }
     if (strncmp(str, CC0_1_0, len) == 0)
+    {
         return LICENSE_CC0_1_0;
+    }
     if (strncmp(str, CDDL_1_0, len) == 0)
+    {
         return LICENSE_CDDL_1_0;
+    }
     if (strncmp(str, CDDL_1_1, len) == 0)
+    {
         return LICENSE_CDDL_1_1;
+    }
     if (strncmp(str, CDL_1_0, len) == 0)
+    {
         return LICENSE_CDL_1_0;
+    }
     if (strncmp(str, CDLA_PERMISSIVE_1_0, len) == 0)
+    {
         return LICENSE_CDLA_PERMISSIVE_1_0;
+    }
     if (strncmp(str, CDLA_PERMISSIVE_2_0, len) == 0)
+    {
         return LICENSE_CDLA_PERMISSIVE_2_0;
+    }
     if (strncmp(str, CDLA_SHARING_1_0, len) == 0)
+    {
         return LICENSE_CDLA_SHARING_1_0;
+    }
     if (strncmp(str, CECILL_1_0, len) == 0)
+    {
         return LICENSE_CECILL_1_0;
+    }
     if (strncmp(str, CECILL_1_1, len) == 0)
+    {
         return LICENSE_CECILL_1_1;
+    }
     if (strncmp(str, CECILL_2_0, len) == 0)
+    {
         return LICENSE_CECILL_2_0;
+    }
     if (strncmp(str, CECILL_2_1, len) == 0)
+    {
         return LICENSE_CECILL_2_1;
+    }
     if (strncmp(str, CECILL_B, len) == 0)
+    {
         return LICENSE_CECILL_B;
+    }
     if (strncmp(str, CECILL_C, len) == 0)
+    {
         return LICENSE_CECILL_C;
+    }
     if (strncmp(str, CERN_OHL_1_1, len) == 0)
+    {
         return LICENSE_CERN_OHL_1_1;
+    }
     if (strncmp(str, CERN_OHL_1_2, len) == 0)
+    {
         return LICENSE_CERN_OHL_1_2;
+    }
     if (strncmp(str, CERN_OHL_P_2_0, len) == 0)
+    {
         return LICENSE_CERN_OHL_P_2_0;
+    }
     if (strncmp(str, CERN_OHL_S_2_0, len) == 0)
+    {
         return LICENSE_CERN_OHL_S_2_0;
+    }
     if (strncmp(str, CERN_OHL_W_2_0, len) == 0)
+    {
         return LICENSE_CERN_OHL_W_2_0;
+    }
     if (strncmp(str, CFITSIO, len) == 0)
+    {
         return LICENSE_CFITSIO;
+    }
     if (strncmp(str, CHECK_CVS, len) == 0)
+    {
         return LICENSE_CHECK_CVS;
+    }
     if (strncmp(str, CHECKMK, len) == 0)
+    {
         return LICENSE_CHECKMK;
+    }
     if (strncmp(str, CLARTISTIC, len) == 0)
+    {
         return LICENSE_CLARTISTIC;
+    }
     if (strncmp(str, CLIPS, len) == 0)
+    {
         return LICENSE_CLIPS;
+    }
     if (strncmp(str, CMU_MACH, len) == 0)
+    {
         return LICENSE_CMU_MACH;
+    }
     if (strncmp(str, CMU_MACH_NODOC, len) == 0)
+    {
         return LICENSE_CMU_MACH_NODOC;
+    }
     if (strncmp(str, CNRI_JYTHON, len) == 0)
+    {
         return LICENSE_CNRI_JYTHON;
+    }
     if (strncmp(str, CNRI_PYTHON, len) == 0)
+    {
         return LICENSE_CNRI_PYTHON;
+    }
     if (strncmp(str, CNRI_PYTHON_GPL_COMPATIBLE, len) == 0)
+    {
         return LICENSE_CNRI_PYTHON_GPL_COMPATIBLE;
+    }
     if (strncmp(str, COIL_1_0, len) == 0)
+    {
         return LICENSE_COIL_1_0;
+    }
     if (strncmp(str, COMMUNITY_SPEC_1_0, len) == 0)
+    {
         return LICENSE_COMMUNITY_SPEC_1_0;
+    }
     if (strncmp(str, CONDOR_1_1, len) == 0)
+    {
         return LICENSE_CONDOR_1_1;
+    }
     if (strncmp(str, COPYLEFT_NEXT_0_3_0, len) == 0)
+    {
         return LICENSE_COPYLEFT_NEXT_0_3_0;
+    }
     if (strncmp(str, COPYLEFT_NEXT_0_3_1, len) == 0)
+    {
         return LICENSE_COPYLEFT_NEXT_0_3_1;
+    }
     if (strncmp(str, CORNELL_LOSSLESS_JPEG, len) == 0)
+    {
         return LICENSE_CORNELL_LOSSLESS_JPEG;
+    }
     if (strncmp(str, CPAL_1_0, len) == 0)
+    {
         return LICENSE_CPAL_1_0;
+    }
     if (strncmp(str, CPL_1_0, len) == 0)
+    {
         return LICENSE_CPL_1_0;
+    }
     if (strncmp(str, CPOL_1_02, len) == 0)
+    {
         return LICENSE_CPOL_1_02;
+    }
     if (strncmp(str, CRONYX, len) == 0)
+    {
         return LICENSE_CRONYX;
+    }
     if (strncmp(str, CROSSWORD, len) == 0)
+    {
         return LICENSE_CROSSWORD;
+    }
     if (strncmp(str, CRYSTALSTACKER, len) == 0)
+    {
         return LICENSE_CRYSTALSTACKER;
+    }
     if (strncmp(str, CUA_OPL_1_0, len) == 0)
+    {
         return LICENSE_CUA_OPL_1_0;
+    }
     if (strncmp(str, CUBE, len) == 0)
+    {
         return LICENSE_CUBE;
+    }
     if (strncmp(str, CURL, len) == 0)
+    {
         return LICENSE_CURL;
+    }
     if (strncmp(str, CVE_TOU, len) == 0)
+    {
         return LICENSE_CVE_TOU;
+    }
     if (strncmp(str, D_FSL_1_0, len) == 0)
+    {
         return LICENSE_D_FSL_1_0;
+    }
     if (strncmp(str, DEC_3_CLAUSE, len) == 0)
+    {
         return LICENSE_DEC_3_CLAUSE;
+    }
     if (strncmp(str, DIFFMARK, len) == 0)
+    {
         return LICENSE_DIFFMARK;
+    }
     if (strncmp(str, DL_DE_BY_2_0, len) == 0)
+    {
         return LICENSE_DL_DE_BY_2_0;
+    }
     if (strncmp(str, DL_DE_ZERO_2_0, len) == 0)
+    {
         return LICENSE_DL_DE_ZERO_2_0;
+    }
     if (strncmp(str, DOC, len) == 0)
+    {
         return LICENSE_DOC;
+    }
     if (strncmp(str, DOCBOOK_SCHEMA, len) == 0)
+    {
         return LICENSE_DOCBOOK_SCHEMA;
+    }
     if (strncmp(str, DOCBOOK_STYLESHEET, len) == 0)
+    {
         return LICENSE_DOCBOOK_STYLESHEET;
+    }
     if (strncmp(str, DOCBOOK_XML, len) == 0)
+    {
         return LICENSE_DOCBOOK_XML;
+    }
     if (strncmp(str, DOTSEQN, len) == 0)
+    {
         return LICENSE_DOTSEQN;
+    }
     if (strncmp(str, DRL_1_0, len) == 0)
+    {
         return LICENSE_DRL_1_0;
+    }
     if (strncmp(str, DRL_1_1, len) == 0)
+    {
         return LICENSE_DRL_1_1;
+    }
     if (strncmp(str, DSDP, len) == 0)
+    {
         return LICENSE_DSDP;
+    }
     if (strncmp(str, DTOA, len) == 0)
+    {
         return LICENSE_DTOA;
+    }
     if (strncmp(str, DVIPDFM, len) == 0)
+    {
         return LICENSE_DVIPDFM;
+    }
     if (strncmp(str, ECL_1_0, len) == 0)
+    {
         return LICENSE_ECL_1_0;
+    }
     if (strncmp(str, ECL_2_0, len) == 0)
+    {
         return LICENSE_ECL_2_0;
+    }
     if (strncmp(str, ECOS_2_0, len) == 0)
+    {
         return LICENSE_ECOS_2_0;
+    }
     if (strncmp(str, EFL_1_0, len) == 0)
+    {
         return LICENSE_EFL_1_0;
+    }
     if (strncmp(str, EFL_2_0, len) == 0)
+    {
         return LICENSE_EFL_2_0;
+    }
     if (strncmp(str, EGENIX, len) == 0)
+    {
         return LICENSE_EGENIX;
+    }
     if (strncmp(str, ELASTIC_2_0, len) == 0)
+    {
         return LICENSE_ELASTIC_2_0;
+    }
     if (strncmp(str, ENTESSA, len) == 0)
+    {
         return LICENSE_ENTESSA;
+    }
     if (strncmp(str, EPICS, len) == 0)
+    {
         return LICENSE_EPICS;
+    }
     if (strncmp(str, EPL_1_0, len) == 0)
+    {
         return LICENSE_EPL_1_0;
+    }
     if (strncmp(str, EPL_2_0, len) == 0)
+    {
         return LICENSE_EPL_2_0;
+    }
     if (strncmp(str, ERLPL_1_1, len) == 0)
+    {
         return LICENSE_ERLPL_1_1;
+    }
     if (strncmp(str, ETALAB_2_0, len) == 0)
+    {
         return LICENSE_ETALAB_2_0;
+    }
     if (strncmp(str, EUDATAGRID, len) == 0)
+    {
         return LICENSE_EUDATAGRID;
+    }
     if (strncmp(str, EUPL_1_0, len) == 0)
+    {
         return LICENSE_EUPL_1_0;
+    }
     if (strncmp(str, EUPL_1_1, len) == 0)
+    {
         return LICENSE_EUPL_1_1;
+    }
     if (strncmp(str, EUPL_1_2, len) == 0)
+    {
         return LICENSE_EUPL_1_2;
+    }
     if (strncmp(str, EUROSYM, len) == 0)
+    {
         return LICENSE_EUROSYM;
+    }
     if (strncmp(str, FAIR, len) == 0)
+    {
         return LICENSE_FAIR;
+    }
     if (strncmp(str, FBM, len) == 0)
+    {
         return LICENSE_FBM;
+    }
     if (strncmp(str, FDK_AAC, len) == 0)
+    {
         return LICENSE_FDK_AAC;
+    }
     if (strncmp(str, FERGUSON_TWOFISH, len) == 0)
+    {
         return LICENSE_FERGUSON_TWOFISH;
+    }
     if (strncmp(str, FRAMEWORX_1_0, len) == 0)
+    {
         return LICENSE_FRAMEWORX_1_0;
+    }
     if (strncmp(str, FREEBSD_DOC, len) == 0)
+    {
         return LICENSE_FREEBSD_DOC;
+    }
     if (strncmp(str, FREEIMAGE, len) == 0)
+    {
         return LICENSE_FREEIMAGE;
+    }
     if (strncmp(str, FSFAP, len) == 0)
+    {
         return LICENSE_FSFAP;
+    }
     if (strncmp(str, FSFAP_NO_WARRANTY_DISCLAIMER, len) == 0)
+    {
         return LICENSE_FSFAP_NO_WARRANTY_DISCLAIMER;
+    }
     if (strncmp(str, FSFUL, len) == 0)
+    {
         return LICENSE_FSFUL;
+    }
     if (strncmp(str, FSFULLR, len) == 0)
+    {
         return LICENSE_FSFULLR;
+    }
     if (strncmp(str, FSFULLRWD, len) == 0)
+    {
         return LICENSE_FSFULLRWD;
+    }
     if (strncmp(str, FTL, len) == 0)
+    {
         return LICENSE_FTL;
+    }
     if (strncmp(str, FURUSETH, len) == 0)
+    {
         return LICENSE_FURUSETH;
+    }
     if (strncmp(str, FWLW, len) == 0)
+    {
         return LICENSE_FWLW;
+    }
     if (strncmp(str, GCR_DOCS, len) == 0)
+    {
         return LICENSE_GCR_DOCS;
+    }
     if (strncmp(str, GD, len) == 0)
+    {
         return LICENSE_GD;
+    }
     if (strncmp(str, GENERIC_XTS, len) == 0)
+    {
         return LICENSE_GENERIC_XTS;
+    }
     if (strncmp(str, GFDL_1_1, len) == 0)
+    {
         return LICENSE_GFDL_1_1;
+    }
     if (strncmp(str, GFDL_1_1_INVARIANTS_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_1_INVARIANTS_ONLY;
+    }
     if (strncmp(str, GFDL_1_1_INVARIANTS_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_1_INVARIANTS_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_1_NO_INVARIANTS_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_1_NO_INVARIANTS_ONLY;
+    }
     if (strncmp(str, GFDL_1_1_NO_INVARIANTS_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_1_NO_INVARIANTS_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_1_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_1_ONLY;
+    }
     if (strncmp(str, GFDL_1_1_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_1_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_2, len) == 0)
+    {
         return LICENSE_GFDL_1_2;
+    }
     if (strncmp(str, GFDL_1_2_INVARIANTS_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_2_INVARIANTS_ONLY;
+    }
     if (strncmp(str, GFDL_1_2_INVARIANTS_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_2_INVARIANTS_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_2_NO_INVARIANTS_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_2_NO_INVARIANTS_ONLY;
+    }
     if (strncmp(str, GFDL_1_2_NO_INVARIANTS_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_2_NO_INVARIANTS_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_2_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_2_ONLY;
+    }
     if (strncmp(str, GFDL_1_2_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_2_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_3, len) == 0)
+    {
         return LICENSE_GFDL_1_3;
+    }
     if (strncmp(str, GFDL_1_3_INVARIANTS_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_3_INVARIANTS_ONLY;
+    }
     if (strncmp(str, GFDL_1_3_INVARIANTS_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_3_INVARIANTS_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_3_NO_INVARIANTS_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_3_NO_INVARIANTS_ONLY;
+    }
     if (strncmp(str, GFDL_1_3_NO_INVARIANTS_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_3_NO_INVARIANTS_OR_LATER;
+    }
     if (strncmp(str, GFDL_1_3_ONLY, len) == 0)
+    {
         return LICENSE_GFDL_1_3_ONLY;
+    }
     if (strncmp(str, GFDL_1_3_OR_LATER, len) == 0)
+    {
         return LICENSE_GFDL_1_3_OR_LATER;
+    }
     if (strncmp(str, GIFTWARE, len) == 0)
+    {
         return LICENSE_GIFTWARE;
+    }
     if (strncmp(str, GL2PS, len) == 0)
+    {
         return LICENSE_GL2PS;
+    }
     if (strncmp(str, GLIDE, len) == 0)
+    {
         return LICENSE_GLIDE;
+    }
     if (strncmp(str, GLULXE, len) == 0)
+    {
         return LICENSE_GLULXE;
+    }
     if (strncmp(str, GLWTPL, len) == 0)
+    {
         return LICENSE_GLWTPL;
+    }
     if (strncmp(str, GNUPLOT, len) == 0)
+    {
         return LICENSE_GNUPLOT;
+    }
     if (strncmp(str, GPL_1_0, len) == 0)
+    {
         return LICENSE_GPL_1_0;
+    }
     if (strncmp(str, GPL_1_0_PLUS, len) == 0)
+    {
         return LICENSE_GPL_1_0_PLUS;
+    }
     if (strncmp(str, GPL_1_0_ONLY, len) == 0)
+    {
         return LICENSE_GPL_1_0_ONLY;
+    }
     if (strncmp(str, GPL_1_0_OR_LATER, len) == 0)
+    {
         return LICENSE_GPL_1_0_OR_LATER;
+    }
     if (strncmp(str, GPL_2_0, len) == 0)
+    {
         return LICENSE_GPL_2_0;
+    }
     if (strncmp(str, GPL_2_0_PLUS, len) == 0)
+    {
         return LICENSE_GPL_2_0_PLUS;
+    }
     if (strncmp(str, GPL_2_0_ONLY, len) == 0)
+    {
         return LICENSE_GPL_2_0_ONLY;
+    }
     if (strncmp(str, GPL_2_0_OR_LATER, len) == 0)
+    {
         return LICENSE_GPL_2_0_OR_LATER;
+    }
     if (strncmp(str, GPL_2_0_WITH_AUTOCONF_EXCEPTION, len) == 0)
+    {
         return LICENSE_GPL_2_0_WITH_AUTOCONF_EXCEPTION;
+    }
     if (strncmp(str, GPL_2_0_WITH_BISON_EXCEPTION, len) == 0)
+    {
         return LICENSE_GPL_2_0_WITH_BISON_EXCEPTION;
+    }
     if (strncmp(str, GPL_2_0_WITH_CLASSPATH_EXCEPTION, len) == 0)
+    {
         return LICENSE_GPL_2_0_WITH_CLASSPATH_EXCEPTION;
+    }
     if (strncmp(str, GPL_2_0_WITH_FONT_EXCEPTION, len) == 0)
+    {
         return LICENSE_GPL_2_0_WITH_FONT_EXCEPTION;
+    }
     if (strncmp(str, GPL_2_0_WITH_GCC_EXCEPTION, len) == 0)
+    {
         return LICENSE_GPL_2_0_WITH_GCC_EXCEPTION;
+    }
     if (strncmp(str, GPL_3_0, len) == 0)
+    {
         return LICENSE_GPL_3_0;
+    }
     if (strncmp(str, GPL_3_0_PLUS, len) == 0)
+    {
         return LICENSE_GPL_3_0_PLUS;
+    }
     if (strncmp(str, GPL_3_0_ONLY, len) == 0)
+    {
         return LICENSE_GPL_3_0_ONLY;
+    }
     if (strncmp(str, GPL_3_0_OR_LATER, len) == 0)
+    {
         return LICENSE_GPL_3_0_OR_LATER;
+    }
     if (strncmp(str, GPL_3_0_WITH_AUTOCONF_EXCEPTION, len) == 0)
+    {
         return LICENSE_GPL_3_0_WITH_AUTOCONF_EXCEPTION;
+    }
     if (strncmp(str, GPL_3_0_WITH_GCC_EXCEPTION, len) == 0)
+    {
         return LICENSE_GPL_3_0_WITH_GCC_EXCEPTION;
+    }
     if (strncmp(str, GRAPHICS_GEMS, len) == 0)
+    {
         return LICENSE_GRAPHICS_GEMS;
+    }
     if (strncmp(str, GSOAP_1_3B, len) == 0)
+    {
         return LICENSE_GSOAP_1_3B;
+    }
     if (strncmp(str, GTKBOOK, len) == 0)
+    {
         return LICENSE_GTKBOOK;
+    }
     if (strncmp(str, GUTMANN, len) == 0)
+    {
         return LICENSE_GUTMANN;
+    }
     if (strncmp(str, HASKELLREPORT, len) == 0)
+    {
         return LICENSE_HASKELLREPORT;
+    }
     if (strncmp(str, HDPARM, len) == 0)
+    {
         return LICENSE_HDPARM;
+    }
     if (strncmp(str, HIDAPI, len) == 0)
+    {
         return LICENSE_HIDAPI;
+    }
     if (strncmp(str, HIPPOCRATIC_2_1, len) == 0)
+    {
         return LICENSE_HIPPOCRATIC_2_1;
+    }
     if (strncmp(str, HP_1986, len) == 0)
+    {
         return LICENSE_HP_1986;
+    }
     if (strncmp(str, HP_1989, len) == 0)
+    {
         return LICENSE_HP_1989;
+    }
     if (strncmp(str, HPND, len) == 0)
+    {
         return LICENSE_HPND;
+    }
     if (strncmp(str, HPND_DEC, len) == 0)
+    {
         return LICENSE_HPND_DEC;
+    }
     if (strncmp(str, HPND_DOC, len) == 0)
+    {
         return LICENSE_HPND_DOC;
+    }
     if (strncmp(str, HPND_DOC_SELL, len) == 0)
+    {
         return LICENSE_HPND_DOC_SELL;
+    }
     if (strncmp(str, HPND_EXPORT_US, len) == 0)
+    {
         return LICENSE_HPND_EXPORT_US;
+    }
     if (strncmp(str, HPND_EXPORT_US_ACKNOWLEDGEMENT, len) == 0)
+    {
         return LICENSE_HPND_EXPORT_US_ACKNOWLEDGEMENT;
+    }
     if (strncmp(str, HPND_EXPORT_US_MODIFY, len) == 0)
+    {
         return LICENSE_HPND_EXPORT_US_MODIFY;
+    }
     if (strncmp(str, HPND_EXPORT2_US, len) == 0)
+    {
         return LICENSE_HPND_EXPORT2_US;
+    }
     if (strncmp(str, HPND_FENNEBERG_LIVINGSTON, len) == 0)
+    {
         return LICENSE_HPND_FENNEBERG_LIVINGSTON;
+    }
     if (strncmp(str, HPND_INRIA_IMAG, len) == 0)
+    {
         return LICENSE_HPND_INRIA_IMAG;
+    }
     if (strncmp(str, HPND_INTEL, len) == 0)
+    {
         return LICENSE_HPND_INTEL;
+    }
     if (strncmp(str, HPND_KEVLIN_HENNEY, len) == 0)
+    {
         return LICENSE_HPND_KEVLIN_HENNEY;
+    }
     if (strncmp(str, HPND_MARKUS_KUHN, len) == 0)
+    {
         return LICENSE_HPND_MARKUS_KUHN;
+    }
     if (strncmp(str, HPND_MERCHANTABILITY_VARIANT, len) == 0)
+    {
         return LICENSE_HPND_MERCHANTABILITY_VARIANT;
+    }
     if (strncmp(str, HPND_MIT_DISCLAIMER, len) == 0)
+    {
         return LICENSE_HPND_MIT_DISCLAIMER;
+    }
     if (strncmp(str, HPND_NETREK, len) == 0)
+    {
         return LICENSE_HPND_NETREK;
+    }
     if (strncmp(str, HPND_PBMPLUS, len) == 0)
+    {
         return LICENSE_HPND_PBMPLUS;
+    }
     if (strncmp(str, HPND_SELL_MIT_DISCLAIMER_XSERVER, len) == 0)
+    {
         return LICENSE_HPND_SELL_MIT_DISCLAIMER_XSERVER;
+    }
     if (strncmp(str, HPND_SELL_REGEXPR, len) == 0)
+    {
         return LICENSE_HPND_SELL_REGEXPR;
+    }
     if (strncmp(str, HPND_SELL_VARIANT, len) == 0)
+    {
         return LICENSE_HPND_SELL_VARIANT;
+    }
     if (strncmp(str, HPND_SELL_VARIANT_MIT_DISCLAIMER, len) == 0)
+    {
         return LICENSE_HPND_SELL_VARIANT_MIT_DISCLAIMER;
+    }
     if (strncmp(str, HPND_SELL_VARIANT_MIT_DISCLAIMER_REV, len) == 0)
+    {
         return LICENSE_HPND_SELL_VARIANT_MIT_DISCLAIMER_REV;
+    }
     if (strncmp(str, HPND_UC, len) == 0)
+    {
         return LICENSE_HPND_UC;
+    }
     if (strncmp(str, HPND_UC_EXPORT_US, len) == 0)
+    {
         return LICENSE_HPND_UC_EXPORT_US;
+    }
     if (strncmp(str, HTMLTIDY, len) == 0)
+    {
         return LICENSE_HTMLTIDY;
+    }
     if (strncmp(str, IBM_PIBS, len) == 0)
+    {
         return LICENSE_IBM_PIBS;
+    }
     if (strncmp(str, ICU, len) == 0)
+    {
         return LICENSE_ICU;
+    }
     if (strncmp(str, IEC_CODE_COMPONENTS_EULA, len) == 0)
+    {
         return LICENSE_IEC_CODE_COMPONENTS_EULA;
+    }
     if (strncmp(str, IJG, len) == 0)
+    {
         return LICENSE_IJG;
+    }
     if (strncmp(str, IJG_SHORT, len) == 0)
+    {
         return LICENSE_IJG_SHORT;
+    }
     if (strncmp(str, IMAGEMAGICK, len) == 0)
+    {
         return LICENSE_IMAGEMAGICK;
+    }
     if (strncmp(str, IMATIX, len) == 0)
+    {
         return LICENSE_IMATIX;
+    }
     if (strncmp(str, IMLIB2, len) == 0)
+    {
         return LICENSE_IMLIB2;
+    }
     if (strncmp(str, INFO_ZIP, len) == 0)
+    {
         return LICENSE_INFO_ZIP;
+    }
     if (strncmp(str, INNER_NET_2_0, len) == 0)
+    {
         return LICENSE_INNER_NET_2_0;
+    }
     if (strncmp(str, INNOSETUP, len) == 0)
+    {
         return LICENSE_INNOSETUP;
+    }
     if (strncmp(str, INTEL, len) == 0)
+    {
         return LICENSE_INTEL;
+    }
     if (strncmp(str, INTEL_ACPI, len) == 0)
+    {
         return LICENSE_INTEL_ACPI;
+    }
     if (strncmp(str, INTERBASE_1_0, len) == 0)
+    {
         return LICENSE_INTERBASE_1_0;
+    }
     if (strncmp(str, IPA, len) == 0)
+    {
         return LICENSE_IPA;
+    }
     if (strncmp(str, IPL_1_0, len) == 0)
+    {
         return LICENSE_IPL_1_0;
+    }
     if (strncmp(str, ISC, len) == 0)
+    {
         return LICENSE_ISC;
+    }
     if (strncmp(str, ISC_VEILLARD, len) == 0)
+    {
         return LICENSE_ISC_VEILLARD;
+    }
     if (strncmp(str, JAM, len) == 0)
+    {
         return LICENSE_JAM;
+    }
     if (strncmp(str, JASPER_2_0, len) == 0)
+    {
         return LICENSE_JASPER_2_0;
+    }
     if (strncmp(str, JPL_IMAGE, len) == 0)
+    {
         return LICENSE_JPL_IMAGE;
+    }
     if (strncmp(str, JPNIC, len) == 0)
+    {
         return LICENSE_JPNIC;
+    }
     if (strncmp(str, JSON, len) == 0)
+    {
         return LICENSE_JSON;
+    }
     if (strncmp(str, KASTRUP, len) == 0)
+    {
         return LICENSE_KASTRUP;
+    }
     if (strncmp(str, KAZLIB, len) == 0)
+    {
         return LICENSE_KAZLIB;
+    }
     if (strncmp(str, KNUTH_CTAN, len) == 0)
+    {
         return LICENSE_KNUTH_CTAN;
+    }
     if (strncmp(str, LAL_1_2, len) == 0)
+    {
         return LICENSE_LAL_1_2;
+    }
     if (strncmp(str, LAL_1_3, len) == 0)
+    {
         return LICENSE_LAL_1_3;
+    }
     if (strncmp(str, LATEX2E, len) == 0)
+    {
         return LICENSE_LATEX2E;
+    }
     if (strncmp(str, LATEX2E_TRANSLATED_NOTICE, len) == 0)
+    {
         return LICENSE_LATEX2E_TRANSLATED_NOTICE;
+    }
     if (strncmp(str, LEPTONICA, len) == 0)
+    {
         return LICENSE_LEPTONICA;
+    }
     if (strncmp(str, LGPL_2_0, len) == 0)
+    {
         return LICENSE_LGPL_2_0;
+    }
     if (strncmp(str, LGPL_2_0_PLUS, len) == 0)
+    {
         return LICENSE_LGPL_2_0_PLUS;
+    }
     if (strncmp(str, LGPL_2_0_ONLY, len) == 0)
+    {
         return LICENSE_LGPL_2_0_ONLY;
+    }
     if (strncmp(str, LGPL_2_0_OR_LATER, len) == 0)
+    {
         return LICENSE_LGPL_2_0_OR_LATER;
+    }
     if (strncmp(str, LGPL_2_1, len) == 0)
+    {
         return LICENSE_LGPL_2_1;
+    }
     if (strncmp(str, LGPL_2_1_PLUS, len) == 0)
+    {
         return LICENSE_LGPL_2_1_PLUS;
+    }
     if (strncmp(str, LGPL_2_1_ONLY, len) == 0)
+    {
         return LICENSE_LGPL_2_1_ONLY;
+    }
     if (strncmp(str, LGPL_2_1_OR_LATER, len) == 0)
+    {
         return LICENSE_LGPL_2_1_OR_LATER;
+    }
     if (strncmp(str, LGPL_3_0, len) == 0)
+    {
         return LICENSE_LGPL_3_0;
+    }
     if (strncmp(str, LGPL_3_0_PLUS, len) == 0)
+    {
         return LICENSE_LGPL_3_0_PLUS;
+    }
     if (strncmp(str, LGPL_3_0_ONLY, len) == 0)
+    {
         return LICENSE_LGPL_3_0_ONLY;
+    }
     if (strncmp(str, LGPL_3_0_OR_LATER, len) == 0)
+    {
         return LICENSE_LGPL_3_0_OR_LATER;
+    }
     if (strncmp(str, LGPLLR, len) == 0)
+    {
         return LICENSE_LGPLLR;
+    }
     if (strncmp(str, LIBPNG, len) == 0)
+    {
         return LICENSE_LIBPNG;
+    }
     if (strncmp(str, LIBPNG_2_0, len) == 0)
+    {
         return LICENSE_LIBPNG_2_0;
+    }
     if (strncmp(str, LIBSELINUX_1_0, len) == 0)
+    {
         return LICENSE_LIBSELINUX_1_0;
+    }
     if (strncmp(str, LIBTIFF, len) == 0)
+    {
         return LICENSE_LIBTIFF;
+    }
     if (strncmp(str, LIBUTIL_DAVID_NUGENT, len) == 0)
+    {
         return LICENSE_LIBUTIL_DAVID_NUGENT;
+    }
     if (strncmp(str, LILIQ_P_1_1, len) == 0)
+    {
         return LICENSE_LILIQ_P_1_1;
+    }
     if (strncmp(str, LILIQ_R_1_1, len) == 0)
+    {
         return LICENSE_LILIQ_R_1_1;
+    }
     if (strncmp(str, LILIQ_RPLUS_1_1, len) == 0)
+    {
         return LICENSE_LILIQ_RPLUS_1_1;
+    }
     if (strncmp(str, LINUX_MAN_PAGES_1_PARA, len) == 0)
+    {
         return LICENSE_LINUX_MAN_PAGES_1_PARA;
+    }
     if (strncmp(str, LINUX_MAN_PAGES_COPYLEFT, len) == 0)
+    {
         return LICENSE_LINUX_MAN_PAGES_COPYLEFT;
+    }
     if (strncmp(str, LINUX_MAN_PAGES_COPYLEFT_2_PARA, len) == 0)
+    {
         return LICENSE_LINUX_MAN_PAGES_COPYLEFT_2_PARA;
+    }
     if (strncmp(str, LINUX_MAN_PAGES_COPYLEFT_VAR, len) == 0)
+    {
         return LICENSE_LINUX_MAN_PAGES_COPYLEFT_VAR;
+    }
     if (strncmp(str, LINUX_OPENIB, len) == 0)
+    {
         return LICENSE_LINUX_OPENIB;
+    }
     if (strncmp(str, LOOP, len) == 0)
+    {
         return LICENSE_LOOP;
+    }
     if (strncmp(str, LPD_DOCUMENT, len) == 0)
+    {
         return LICENSE_LPD_DOCUMENT;
+    }
     if (strncmp(str, LPL_1_0, len) == 0)
+    {
         return LICENSE_LPL_1_0;
+    }
     if (strncmp(str, LPL_1_02, len) == 0)
+    {
         return LICENSE_LPL_1_02;
+    }
     if (strncmp(str, LPPL_1_0, len) == 0)
+    {
         return LICENSE_LPPL_1_0;
+    }
     if (strncmp(str, LPPL_1_1, len) == 0)
+    {
         return LICENSE_LPPL_1_1;
+    }
     if (strncmp(str, LPPL_1_2, len) == 0)
+    {
         return LICENSE_LPPL_1_2;
+    }
     if (strncmp(str, LPPL_1_3A, len) == 0)
+    {
         return LICENSE_LPPL_1_3A;
+    }
     if (strncmp(str, LPPL_1_3C, len) == 0)
+    {
         return LICENSE_LPPL_1_3C;
+    }
     if (strncmp(str, LSOF, len) == 0)
+    {
         return LICENSE_LSOF;
+    }
     if (strncmp(str, LUCIDA_BITMAP_FONTS, len) == 0)
+    {
         return LICENSE_LUCIDA_BITMAP_FONTS;
+    }
     if (strncmp(str, LZMA_SDK_9_11_TO_9_20, len) == 0)
+    {
         return LICENSE_LZMA_SDK_9_11_TO_9_20;
+    }
     if (strncmp(str, LZMA_SDK_9_22, len) == 0)
+    {
         return LICENSE_LZMA_SDK_9_22;
+    }
     if (strncmp(str, MACKERRAS_3_CLAUSE, len) == 0)
+    {
         return LICENSE_MACKERRAS_3_CLAUSE;
+    }
     if (strncmp(str, MACKERRAS_3_CLAUSE_ACKNOWLEDGMENT, len) == 0)
+    {
         return LICENSE_MACKERRAS_3_CLAUSE_ACKNOWLEDGMENT;
+    }
     if (strncmp(str, MAGAZ, len) == 0)
+    {
         return LICENSE_MAGAZ;
+    }
     if (strncmp(str, MAILPRIO, len) == 0)
+    {
         return LICENSE_MAILPRIO;
+    }
     if (strncmp(str, MAKEINDEX, len) == 0)
+    {
         return LICENSE_MAKEINDEX;
+    }
     if (strncmp(str, MARTIN_BIRGMEIER, len) == 0)
+    {
         return LICENSE_MARTIN_BIRGMEIER;
+    }
     if (strncmp(str, MCPHEE_SLIDESHOW, len) == 0)
+    {
         return LICENSE_MCPHEE_SLIDESHOW;
+    }
     if (strncmp(str, METAMAIL, len) == 0)
+    {
         return LICENSE_METAMAIL;
+    }
     if (strncmp(str, MINPACK, len) == 0)
+    {
         return LICENSE_MINPACK;
+    }
     if (strncmp(str, MIPS, len) == 0)
+    {
         return LICENSE_MIPS;
+    }
     if (strncmp(str, MIROS, len) == 0)
+    {
         return LICENSE_MIROS;
+    }
     if (strncmp(str, MIT, len) == 0)
+    {
         return LICENSE_MIT;
+    }
     if (strncmp(str, MIT_0, len) == 0)
+    {
         return LICENSE_MIT_0;
+    }
     if (strncmp(str, MIT_ADVERTISING, len) == 0)
+    {
         return LICENSE_MIT_ADVERTISING;
+    }
     if (strncmp(str, MIT_CLICK, len) == 0)
+    {
         return LICENSE_MIT_CLICK;
+    }
     if (strncmp(str, MIT_CMU, len) == 0)
+    {
         return LICENSE_MIT_CMU;
+    }
     if (strncmp(str, MIT_ENNA, len) == 0)
+    {
         return LICENSE_MIT_ENNA;
+    }
     if (strncmp(str, MIT_FEH, len) == 0)
+    {
         return LICENSE_MIT_FEH;
+    }
     if (strncmp(str, MIT_FESTIVAL, len) == 0)
+    {
         return LICENSE_MIT_FESTIVAL;
+    }
     if (strncmp(str, MIT_KHRONOS_OLD, len) == 0)
+    {
         return LICENSE_MIT_KHRONOS_OLD;
+    }
     if (strncmp(str, MIT_MODERN_VARIANT, len) == 0)
+    {
         return LICENSE_MIT_MODERN_VARIANT;
+    }
     if (strncmp(str, MIT_OPEN_GROUP, len) == 0)
+    {
         return LICENSE_MIT_OPEN_GROUP;
+    }
     if (strncmp(str, MIT_TESTREGEX, len) == 0)
+    {
         return LICENSE_MIT_TESTREGEX;
+    }
     if (strncmp(str, MIT_WU, len) == 0)
+    {
         return LICENSE_MIT_WU;
+    }
     if (strncmp(str, MITNFA, len) == 0)
+    {
         return LICENSE_MITNFA;
+    }
     if (strncmp(str, MMIXWARE, len) == 0)
+    {
         return LICENSE_MMIXWARE;
+    }
     if (strncmp(str, MOTOSOTO, len) == 0)
+    {
         return LICENSE_MOTOSOTO;
+    }
     if (strncmp(str, MPEG_SSG, len) == 0)
+    {
         return LICENSE_MPEG_SSG;
+    }
     if (strncmp(str, MPI_PERMISSIVE, len) == 0)
+    {
         return LICENSE_MPI_PERMISSIVE;
+    }
     if (strncmp(str, MPICH2, len) == 0)
+    {
         return LICENSE_MPICH2;
+    }
     if (strncmp(str, MPL_1_0, len) == 0)
+    {
         return LICENSE_MPL_1_0;
+    }
     if (strncmp(str, MPL_1_1, len) == 0)
+    {
         return LICENSE_MPL_1_1;
+    }
     if (strncmp(str, MPL_2_0, len) == 0)
+    {
         return LICENSE_MPL_2_0;
+    }
     if (strncmp(str, MPL_2_0_NO_COPYLEFT_EXCEPTION, len) == 0)
+    {
         return LICENSE_MPL_2_0_NO_COPYLEFT_EXCEPTION;
+    }
     if (strncmp(str, MPLUS, len) == 0)
+    {
         return LICENSE_MPLUS;
+    }
     if (strncmp(str, MS_LPL, len) == 0)
+    {
         return LICENSE_MS_LPL;
+    }
     if (strncmp(str, MS_PL, len) == 0)
+    {
         return LICENSE_MS_PL;
+    }
     if (strncmp(str, MS_RL, len) == 0)
+    {
         return LICENSE_MS_RL;
+    }
     if (strncmp(str, MTLL, len) == 0)
+    {
         return LICENSE_MTLL;
+    }
     if (strncmp(str, MULANPSL_1_0, len) == 0)
+    {
         return LICENSE_MULANPSL_1_0;
+    }
     if (strncmp(str, MULANPSL_2_0, len) == 0)
+    {
         return LICENSE_MULANPSL_2_0;
+    }
     if (strncmp(str, MULTICS, len) == 0)
+    {
         return LICENSE_MULTICS;
+    }
     if (strncmp(str, MUP, len) == 0)
+    {
         return LICENSE_MUP;
+    }
     if (strncmp(str, NAIST_2003, len) == 0)
+    {
         return LICENSE_NAIST_2003;
+    }
     if (strncmp(str, NASA_1_3, len) == 0)
+    {
         return LICENSE_NASA_1_3;
+    }
     if (strncmp(str, NAUMEN, len) == 0)
+    {
         return LICENSE_NAUMEN;
+    }
     if (strncmp(str, NBPL_1_0, len) == 0)
+    {
         return LICENSE_NBPL_1_0;
+    }
     if (strncmp(str, NCBI_PD, len) == 0)
+    {
         return LICENSE_NCBI_PD;
+    }
     if (strncmp(str, NCGL_UK_2_0, len) == 0)
+    {
         return LICENSE_NCGL_UK_2_0;
+    }
     if (strncmp(str, NCL, len) == 0)
+    {
         return LICENSE_NCL;
+    }
     if (strncmp(str, NCSA, len) == 0)
+    {
         return LICENSE_NCSA;
+    }
     if (strncmp(str, NET_SNMP, len) == 0)
+    {
         return LICENSE_NET_SNMP;
+    }
     if (strncmp(str, NETCDF, len) == 0)
+    {
         return LICENSE_NETCDF;
+    }
     if (strncmp(str, NEWSLETR, len) == 0)
+    {
         return LICENSE_NEWSLETR;
+    }
     if (strncmp(str, NGPL, len) == 0)
+    {
         return LICENSE_NGPL;
+    }
     if (strncmp(str, NICTA_1_0, len) == 0)
+    {
         return LICENSE_NICTA_1_0;
+    }
     if (strncmp(str, NIST_PD, len) == 0)
+    {
         return LICENSE_NIST_PD;
+    }
     if (strncmp(str, NIST_PD_FALLBACK, len) == 0)
+    {
         return LICENSE_NIST_PD_FALLBACK;
+    }
     if (strncmp(str, NIST_SOFTWARE, len) == 0)
+    {
         return LICENSE_NIST_SOFTWARE;
+    }
     if (strncmp(str, NLOD_1_0, len) == 0)
+    {
         return LICENSE_NLOD_1_0;
+    }
     if (strncmp(str, NLOD_2_0, len) == 0)
+    {
         return LICENSE_NLOD_2_0;
+    }
     if (strncmp(str, NLPL, len) == 0)
+    {
         return LICENSE_NLPL;
+    }
     if (strncmp(str, NOKIA, len) == 0)
+    {
         return LICENSE_NOKIA;
+    }
     if (strncmp(str, NOSL, len) == 0)
+    {
         return LICENSE_NOSL;
+    }
     if (strncmp(str, NOWEB, len) == 0)
+    {
         return LICENSE_NOWEB;
+    }
     if (strncmp(str, NPL_1_0, len) == 0)
+    {
         return LICENSE_NPL_1_0;
+    }
     if (strncmp(str, NPL_1_1, len) == 0)
+    {
         return LICENSE_NPL_1_1;
+    }
     if (strncmp(str, NPOSL_3_0, len) == 0)
+    {
         return LICENSE_NPOSL_3_0;
+    }
     if (strncmp(str, NRL, len) == 0)
+    {
         return LICENSE_NRL;
+    }
     if (strncmp(str, NTP, len) == 0)
+    {
         return LICENSE_NTP;
+    }
     if (strncmp(str, NTP_0, len) == 0)
+    {
         return LICENSE_NTP_0;
+    }
     if (strncmp(str, NUNIT, len) == 0)
+    {
         return LICENSE_NUNIT;
+    }
     if (strncmp(str, O_UDA_1_0, len) == 0)
+    {
         return LICENSE_O_UDA_1_0;
+    }
     if (strncmp(str, OAR, len) == 0)
+    {
         return LICENSE_OAR;
+    }
     if (strncmp(str, OCCT_PL, len) == 0)
+    {
         return LICENSE_OCCT_PL;
+    }
     if (strncmp(str, OCLC_2_0, len) == 0)
+    {
         return LICENSE_OCLC_2_0;
+    }
     if (strncmp(str, ODBL_1_0, len) == 0)
+    {
         return LICENSE_ODBL_1_0;
+    }
     if (strncmp(str, ODC_BY_1_0, len) == 0)
+    {
         return LICENSE_ODC_BY_1_0;
+    }
     if (strncmp(str, OFFIS, len) == 0)
+    {
         return LICENSE_OFFIS;
+    }
     if (strncmp(str, OFL_1_0, len) == 0)
+    {
         return LICENSE_OFL_1_0;
+    }
     if (strncmp(str, OFL_1_0_NO_RFN, len) == 0)
+    {
         return LICENSE_OFL_1_0_NO_RFN;
+    }
     if (strncmp(str, OFL_1_0_RFN, len) == 0)
+    {
         return LICENSE_OFL_1_0_RFN;
+    }
     if (strncmp(str, OFL_1_1, len) == 0)
+    {
         return LICENSE_OFL_1_1;
+    }
     if (strncmp(str, OFL_1_1_NO_RFN, len) == 0)
+    {
         return LICENSE_OFL_1_1_NO_RFN;
+    }
     if (strncmp(str, OFL_1_1_RFN, len) == 0)
+    {
         return LICENSE_OFL_1_1_RFN;
+    }
     if (strncmp(str, OGC_1_0, len) == 0)
+    {
         return LICENSE_OGC_1_0;
+    }
     if (strncmp(str, OGDL_TAIWAN_1_0, len) == 0)
+    {
         return LICENSE_OGDL_TAIWAN_1_0;
+    }
     if (strncmp(str, OGL_CANADA_2_0, len) == 0)
+    {
         return LICENSE_OGL_CANADA_2_0;
+    }
     if (strncmp(str, OGL_UK_1_0, len) == 0)
+    {
         return LICENSE_OGL_UK_1_0;
+    }
     if (strncmp(str, OGL_UK_2_0, len) == 0)
+    {
         return LICENSE_OGL_UK_2_0;
+    }
     if (strncmp(str, OGL_UK_3_0, len) == 0)
+    {
         return LICENSE_OGL_UK_3_0;
+    }
     if (strncmp(str, OGTSL, len) == 0)
+    {
         return LICENSE_OGTSL;
+    }
     if (strncmp(str, OLDAP_1_1, len) == 0)
+    {
         return LICENSE_OLDAP_1_1;
+    }
     if (strncmp(str, OLDAP_1_2, len) == 0)
+    {
         return LICENSE_OLDAP_1_2;
+    }
     if (strncmp(str, OLDAP_1_3, len) == 0)
+    {
         return LICENSE_OLDAP_1_3;
+    }
     if (strncmp(str, OLDAP_1_4, len) == 0)
+    {
         return LICENSE_OLDAP_1_4;
+    }
     if (strncmp(str, OLDAP_2_0, len) == 0)
+    {
         return LICENSE_OLDAP_2_0;
+    }
     if (strncmp(str, OLDAP_2_0_1, len) == 0)
+    {
         return LICENSE_OLDAP_2_0_1;
+    }
     if (strncmp(str, OLDAP_2_1, len) == 0)
+    {
         return LICENSE_OLDAP_2_1;
+    }
     if (strncmp(str, OLDAP_2_2, len) == 0)
+    {
         return LICENSE_OLDAP_2_2;
+    }
     if (strncmp(str, OLDAP_2_2_1, len) == 0)
+    {
         return LICENSE_OLDAP_2_2_1;
+    }
     if (strncmp(str, OLDAP_2_2_2, len) == 0)
+    {
         return LICENSE_OLDAP_2_2_2;
+    }
     if (strncmp(str, OLDAP_2_3, len) == 0)
+    {
         return LICENSE_OLDAP_2_3;
+    }
     if (strncmp(str, OLDAP_2_4, len) == 0)
+    {
         return LICENSE_OLDAP_2_4;
+    }
     if (strncmp(str, OLDAP_2_5, len) == 0)
+    {
         return LICENSE_OLDAP_2_5;
+    }
     if (strncmp(str, OLDAP_2_6, len) == 0)
+    {
         return LICENSE_OLDAP_2_6;
+    }
     if (strncmp(str, OLDAP_2_7, len) == 0)
+    {
         return LICENSE_OLDAP_2_7;
+    }
     if (strncmp(str, OLDAP_2_8, len) == 0)
+    {
         return LICENSE_OLDAP_2_8;
+    }
     if (strncmp(str, OLFL_1_3, len) == 0)
+    {
         return LICENSE_OLFL_1_3;
+    }
     if (strncmp(str, OML, len) == 0)
+    {
         return LICENSE_OML;
+    }
     if (strncmp(str, OPENPBS_2_3, len) == 0)
+    {
         return LICENSE_OPENPBS_2_3;
+    }
     if (strncmp(str, OPENSSL, len) == 0)
+    {
         return LICENSE_OPENSSL;
+    }
     if (strncmp(str, OPENSSL_STANDALONE, len) == 0)
+    {
         return LICENSE_OPENSSL_STANDALONE;
+    }
     if (strncmp(str, OPENVISION, len) == 0)
+    {
         return LICENSE_OPENVISION;
+    }
     if (strncmp(str, OPL_1_0, len) == 0)
+    {
         return LICENSE_OPL_1_0;
+    }
     if (strncmp(str, OPL_UK_3_0, len) == 0)
+    {
         return LICENSE_OPL_UK_3_0;
+    }
     if (strncmp(str, OPUBL_1_0, len) == 0)
+    {
         return LICENSE_OPUBL_1_0;
+    }
     if (strncmp(str, OSET_PL_2_1, len) == 0)
+    {
         return LICENSE_OSET_PL_2_1;
+    }
     if (strncmp(str, OSL_1_0, len) == 0)
+    {
         return LICENSE_OSL_1_0;
+    }
     if (strncmp(str, OSL_1_1, len) == 0)
+    {
         return LICENSE_OSL_1_1;
+    }
     if (strncmp(str, OSL_2_0, len) == 0)
+    {
         return LICENSE_OSL_2_0;
+    }
     if (strncmp(str, OSL_2_1, len) == 0)
+    {
         return LICENSE_OSL_2_1;
+    }
     if (strncmp(str, OSL_3_0, len) == 0)
+    {
         return LICENSE_OSL_3_0;
+    }
     if (strncmp(str, PADL, len) == 0)
+    {
         return LICENSE_PADL;
+    }
     if (strncmp(str, PARITY_6_0_0, len) == 0)
+    {
         return LICENSE_PARITY_6_0_0;
+    }
     if (strncmp(str, PARITY_7_0_0, len) == 0)
+    {
         return LICENSE_PARITY_7_0_0;
+    }
     if (strncmp(str, PDDL_1_0, len) == 0)
+    {
         return LICENSE_PDDL_1_0;
+    }
     if (strncmp(str, PHP_3_0, len) == 0)
+    {
         return LICENSE_PHP_3_0;
+    }
     if (strncmp(str, PHP_3_01, len) == 0)
+    {
         return LICENSE_PHP_3_01;
+    }
     if (strncmp(str, PIXAR, len) == 0)
+    {
         return LICENSE_PIXAR;
+    }
     if (strncmp(str, PKGCONF, len) == 0)
+    {
         return LICENSE_PKGCONF;
+    }
     if (strncmp(str, PLEXUS, len) == 0)
+    {
         return LICENSE_PLEXUS;
+    }
     if (strncmp(str, PNMSTITCH, len) == 0)
+    {
         return LICENSE_PNMSTITCH;
+    }
     if (strncmp(str, POLYFORM_NONCOMMERCIAL_1_0_0, len) == 0)
+    {
         return LICENSE_POLYFORM_NONCOMMERCIAL_1_0_0;
+    }
     if (strncmp(str, POLYFORM_SMALL_BUSINESS_1_0_0, len) == 0)
+    {
         return LICENSE_POLYFORM_SMALL_BUSINESS_1_0_0;
+    }
     if (strncmp(str, POSTGRESQL, len) == 0)
+    {
         return LICENSE_POSTGRESQL;
+    }
     if (strncmp(str, PPL, len) == 0)
+    {
         return LICENSE_PPL;
+    }
     if (strncmp(str, PSF_2_0, len) == 0)
+    {
         return LICENSE_PSF_2_0;
+    }
     if (strncmp(str, PSFRAG, len) == 0)
+    {
         return LICENSE_PSFRAG;
+    }
     if (strncmp(str, PSUTILS, len) == 0)
+    {
         return LICENSE_PSUTILS;
+    }
     if (strncmp(str, PYTHON_2_0, len) == 0)
+    {
         return LICENSE_PYTHON_2_0;
+    }
     if (strncmp(str, PYTHON_2_0_1, len) == 0)
+    {
         return LICENSE_PYTHON_2_0_1;
+    }
     if (strncmp(str, PYTHON_LDAP, len) == 0)
+    {
         return LICENSE_PYTHON_LDAP;
+    }
     if (strncmp(str, QHULL, len) == 0)
+    {
         return LICENSE_QHULL;
+    }
     if (strncmp(str, QPL_1_0, len) == 0)
+    {
         return LICENSE_QPL_1_0;
+    }
     if (strncmp(str, QPL_1_0_INRIA_2004, len) == 0)
+    {
         return LICENSE_QPL_1_0_INRIA_2004;
+    }
     if (strncmp(str, RADVD, len) == 0)
+    {
         return LICENSE_RADVD;
+    }
     if (strncmp(str, RDISC, len) == 0)
+    {
         return LICENSE_RDISC;
+    }
     if (strncmp(str, RHECOS_1_1, len) == 0)
+    {
         return LICENSE_RHECOS_1_1;
+    }
     if (strncmp(str, RPL_1_1, len) == 0)
+    {
         return LICENSE_RPL_1_1;
+    }
     if (strncmp(str, RPL_1_5, len) == 0)
+    {
         return LICENSE_RPL_1_5;
+    }
     if (strncmp(str, RPSL_1_0, len) == 0)
+    {
         return LICENSE_RPSL_1_0;
+    }
     if (strncmp(str, RSA_MD, len) == 0)
+    {
         return LICENSE_RSA_MD;
+    }
     if (strncmp(str, RSCPL, len) == 0)
+    {
         return LICENSE_RSCPL;
+    }
     if (strncmp(str, RUBY, len) == 0)
+    {
         return LICENSE_RUBY;
+    }
     if (strncmp(str, RUBY_PTY, len) == 0)
+    {
         return LICENSE_RUBY_PTY;
+    }
     if (strncmp(str, SAX_PD, len) == 0)
+    {
         return LICENSE_SAX_PD;
+    }
     if (strncmp(str, SAX_PD_2_0, len) == 0)
+    {
         return LICENSE_SAX_PD_2_0;
+    }
     if (strncmp(str, SAXPATH, len) == 0)
+    {
         return LICENSE_SAXPATH;
+    }
     if (strncmp(str, SCEA, len) == 0)
+    {
         return LICENSE_SCEA;
+    }
     if (strncmp(str, SCHEMEREPORT, len) == 0)
+    {
         return LICENSE_SCHEMEREPORT;
+    }
     if (strncmp(str, SENDMAIL, len) == 0)
+    {
         return LICENSE_SENDMAIL;
+    }
     if (strncmp(str, SENDMAIL_8_23, len) == 0)
+    {
         return LICENSE_SENDMAIL_8_23;
+    }
     if (strncmp(str, SENDMAIL_OPEN_SOURCE_1_1, len) == 0)
+    {
         return LICENSE_SENDMAIL_OPEN_SOURCE_1_1;
+    }
     if (strncmp(str, SGI_B_1_0, len) == 0)
+    {
         return LICENSE_SGI_B_1_0;
+    }
     if (strncmp(str, SGI_B_1_1, len) == 0)
+    {
         return LICENSE_SGI_B_1_1;
+    }
     if (strncmp(str, SGI_B_2_0, len) == 0)
+    {
         return LICENSE_SGI_B_2_0;
+    }
     if (strncmp(str, SGI_OPENGL, len) == 0)
+    {
         return LICENSE_SGI_OPENGL;
+    }
     if (strncmp(str, SGP4, len) == 0)
+    {
         return LICENSE_SGP4;
+    }
     if (strncmp(str, SHL_0_5, len) == 0)
+    {
         return LICENSE_SHL_0_5;
+    }
     if (strncmp(str, SHL_0_51, len) == 0)
+    {
         return LICENSE_SHL_0_51;
+    }
     if (strncmp(str, SIMPL_2_0, len) == 0)
+    {
         return LICENSE_SIMPL_2_0;
+    }
     if (strncmp(str, SISSL, len) == 0)
+    {
         return LICENSE_SISSL;
+    }
     if (strncmp(str, SISSL_1_2, len) == 0)
+    {
         return LICENSE_SISSL_1_2;
+    }
     if (strncmp(str, SL, len) == 0)
+    {
         return LICENSE_SL;
+    }
     if (strncmp(str, SLEEPYCAT, len) == 0)
+    {
         return LICENSE_SLEEPYCAT;
+    }
     if (strncmp(str, SMAIL_GPL, len) == 0)
+    {
         return LICENSE_SMAIL_GPL;
+    }
     if (strncmp(str, SMLNJ, len) == 0)
+    {
         return LICENSE_SMLNJ;
+    }
     if (strncmp(str, SMPPL, len) == 0)
+    {
         return LICENSE_SMPPL;
+    }
     if (strncmp(str, SNIA, len) == 0)
+    {
         return LICENSE_SNIA;
+    }
     if (strncmp(str, SNPRINTF, len) == 0)
+    {
         return LICENSE_SNPRINTF;
+    }
     if (strncmp(str, SOFTSURFER, len) == 0)
+    {
         return LICENSE_SOFTSURFER;
+    }
     if (strncmp(str, SOUNDEX, len) == 0)
+    {
         return LICENSE_SOUNDEX;
+    }
     if (strncmp(str, SPENCER_86, len) == 0)
+    {
         return LICENSE_SPENCER_86;
+    }
     if (strncmp(str, SPENCER_94, len) == 0)
+    {
         return LICENSE_SPENCER_94;
+    }
     if (strncmp(str, SPENCER_99, len) == 0)
+    {
         return LICENSE_SPENCER_99;
+    }
     if (strncmp(str, SPL_1_0, len) == 0)
+    {
         return LICENSE_SPL_1_0;
+    }
     if (strncmp(str, SSH_KEYSCAN, len) == 0)
+    {
         return LICENSE_SSH_KEYSCAN;
+    }
     if (strncmp(str, SSH_OPENSSH, len) == 0)
+    {
         return LICENSE_SSH_OPENSSH;
+    }
     if (strncmp(str, SSH_SHORT, len) == 0)
+    {
         return LICENSE_SSH_SHORT;
+    }
     if (strncmp(str, SSLEAY_STANDALONE, len) == 0)
+    {
         return LICENSE_SSLEAY_STANDALONE;
+    }
     if (strncmp(str, SSPL_1_0, len) == 0)
+    {
         return LICENSE_SSPL_1_0;
+    }
     if (strncmp(str, STANDARDML_NJ, len) == 0)
+    {
         return LICENSE_STANDARDML_NJ;
+    }
     if (strncmp(str, SUGARCRM_1_1_3, len) == 0)
+    {
         return LICENSE_SUGARCRM_1_1_3;
+    }
     if (strncmp(str, SUN_PPP, len) == 0)
+    {
         return LICENSE_SUN_PPP;
+    }
     if (strncmp(str, SUN_PPP_2000, len) == 0)
+    {
         return LICENSE_SUN_PPP_2000;
+    }
     if (strncmp(str, SUNPRO, len) == 0)
+    {
         return LICENSE_SUNPRO;
+    }
     if (strncmp(str, SWL, len) == 0)
+    {
         return LICENSE_SWL;
+    }
     if (strncmp(str, SWRULE, len) == 0)
+    {
         return LICENSE_SWRULE;
+    }
     if (strncmp(str, SYMLINKS, len) == 0)
+    {
         return LICENSE_SYMLINKS;
+    }
     if (strncmp(str, TAPR_OHL_1_0, len) == 0)
+    {
         return LICENSE_TAPR_OHL_1_0;
+    }
     if (strncmp(str, TCL, len) == 0)
+    {
         return LICENSE_TCL;
+    }
     if (strncmp(str, TCP_WRAPPERS, len) == 0)
+    {
         return LICENSE_TCP_WRAPPERS;
+    }
     if (strncmp(str, TERMREADKEY, len) == 0)
+    {
         return LICENSE_TERMREADKEY;
+    }
     if (strncmp(str, TGPPL_1_0, len) == 0)
+    {
         return LICENSE_TGPPL_1_0;
+    }
     if (strncmp(str, THIRDEYE, len) == 0)
+    {
         return LICENSE_THIRDEYE;
+    }
     if (strncmp(str, THREEPARTTABLE, len) == 0)
+    {
         return LICENSE_THREEPARTTABLE;
+    }
     if (strncmp(str, TMATE, len) == 0)
+    {
         return LICENSE_TMATE;
+    }
     if (strncmp(str, TORQUE_1_1, len) == 0)
+    {
         return LICENSE_TORQUE_1_1;
+    }
     if (strncmp(str, TOSL, len) == 0)
+    {
         return LICENSE_TOSL;
+    }
     if (strncmp(str, TPDL, len) == 0)
+    {
         return LICENSE_TPDL;
+    }
     if (strncmp(str, TPL_1_0, len) == 0)
+    {
         return LICENSE_TPL_1_0;
+    }
     if (strncmp(str, TRUSTEDQSL, len) == 0)
+    {
         return LICENSE_TRUSTEDQSL;
+    }
     if (strncmp(str, TTWL, len) == 0)
+    {
         return LICENSE_TTWL;
+    }
     if (strncmp(str, TTYP0, len) == 0)
+    {
         return LICENSE_TTYP0;
+    }
     if (strncmp(str, TU_BERLIN_1_0, len) == 0)
+    {
         return LICENSE_TU_BERLIN_1_0;
+    }
     if (strncmp(str, TU_BERLIN_2_0, len) == 0)
+    {
         return LICENSE_TU_BERLIN_2_0;
+    }
     if (strncmp(str, UBUNTU_FONT_1_0, len) == 0)
+    {
         return LICENSE_UBUNTU_FONT_1_0;
+    }
     if (strncmp(str, UCAR, len) == 0)
+    {
         return LICENSE_UCAR;
+    }
     if (strncmp(str, UCL_1_0, len) == 0)
+    {
         return LICENSE_UCL_1_0;
+    }
     if (strncmp(str, ULEM, len) == 0)
+    {
         return LICENSE_ULEM;
+    }
     if (strncmp(str, UMICH_MERIT, len) == 0)
+    {
         return LICENSE_UMICH_MERIT;
+    }
     if (strncmp(str, UNICODE_3_0, len) == 0)
+    {
         return LICENSE_UNICODE_3_0;
+    }
     if (strncmp(str, UNICODE_DFS_2015, len) == 0)
+    {
         return LICENSE_UNICODE_DFS_2015;
+    }
     if (strncmp(str, UNICODE_DFS_2016, len) == 0)
+    {
         return LICENSE_UNICODE_DFS_2016;
+    }
     if (strncmp(str, UNICODE_TOU, len) == 0)
+    {
         return LICENSE_UNICODE_TOU;
+    }
     if (strncmp(str, UNIXCRYPT, len) == 0)
+    {
         return LICENSE_UNIXCRYPT;
+    }
     if (strncmp(str, UNLICENSE, len) == 0)
+    {
         return LICENSE_UNLICENSE;
+    }
     if (strncmp(str, UPL_1_0, len) == 0)
+    {
         return LICENSE_UPL_1_0;
+    }
     if (strncmp(str, URT_RLE, len) == 0)
+    {
         return LICENSE_URT_RLE;
+    }
     if (strncmp(str, VIM, len) == 0)
+    {
         return LICENSE_VIM;
+    }
     if (strncmp(str, VOSTROM, len) == 0)
+    {
         return LICENSE_VOSTROM;
+    }
     if (strncmp(str, VSL_1_0, len) == 0)
+    {
         return LICENSE_VSL_1_0;
+    }
     if (strncmp(str, W3C, len) == 0)
+    {
         return LICENSE_W3C;
+    }
     if (strncmp(str, W3C_19980720, len) == 0)
+    {
         return LICENSE_W3C_19980720;
+    }
     if (strncmp(str, W3C_20150513, len) == 0)
+    {
         return LICENSE_W3C_20150513;
+    }
     if (strncmp(str, W3M, len) == 0)
+    {
         return LICENSE_W3M;
+    }
     if (strncmp(str, WATCOM_1_0, len) == 0)
+    {
         return LICENSE_WATCOM_1_0;
+    }
     if (strncmp(str, WIDGET_WORKSHOP, len) == 0)
+    {
         return LICENSE_WIDGET_WORKSHOP;
+    }
     if (strncmp(str, WSUIPA, len) == 0)
+    {
         return LICENSE_WSUIPA;
+    }
     if (strncmp(str, WTFPL, len) == 0)
+    {
         return LICENSE_WTFPL;
+    }
     if (strncmp(str, WWL, len) == 0)
+    {
         return LICENSE_WWL;
+    }
     if (strncmp(str, WXWINDOWS, len) == 0)
+    {
         return LICENSE_WXWINDOWS;
+    }
     if (strncmp(str, X11, len) == 0)
+    {
         return LICENSE_X11;
+    }
     if (strncmp(str, X11_DISTRIBUTE_MODIFICATIONS_VARIANT, len) == 0)
+    {
         return LICENSE_X11_DISTRIBUTE_MODIFICATIONS_VARIANT;
+    }
     if (strncmp(str, X11_SWAPPED, len) == 0)
+    {
         return LICENSE_X11_SWAPPED;
+    }
     if (strncmp(str, XDEBUG_1_03, len) == 0)
+    {
         return LICENSE_XDEBUG_1_03;
+    }
     if (strncmp(str, XEROX, len) == 0)
+    {
         return LICENSE_XEROX;
+    }
     if (strncmp(str, XFIG, len) == 0)
+    {
         return LICENSE_XFIG;
+    }
     if (strncmp(str, XFREE86_1_1, len) == 0)
+    {
         return LICENSE_XFREE86_1_1;
+    }
     if (strncmp(str, XINETD, len) == 0)
+    {
         return LICENSE_XINETD;
+    }
     if (strncmp(str, XKEYBOARD_CONFIG_ZINOVIEV, len) == 0)
+    {
         return LICENSE_XKEYBOARD_CONFIG_ZINOVIEV;
+    }
     if (strncmp(str, XLOCK, len) == 0)
+    {
         return LICENSE_XLOCK;
+    }
     if (strncmp(str, XNET, len) == 0)
+    {
         return LICENSE_XNET;
+    }
     if (strncmp(str, XPP, len) == 0)
+    {
         return LICENSE_XPP;
+    }
     if (strncmp(str, XSKAT, len) == 0)
+    {
         return LICENSE_XSKAT;
+    }
     if (strncmp(str, XZOOM, len) == 0)
+    {
         return LICENSE_XZOOM;
+    }
     if (strncmp(str, YPL_1_0, len) == 0)
+    {
         return LICENSE_YPL_1_0;
+    }
     if (strncmp(str, YPL_1_1, len) == 0)
+    {
         return LICENSE_YPL_1_1;
+    }
     if (strncmp(str, ZED, len) == 0)
+    {
         return LICENSE_ZED;
+    }
     if (strncmp(str, ZEEFF, len) == 0)
+    {
         return LICENSE_ZEEFF;
+    }
     if (strncmp(str, ZEND_2_0, len) == 0)
+    {
         return LICENSE_ZEND_2_0;
+    }
     if (strncmp(str, ZIMBRA_1_3, len) == 0)
+    {
         return LICENSE_ZIMBRA_1_3;
+    }
     if (strncmp(str, ZIMBRA_1_4, len) == 0)
+    {
         return LICENSE_ZIMBRA_1_4;
+    }
     if (strncmp(str, ZLIB, len) == 0)
+    {
         return LICENSE_ZLIB;
+    }
     if (strncmp(str, ZLIB_ACKNOWLEDGEMENT, len) == 0)
+    {
         return LICENSE_ZLIB_ACKNOWLEDGEMENT;
+    }
     if (strncmp(str, ZPL_1_1, len) == 0)
+    {
         return LICENSE_ZPL_1_1;
+    }
     if (strncmp(str, ZPL_2_0, len) == 0)
+    {
         return LICENSE_ZPL_2_0;
+    }
     if (strncmp(str, ZPL_2_1, len) == 0)
+    {
         return LICENSE_ZPL_2_1;
+    }
 
     return LICENSE_UNKNOWN;
 }

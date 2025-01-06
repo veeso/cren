@@ -9,24 +9,17 @@ cren_manifest_package_t *cren_manifest_package_init()
         return NULL;
     }
 
-    package->name = string_init();
-    package->description = string_init();
+    package->name = NULL;
+    package->description = NULL;
     package->version = (semver_t){0, 0, 0};
     package->edition = MANIFEST_EDITION_ONE;
     package->language = C11;
     package->authors = string_list_init();
-    package->documentation = string_init();
-    package->homepage = string_init();
-    package->repository = string_init();
+    package->documentation = NULL;
+    package->homepage = NULL;
+    package->repository = NULL;
     package->license = LICENSE_NONE;
-    package->license_file = string_init();
-
-    // Check if any of the fields failed to initialize
-    if (package->name == NULL || package->description == NULL || package->authors == NULL || package->documentation == NULL || package->homepage == NULL || package->repository == NULL || package->license_file == NULL)
-    {
-        cren_manifest_package_free(package);
-        return NULL;
-    }
+    package->license_file = NULL;
 
     return package;
 }

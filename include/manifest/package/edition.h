@@ -4,15 +4,13 @@
 #define CREN_MANIFEST_EDITION_H
 
 /// @brief edition enum type
-typedef enum edition_t edition_t;
-
-enum edition_t
+typedef enum edition_t
 {
     /// @brief unknown edition (error)
     MANIFEST_EDITION_UNKNOWN = -1,
     /// @brief First edition
     MANIFEST_EDITION_ONE = 1,
-};
+} edition_t;
 
 /// @brief parse `edition` from a string.
 /// @param str

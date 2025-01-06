@@ -1,4 +1,5 @@
 #include <manifest/features.h>
+#include <cren.h>
 
 cren_manifest_features_t *cren_manifest_features_init()
 {
@@ -58,4 +59,39 @@ void cren_manifest_feature_free(cren_manifest_feature_t *feature)
     string_list_free(feature->defines);
 
     free(feature);
+}
+
+cren_manifest_feature_t *cren_manifest_feature_init()
+{
+    cren_manifest_feature_t *feature = (cren_manifest_feature_t *)malloc(sizeof(cren_manifest_feature_t));
+    if (feature == NULL)
+    {
+        return NULL;
+    }
+
+    feature->name = NULL;
+    feature->dependencies = NULL;
+    feature->defines = NULL;
+
+    return feature;
+}
+
+int cren_manifest_features_add_feature(cren_manifest_features_t *features, cren_manifest_feature_t *feature)
+{
+    if (features == NULL || feature == NULL)
+    {
+        return CREN_NOK;
+    }
+
+    cren_manifest_feature_t **new_features = (cren_manifest_feature_t **)realloc(features->features, (features->features_len + 1) * sizeof(cren_manifest_feature_t *));
+    if (new_features == NULL)
+    {
+        return CREN_NOK;
+    }
+
+    features->features = new_features;
+    features->features[features->features_len] = feature;
+    features->features_len++;
+
+    return CREN_OK;
 }

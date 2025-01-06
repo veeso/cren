@@ -20,7 +20,7 @@ Every manifest consists of the following sections:
   - `license-file`: path containing license
 - Target tables
   - `[lib]`: library target settings
-    - `name`: override library name; defaults to package name
+    - `name`: library name
     - `requires-features`: list of requires features
   - `[[bin]]`: binary target settings
     - `name`: binary name
@@ -134,7 +134,7 @@ The targets table defines the different targets to be built for a project
 ### Library
 
 The library target defines a **library** that can be used and linked by other libraries and
-executables. The library name defaults to package name, and the path defaults to `src/package_name.c`. A package can have only one library.
+executables. A package can have only one library.
 
 ### Binary
 

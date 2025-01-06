@@ -4,9 +4,7 @@
 #define CREN_MANIFEST_LICENSE_H
 
 /// @brief License type for manifest SPDX 3.20 <https://github.com/spdx/license-list-data/tree/v3.20>
-typedef enum license_t license_t;
-
-enum license_t
+typedef enum license_t
 {
     /// @brief Unknown license
     LICENSE_UNKNOWN = -1,
@@ -692,7 +690,7 @@ enum license_t
     LICENSE_ZPL_1_1,                              // ZPL-1.1
     LICENSE_ZPL_2_0,                              // ZPL-2.0
     LICENSE_ZPL_2_1                               // ZPL-2.1
-};
+} license_t;
 
 /// @brief get license from str
 /// @param str

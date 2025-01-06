@@ -50,6 +50,37 @@ void cren_manifest_targets_free(cren_manifest_targets_t *targets)
     free(targets);
 }
 
+cren_manifest_target_cfg_t *cren_manifest_target_cfg_init()
+{
+    cren_manifest_target_cfg_t *cfg = (cren_manifest_target_cfg_t *)malloc(sizeof(cren_manifest_target_cfg_t));
+    if (cfg == NULL)
+    {
+        return NULL;
+    }
+
+    cfg->name = NULL;
+    cfg->path = NULL;
+    cfg->required_features = string_list_init();
+
+    return cfg;
+}
+
+int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t **dest, size_t *len, cren_manifest_target_cfg_t *cfg)
+{
+    size_t new_size = sizeof(cren_manifest_target_cfg_t *) * (*len + 1);
+    cren_manifest_target_cfg_t **new_bin = (cren_manifest_target_cfg_t **)realloc(*dest, new_size);
+    if (new_bin == NULL)
+    {
+        return 1;
+    }
+
+    dest = new_bin;
+    dest[*len] = cfg;
+    (*len)++;
+
+    return 0;
+}
+
 void cren_manifest_target_cfg_free(cren_manifest_target_cfg_t *cfg)
 {
     if (cfg == NULL)

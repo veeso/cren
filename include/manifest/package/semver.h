@@ -14,13 +14,6 @@ typedef struct semver_t
     uint64_t patch;
 } semver_t;
 
-struct semver_t
-{
-    uint64_t major;
-    uint64_t minor;
-    uint64_t patch;
-};
-
 /// @brief parse a string into `semver`. Returns 0 in case of success
 /// @param str the string to parse
 /// @param strlen the length of the string

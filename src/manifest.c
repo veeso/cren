@@ -1,8 +1,11 @@
+#include <stdbool.h>
+
+#include <cren.h>
 #include <manifest.h>
 
 cren_manifest_t *cren_manifest_init()
 {
-    cren_manifest_t *manifest = malloc(sizeof(cren_manifest_t));
+    cren_manifest_t *manifest = (cren_manifest_t *)malloc(sizeof(cren_manifest_t));
 
     if (manifest == NULL)
     {
@@ -28,7 +31,7 @@ void cren_manifest_free(cren_manifest_t *manifest)
 {
     if (manifest == NULL)
     {
-        return NULL;
+        return;
     }
 
     cren_manifest_package_free(manifest->package);

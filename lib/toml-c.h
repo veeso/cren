@@ -380,7 +380,7 @@ static void **expand_ptrarr(void **p, int n)
 
 static toml_arritem_t *expand_arritem(toml_arritem_t *p, int n)
 {
-    toml_arritem_t *pp = (toml_arritem_t *)(p, n * sizeof(*p), (n + 1) * sizeof(*p));
+    toml_arritem_t *pp = (toml_arritem_t *)expand(p, n * sizeof(*p), (n + 1) * sizeof(*p));
     if (!pp)
         return 0;
 

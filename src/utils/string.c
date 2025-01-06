@@ -1,6 +1,6 @@
-#include <utils/string.h>
-
 #include <string.h>
+
+#include <utils/string.h>
 
 string_t *string_init()
 {

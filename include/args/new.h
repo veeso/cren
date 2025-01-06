@@ -8,6 +8,13 @@
 
 #include <manifest/package/language.h>
 
+/// @brief New package type (bin or lib)
+typedef enum args_new_package_type_t
+{
+    INIT_PACKAGE_TYPE_BIN,
+    INIT_PACKAGE_TYPE_LIB,
+} args_new_package_type_t;
+
 /// Args for new command
 typedef struct args_new_t args_new_t;
 
@@ -17,15 +24,6 @@ struct args_new_t
     size_t package_len;
     args_new_package_type_t package_type;
     language_t language;
-};
-
-/// @brief New package type (bin or lib)
-typedef enum args_new_package_type_t args_new_package_type_t;
-
-enum args_new_package_type_t
-{
-    INIT_PACKAGE_TYPE_BIN,
-    INIT_PACKAGE_TYPE_LIB,
 };
 
 /// @brief parse init command arguments

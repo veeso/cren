@@ -9,7 +9,6 @@ typedef enum args_cmd args_cmd;
 enum args_cmd
 {
     ARGS_CMD_BUILD,
-    ARGS_CMD_BUILD,
     ARGS_CMD_MANIFEST,
     ARGS_CMD_NEW,
     ARGS_CMD_RUN,

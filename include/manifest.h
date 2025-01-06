@@ -7,7 +7,6 @@
 #include <stdlib.h>
 
 #include <manifest/dependencies.h>
-#include <manifest/error.h>
 #include <manifest/features.h>
 #include <manifest/package.h>
 #include <manifest/targets.h>
@@ -30,8 +29,8 @@ cren_manifest_t *cren_manifest_init();
 /// @brief Parse a cren manifest file
 /// @param manifest
 /// @param file to parse
-/// @return manifest_parse_error_msg
-manifest_parse_error_t cren_manifest_parse(cren_manifest_t *manifest, FILE *file);
+/// @return `CREN_OK` on success
+int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size_t error_sz);
 
 /// @brief Write manifest to file
 /// @param manifest

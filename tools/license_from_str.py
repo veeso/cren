@@ -16,4 +16,4 @@ for license in licenses["licenses"]:
         identifier.replace("-", "_").replace(".", "_").replace("+", "_PLUS").upper()
     )}"
 
-    print(f"if (strncmp(str, {const_name}, len) == 0) return {c_enum};")
+    print(f"if (strncmp(str, {const_name}, len) == 0) \n {{ return {c_enum}; \n }}")

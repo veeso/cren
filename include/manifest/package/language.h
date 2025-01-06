@@ -3,10 +3,8 @@
 #ifndef CREN_MANIFEST_LANGUAGE_H
 #define CREN_MANIFEST_LANGUAGE_H
 
-typedef enum language_t language_t;
-
 /// @brief Language variants
-enum language_t
+typedef enum language_t
 {
     LANGUAGE_UNKNOWN = -1,
     C89,
@@ -22,7 +20,7 @@ enum language_t
     CPP17,
     CPP20,
     CPP26,
-};
+} language_t;
 
 /// @brief convert string into language. In case of error returns `UNKNOWN`
 /// @param str
