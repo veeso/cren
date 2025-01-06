@@ -1,5 +1,7 @@
 #include <utils/string.h>
 
+#include <string.h>
+
 string_t *string_init()
 {
     string_t *string = (string_t *)malloc(sizeof(string_t));
@@ -9,6 +11,30 @@ string_t *string_init()
     }
     string->data = NULL;
     string->length = 0;
+    return string;
+}
+
+string_t *string_from_cstr(const char *data)
+{
+    string_t *string = string_init();
+    if (string == NULL)
+    {
+        return NULL;
+    }
+
+    string->data = (char *)malloc(strlen(data) + 1);
+    if (string->data == NULL)
+    {
+        string_free(string);
+        return NULL;
+    }
+
+    size_t len = strlen(data);
+
+    strncpy(string->data, data, len);
+    string->data[len] = '\0';
+    string->length = len;
+
     return string;
 }
 

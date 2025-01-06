@@ -26,7 +26,7 @@ struct cren_manifest_package_t
     string_t *documentation;
     string_t *homepage;
     string_t *repository;
-    license license;
+    license_t license;
     string_t *license_file;
 };
 

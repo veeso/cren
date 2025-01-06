@@ -18,9 +18,9 @@ typedef struct cren_manifest_t cren_manifest_t;
 struct cren_manifest_t
 {
     cren_manifest_package_t *package;
-    cren_manifest_targets *targets;
-    cren_manifest_dependencies *dependencies;
-    cren_manifest_features *features;
+    cren_manifest_targets_t *targets;
+    cren_manifest_dependencies_t *dependencies;
+    cren_manifest_features_t *features;
 };
 
 /// @brief Init a new manifest
@@ -31,7 +31,7 @@ cren_manifest_t *cren_manifest_init();
 /// @param manifest
 /// @param file to parse
 /// @return manifest_parse_error_msg
-manifest_parse_error cren_manifest_parse(cren_manifest_t *manifest, FILE *file);
+manifest_parse_error_t cren_manifest_parse(cren_manifest_t *manifest, FILE *file);
 
 /// @brief Write manifest to file
 /// @param manifest

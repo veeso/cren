@@ -9,9 +9,9 @@ typedef enum edition_t edition_t;
 enum edition_t
 {
     /// @brief unknown edition (error)
-    UNKNOWN = -1,
+    MANIFEST_EDITION_UNKNOWN = -1,
     /// @brief First edition
-    ONE = 1,
+    MANIFEST_EDITION_ONE = 1,
 };
 
 /// @brief parse `edition` from a string.

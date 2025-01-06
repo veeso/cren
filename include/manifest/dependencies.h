@@ -10,17 +10,17 @@
 #include <utils/string.h>
 
 /// Cren manifest dependencies
-typedef struct cren_manifest_dependencies cren_manifest_dependencies;
+typedef struct cren_manifest_dependencies_t cren_manifest_dependencies_t;
 
-struct cren_manifest_dependencies
+struct cren_manifest_dependencies_t
 {
-    cren_manifest_dependency **dependencies;
+    cren_manifest_dependency_t **dependencies;
     size_t dependencies_len;
 };
 
-typedef struct cren_manifest_dependency cren_manifest_dependency;
+typedef struct cren_manifest_dependency_t cren_manifest_dependency_t;
 
-struct cren_manifest_dependency
+struct cren_manifest_dependency_t
 {
     string_t *name;
     string_t *git;
@@ -31,10 +31,10 @@ struct cren_manifest_dependency
 
 /// @brief init cren manifest dependencies
 /// @return cren manifest dependencies
-cren_manifest_dependencies *cren_manifest_dependencies_init();
+cren_manifest_dependencies_t *cren_manifest_dependencies_init();
 
 /// @brief free cren manifest dependencies
 /// @param dependencies
-void cren_manifest_dependencies_free(cren_manifest_dependencies *dependencies);
+void cren_manifest_dependencies_free(cren_manifest_dependencies_t *dependencies);
 
 #endif // CREN_MANIFEST_DEPENDENCIES_H

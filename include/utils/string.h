@@ -17,6 +17,11 @@ struct string_t
 /// @return string
 string_t *string_init();
 
+/// @brief create a string from a c string
+/// @param data
+/// @return string
+string_t *string_from_cstr(const char *data);
+
 /// @brief free a string
 /// @param string
 void string_free(string_t *string);

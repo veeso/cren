@@ -8,7 +8,7 @@ typedef enum language_t language_t;
 /// @brief Language variants
 enum language_t
 {
-    UNKNOWN = -1,
+    LANGUAGE_UNKNOWN = -1,
     C89,
     C90,
     C99,
