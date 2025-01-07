@@ -1,6 +1,7 @@
-#include <manifest/package/license.h>
-
 #include <string.h>
+
+#include <lib/log.h>
+#include <manifest/package/license.h>
 
 const char *L0BSD = "0BSD";
 const char *L3D_SLICER_1_0 = "3D-Slicer-1.0";
@@ -683,7 +684,25 @@ const char *ZPL_1_1 = "ZPL-1.1";
 const char *ZPL_2_0 = "ZPL-2.0";
 const char *ZPL_2_1 = "ZPL-2.1";
 
+license_t license_from_str_impl(const char *str);
+
 license_t license_from_str(const char *str)
+{
+    license_t license = license_from_str_impl(str);
+
+    if (license == LICENSE_UNKNOWN)
+    {
+        log_error("Unknown license: %s", str);
+    }
+    else
+    {
+        log_trace("License: %s", str);
+    }
+
+    return license;
+}
+
+license_t license_from_str_impl(const char *str)
 {
     size_t len = strlen(str);
 

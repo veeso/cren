@@ -1,3 +1,4 @@
+#include <lib/log.h>
 #include <manifest/package.h>
 
 cren_manifest_package_t *cren_manifest_package_init()
@@ -6,6 +7,7 @@ cren_manifest_package_t *cren_manifest_package_init()
 
     if (package == NULL)
     {
+        log_fatal("Failed to allocate memory for manifest package");
         return NULL;
     }
 
@@ -21,6 +23,8 @@ cren_manifest_package_t *cren_manifest_package_init()
     package->license = LICENSE_NONE;
     package->license_file = NULL;
 
+    log_trace("Initialized manifest package");
+
     return package;
 }
 
@@ -28,6 +32,7 @@ void cren_manifest_package_free(cren_manifest_package_t *package)
 {
     if (package == NULL)
     {
+        log_trace("Manifest package is NULL");
         return;
     }
 
@@ -40,4 +45,6 @@ void cren_manifest_package_free(cren_manifest_package_t *package)
     string_free(package->license_file);
 
     free(package);
+
+    log_trace("Freed manifest package");
 }

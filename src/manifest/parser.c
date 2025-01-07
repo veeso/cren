@@ -1,8 +1,9 @@
 #include <stdbool.h>
 #include <string.h>
-#include <toml-c.h>
 
 #include <cren.h>
+#include <lib/log.h>
+#include <lib/toml-c.h>
 #include <manifest.h>
 
 const char *KEY_PACKAGE = "package";
@@ -60,6 +61,7 @@ int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size
     if (manifest == NULL || file == NULL)
     {
         parse_error(error, error_sz, "One or more arguments are NULL");
+        log_error("One or more arguments are NULL");
         return CREN_NOK;
     }
 
@@ -67,6 +69,7 @@ int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size
 
     if (toml == NULL)
     {
+        log_error("Error parsing toml file: %s", error);
         return CREN_NOK;
     }
 
@@ -100,6 +103,9 @@ int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size
         return CREN_NOK;
     }
 
+    toml_free(toml);
+    log_info("Cren.toml manifest parsed successfully");
+
     return CREN_OK;
 }
 
@@ -111,6 +117,7 @@ int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size
 /// @return CREN_OK on success, CREN_NOK on failure
 int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t *manifest_package, char *error, size_t error_sz)
 {
+    log_debug("Parsing `package` table");
     if (manifest == NULL || manifest_package == NULL)
     {
         parse_error(error, error_sz, "One or more arguments are NULL");
@@ -205,6 +212,8 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
         return CREN_NOK;
     }
 
+    log_debug("Parsed `package` table");
+
     return CREN_OK;
 }
 
@@ -216,6 +225,7 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
 /// @return CREN_OK on success, CREN_NOK on failure
 int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t *targets, char *error, size_t error_sz)
 {
+    log_debug("Parsing `targets` table");
     if (manifest == NULL || targets == NULL)
     {
         parse_error(error, error_sz, "One or more arguments are NULL");
@@ -226,21 +236,26 @@ int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t 
     toml_table_t *lib = toml_table_table(manifest, KEY_TARGETS_LIB);
     if (lib != NULL)
     {
+        log_debug("Parsing `lib` table");
         targets->lib = cren_manifest_target_cfg_init();
         if (parse_target_cfg(lib, targets->lib, error, error_sz) != CREN_OK)
         {
             parse_error(error, error_sz, "Error parsing `lib` table");
             return CREN_NOK;
         }
+        log_debug("Parsed `lib` table");
     }
 
     // parse `bin` array
     toml_array_t *bin = toml_table_array(manifest, KEY_TARGETS_BIN);
     if (bin != NULL)
     {
+        log_debug("Parsing `bin` table");
         const int len = toml_array_len(bin);
+        log_debug("Found %d `bin` targets", len);
         for (int i = 0; i < len; i++)
         {
+            log_debug("Parsing `bin` target %d", i);
             toml_table_t *bin_table = toml_array_table(bin, i);
             cren_manifest_target_cfg_t *cfg = cren_manifest_target_cfg_init();
             if (parse_target_cfg(bin_table, cfg, error, error_sz) != CREN_OK)
@@ -255,6 +270,7 @@ int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t 
                 cren_manifest_target_cfg_free(cfg);
                 return CREN_NOK;
             }
+            log_debug("Parsed `bin` target %d", i);
         }
     }
 
@@ -262,8 +278,9 @@ int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t 
     toml_array_t *examples = toml_table_array(manifest, KEY_TARGETS_EXAMPLES);
     if (examples != NULL)
     {
-
+        log_debug("Parsing `examples` table");
         const int len = toml_array_len(examples);
+        log_debug("Found %d `examples` targets", len);
         for (int i = 0; i < len; i++)
         {
             toml_table_t *examples_table = toml_array_table(examples, i);
@@ -280,8 +297,11 @@ int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t 
                 cren_manifest_target_cfg_free(cfg);
                 return CREN_NOK;
             }
+            log_debug("Parsed `examples` target %d", i);
         }
     }
+
+    log_debug("Parsed `targets` table");
 
     return CREN_OK;
 }
@@ -294,6 +314,7 @@ int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t 
 /// @return CREN_OK on success, CREN_NOK on failure
 int cren_manifest_parse_dependencies(toml_table_t *manifest, cren_manifest_dependencies_t *dependencies, char *error, size_t error_sz)
 {
+    log_debug("Parsing `dependencies` table");
     if (manifest == NULL || dependencies == NULL)
     {
         parse_error(error, error_sz, "One or more arguments are NULL");
@@ -304,23 +325,29 @@ int cren_manifest_parse_dependencies(toml_table_t *manifest, cren_manifest_depen
     toml_table_t *deps = toml_table_table(manifest, KEY_DEPENDENCIES);
     if (deps != NULL)
     {
+        log_debug("Parsing `dependencies` table");
         if (parse_dependencies(deps, dependencies->dependencies, &dependencies->dependencies_len, error, error_sz) != CREN_OK)
         {
             parse_error(error, error_sz, "Error parsing `dependencies` table");
             return CREN_NOK;
         }
+        log_debug("Parsed `dependencies` table");
     }
 
     // get `dev-dependencies` table
     toml_table_t *dev_deps = toml_table_table(manifest, KEY_DEV_DEPENDENCIES);
     if (dev_deps != NULL)
     {
+        log_debug("Parsing `dev-dependencies` table");
         if (parse_dependencies(dev_deps, dependencies->dev_dependencies, &dependencies->dev_dependencies_len, error, error_sz) != CREN_OK)
         {
             parse_error(error, error_sz, "Error parsing `dev-dependencies` table");
             return CREN_NOK;
         }
+        log_debug("Parsed `dev-dependencies` table");
     }
+
+    log_debug("Parsed `dependencies` and `dev-dependencies` tables");
 
     return CREN_OK;
 }
@@ -333,6 +360,7 @@ int cren_manifest_parse_dependencies(toml_table_t *manifest, cren_manifest_depen
 /// @return CREN_OK on success, CREN_NOK on failure
 int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_t *manifest_features, char *error, size_t error_sz)
 {
+    log_debug("Parsing `features` table");
     if (manifest == NULL || manifest_features == NULL)
     {
         parse_error(error, error_sz, "One or more arguments are NULL");
@@ -341,18 +369,22 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
     toml_table_t *features = toml_table_table(manifest, KEY_FEATURES);
     if (features == NULL)
     {
+        log_debug("`features` table not found");
         return CREN_OK;
     }
 
     // iterate over features
     const int len = toml_table_len(features);
+    log_debug("Found %d features", len);
     for (int i = 0; i < len; i++)
     {
         int keylen;
         const char *key = toml_table_key(features, i, &keylen);
+        log_debug("Parsing feature `%.*s`", keylen, key);
         // check if `key` is `default`
         if (strncmp(key, KEY_FEATURES_DEFAULT, keylen) == 0)
         {
+            log_debug("Parsing `default` features");
             // get as array
             toml_array_t *default_features = toml_table_array(features, key);
             if (default_features == NULL)
@@ -362,6 +394,7 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
             }
             // iterate over default features
             const int default_len = toml_array_len(default_features);
+            log_debug("Found %d default features", default_len);
             string_list_t *default_list = string_list_init();
             if (default_list == NULL)
             {
@@ -370,6 +403,7 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
             }
             for (int j = 0; j < default_len; j++)
             {
+                log_debug("Parsing default feature %d", j);
                 toml_value_t value = toml_array_string(default_features, j);
                 if (!value.ok)
                 {
@@ -377,6 +411,8 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
                     string_list_free(default_list);
                     return CREN_NOK;
                 }
+
+                log_debug("Found default feature `%s`", value.u.s);
 
                 string_t *name = string_from_cstr(value.u.s);
                 free(value.u.s);
@@ -392,11 +428,14 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
                     string_list_free(default_list);
                     return CREN_NOK;
                 }
+                log_debug("Parsed default feature %d", j);
             }
             manifest_features->default_features = default_list;
+            log_debug("Parsed `default` features");
         }
         else
         {
+            log_debug("Parsing feature `%.*s`", keylen, key);
             string_t *name = string_from_cstr(key);
             // parse feature
             toml_table_t *feature_table = toml_table_table(features, key);
@@ -406,8 +445,11 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
                 string_free(name);
                 return CREN_NOK;
             }
+            log_debug("Parsed feature `%.*s`", keylen, key);
         }
     }
+
+    log_debug("Parsed `features` table");
 
     return CREN_OK;
 }
@@ -419,74 +461,97 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
 /// @return CREN_OK on success, CREN_NOK on failure
 int get_string(toml_table_t *table, const char *key, string_t *dest, bool required)
 {
+    log_debug("Getting string `%s` from table", key);
     toml_value_t value = toml_table_string(table, key);
     if (!value.ok)
     {
+        log_debug("Key `%s` not found in table (was required? %d)", key, required);
         return required ? CREN_NOK : CREN_OK;
     }
 
     string_append(dest, value.u.s);
     free(value.u.s);
 
+    log_debug("Got string `%s` from table", key);
+
     return CREN_OK;
 }
 
 int get_string_list(toml_table_t *table, const char *key, string_list_t *dest, bool required)
 {
+    log_debug("Getting string list `%s` from table", key);
     toml_array_t *array = toml_table_array(table, key);
     if (array == NULL)
     {
+        log_debug("Key `%s` not found in table (was required? %d)", key, required);
         return required ? CREN_NOK : CREN_OK;
     }
 
     int len = toml_array_len(array);
+    log_debug("Found %d strings in array", len);
     for (int i = 0; i < len; i++)
     {
+        log_debug("Parsing string at index %d", i);
         toml_value_t value = toml_array_string(array, i);
         if (!value.ok)
         {
+            log_debug("Error parsing string at index %d", i);
             return CREN_NOK;
         }
+
+        log_debug("Found string `%s` at index %d", value.u.s, i);
 
         string_t *item = string_from_cstr(value.u.s);
         free(value.u.s);
         if (item == NULL)
         {
+            log_error("Error allocating memory for string at index %d", i);
             return CREN_NOK;
         }
 
         if (string_list_push(dest, item) != CREN_OK)
         {
+            log_error("Error adding string at index %d", i);
             free(value.u.s);
             return CREN_NOK;
         }
     }
+
+    log_debug("Got string list `%s` from table", key);
 
     return CREN_OK;
 }
 
 int get_semver(toml_table_t *table, const char *key, semver_t *dest)
 {
+    log_debug("Getting semver `%s` from table", key);
     toml_value_t value = toml_table_string(table, key);
     if (!value.ok)
     {
+        log_debug("Key `%s` not found in table", key);
         return CREN_OK; // value is optional
     }
 
+    log_debug("Found semver `%s` in table", value.u.s);
     semver_from_str(value.u.s, dest);
     free(value.u.s);
+
+    log_debug("Got semver `%s` from table", key);
 
     return CREN_OK;
 }
 
 int get_edition(toml_table_t *table, const char *key, edition_t *dest)
 {
+    log_debug("Getting edition `%s` from table", key);
     toml_value_t value = toml_table_string(table, key);
     if (!value.ok)
     {
-        return CREN_OK; // value is optional
+        log_error("Key `%s` not found in table", key);
+        return CREN_NOK; // value is NOT optional
     }
 
+    log_debug("Got edition `%s` from table: %s", key, value.u.s);
     *dest = edition_from_str(value.u.s);
     free(value.u.s);
 
@@ -495,12 +560,15 @@ int get_edition(toml_table_t *table, const char *key, edition_t *dest)
 
 int get_license(toml_table_t *table, const char *key, license_t *dest)
 {
+    log_debug("Getting license `%s` from table", key);
     toml_value_t value = toml_table_string(table, key);
     if (!value.ok)
     {
+        log_debug("Key `%s` not found in table", key);
         return CREN_OK; // value is optional
     }
 
+    log_debug("Got license `%s` from table: %s", key, value.u.s);
     *dest = license_from_str(value.u.s);
     free(value.u.s);
 
@@ -509,12 +577,15 @@ int get_license(toml_table_t *table, const char *key, license_t *dest)
 
 int get_language(toml_table_t *table, const char *key, language_t *dest)
 {
+    log_debug("Getting language `%s` from table", key);
     toml_value_t value = toml_table_string(table, key);
     if (!value.ok)
     {
+        log_debug("Key `%s` not found in table", key);
         return CREN_OK; // value is optional
     }
 
+    log_debug("Got language `%s` from table: %s", key, value.u.s);
     *dest = language_from_str(value.u.s);
     free(value.u.s);
 
@@ -550,17 +621,21 @@ int parse_target_cfg(toml_table_t *table, cren_manifest_target_cfg_t *cfg, char 
         return CREN_NOK;
     }
 
+    log_debug("Parsed target cfg");
+
     return CREN_OK;
 }
 
 int parse_dependencies(toml_table_t *deps, cren_manifest_dependency_t **dest, size_t *dest_len, char *error, size_t error_sz)
 {
     int table_len = toml_table_len(deps);
+    log_debug("Found %d dependencies", table_len);
     // init deps
     for (int i = 0; i < table_len; i++)
     {
         int keylen;
         const char *key = toml_table_key(deps, i, &keylen);
+        log_debug("Parsing dependency `%.*s`", keylen, key);
         string_t *name = string_from_cstr(key);
         if (name == NULL)
         {
@@ -583,7 +658,12 @@ int parse_dependencies(toml_table_t *deps, cren_manifest_dependency_t **dest, si
             cren_manifest_dependency_free(dependency);
             return CREN_NOK;
         }
+        log_debug("Parsed dependency `%.*s`", keylen, key);
     }
+
+    log_debug("Parsed dependencies");
+
+    return CREN_OK;
 }
 
 int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependency_t *dependency, char *error, size_t error_sz)
@@ -595,6 +675,7 @@ int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependenc
     }
 
     dependency->name = key;
+    log_debug("Parsing dependency `%s`", key->data);
     if (get_string(table, KEY_DEPENDENCY_GIT, dependency->git, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `git` found in dependency table");
@@ -610,18 +691,23 @@ int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependenc
     toml_value_t value = toml_table_bool(table, KEY_DEPENDENCY_OPTIONAL);
     if (value.ok)
     {
+        log_debug("Found `optional` in dependency table");
         dependency->optional = value.u.b;
     }
     else
     {
+        log_debug("`optional` not found in dependency table");
         dependency->optional = false;
     }
+
+    log_debug("Parsed dependency `%s`", key->data);
 
     return CREN_OK;
 }
 
 int parse_feature(toml_table_t *table, string_t *name, cren_manifest_features_t *features, char *error, size_t error_sz)
 {
+    log_debug("Parsing feature `%s`", name->data);
     if (table == NULL || features == NULL)
     {
         parse_error(error, error_sz, "One or more arguments are NULL");
@@ -657,6 +743,8 @@ int parse_feature(toml_table_t *table, string_t *name, cren_manifest_features_t 
         return CREN_NOK;
     }
 
+    log_debug("Parsed feature `%s`", name->data);
+
     return CREN_OK;
 }
 
@@ -667,4 +755,5 @@ int parse_feature(toml_table_t *table, string_t *name, cren_manifest_features_t 
 void parse_error(char *error, size_t error_sz, const char *msg)
 {
     snprintf(error, error_sz, "Error parsing Cren.toml manifest: %s", msg);
+    log_error("%s", error);
 }

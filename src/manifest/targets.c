@@ -1,3 +1,4 @@
+#include <lib/log.h>
 #include <manifest/targets.h>
 
 cren_manifest_targets_t *cren_manifest_targets_init()
@@ -5,6 +6,7 @@ cren_manifest_targets_t *cren_manifest_targets_init()
     cren_manifest_targets_t *targets = (cren_manifest_targets_t *)malloc(sizeof(cren_manifest_targets_t));
     if (targets == NULL)
     {
+        log_fatal("Failed to allocate memory for targets");
         return NULL;
     }
 
@@ -14,6 +16,8 @@ cren_manifest_targets_t *cren_manifest_targets_init()
     targets->examples = NULL;
     targets->examples_len = 0;
 
+    log_trace("Initialized new manifest targets");
+
     return targets;
 }
 
@@ -21,6 +25,7 @@ void cren_manifest_targets_free(cren_manifest_targets_t *targets)
 {
     if (targets == NULL)
     {
+        log_trace("Attempted to free NULL targets");
         return;
     }
 
@@ -48,6 +53,8 @@ void cren_manifest_targets_free(cren_manifest_targets_t *targets)
     }
 
     free(targets);
+
+    log_trace("Freed manifest targets");
 }
 
 cren_manifest_target_cfg_t *cren_manifest_target_cfg_init()
@@ -55,6 +62,7 @@ cren_manifest_target_cfg_t *cren_manifest_target_cfg_init()
     cren_manifest_target_cfg_t *cfg = (cren_manifest_target_cfg_t *)malloc(sizeof(cren_manifest_target_cfg_t));
     if (cfg == NULL)
     {
+        log_fatal("Failed to allocate memory for target cfg");
         return NULL;
     }
 
@@ -62,21 +70,26 @@ cren_manifest_target_cfg_t *cren_manifest_target_cfg_init()
     cfg->path = NULL;
     cfg->required_features = string_list_init();
 
+    log_trace("Initialized new manifest target cfg");
+
     return cfg;
 }
 
 int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t **dest, size_t *len, cren_manifest_target_cfg_t *cfg)
 {
     size_t new_size = sizeof(cren_manifest_target_cfg_t *) * (*len + 1);
-    cren_manifest_target_cfg_t **new_bin = (cren_manifest_target_cfg_t **)realloc(*dest, new_size);
-    if (new_bin == NULL)
+    cren_manifest_target_cfg_t **new_target = (cren_manifest_target_cfg_t **)realloc(*dest, new_size);
+    if (new_target == NULL)
     {
+        log_fatal("Failed to reallocate memory for targets");
         return 1;
     }
 
-    dest = new_bin;
+    dest = new_target;
     dest[*len] = cfg;
     (*len)++;
+
+    log_trace("Added new target to targets; new length: %zu", *len);
 
     return 0;
 }
