@@ -45,7 +45,7 @@ cren_manifest_dependency_t *cren_manifest_dependency_init();
 /// @param len
 /// @param dependency
 /// @return CREN_OK on success, CREN_NOK on failure
-int cren_manifest_dependencies_add_dependency(cren_manifest_dependency_t **dest, size_t *len, cren_manifest_dependency_t *dependency);
+int cren_manifest_dependencies_add_dependency(cren_manifest_dependency_t ***dest, size_t *len, cren_manifest_dependency_t *dependency);
 
 /// @brief free cren manifest dependencies
 /// @param dependencies

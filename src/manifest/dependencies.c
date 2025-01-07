@@ -68,7 +68,7 @@ cren_manifest_dependency_t *cren_manifest_dependency_init()
     return dependency;
 }
 
-int cren_manifest_dependencies_add_dependency(cren_manifest_dependency_t **dest, size_t *len, cren_manifest_dependency_t *dependency)
+int cren_manifest_dependencies_add_dependency(cren_manifest_dependency_t ***dest, size_t *len, cren_manifest_dependency_t *dependency)
 {
     cren_manifest_dependency_t **new_dependencies = (cren_manifest_dependency_t **)realloc(*dest, (*len + 1) * sizeof(cren_manifest_dependency_t *));
     if (new_dependencies == NULL)
@@ -77,8 +77,8 @@ int cren_manifest_dependencies_add_dependency(cren_manifest_dependency_t **dest,
         return CREN_NOK;
     }
 
-    dest = new_dependencies;
-    dest[*len] = dependency;
+    *dest = new_dependencies;
+    (*dest[*len]) = dependency;
     (*len)++;
 
     log_trace("Added dependency `%.*s`", dependency->name->length, dependency->name->data);

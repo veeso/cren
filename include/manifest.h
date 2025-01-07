@@ -34,7 +34,7 @@ int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size
 
 /// @brief Write manifest to file
 /// @param manifest
-/// @param file to write
+/// @param file to write; if NULL, write to stdout
 /// @return `CREN_OK` on success
 int cren_manifest_write(cren_manifest_t *manifest, FILE *file);
 

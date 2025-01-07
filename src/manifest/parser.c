@@ -51,7 +51,7 @@ int get_edition(toml_table_t *table, const char *key, edition_t *dest);
 int get_language(toml_table_t *table, const char *key, language_t *dest);
 int get_license(toml_table_t *table, const char *key, license_t *dest);
 int parse_target_cfg(toml_table_t *table, cren_manifest_target_cfg_t *cfg, char *error, size_t error_sz);
-int parse_dependencies(toml_table_t *deps, cren_manifest_dependency_t **dest, size_t *dest_len, char *error, size_t error_sz);
+int parse_dependencies(toml_table_t *deps, cren_manifest_dependency_t ***dest, size_t *dest_len, char *error, size_t error_sz);
 int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependency_t *dependency, char *error, size_t error_sz);
 int parse_feature(toml_table_t *table, string_t *name, cren_manifest_features_t *features, char *error, size_t error_sz);
 void parse_error(char *error, size_t error_sz, const char *msg);
@@ -327,7 +327,7 @@ int cren_manifest_parse_dependencies(toml_table_t *manifest, cren_manifest_depen
     if (deps != NULL)
     {
         log_debug("Parsing `dependencies` table");
-        if (parse_dependencies(deps, dependencies->dependencies, &dependencies->dependencies_len, error, error_sz) != CREN_OK)
+        if (parse_dependencies(deps, &dependencies->dependencies, &dependencies->dependencies_len, error, error_sz) != CREN_OK)
         {
             parse_error(error, error_sz, "Error parsing `dependencies` table");
             return CREN_NOK;
@@ -340,7 +340,7 @@ int cren_manifest_parse_dependencies(toml_table_t *manifest, cren_manifest_depen
     if (dev_deps != NULL)
     {
         log_debug("Parsing `dev-dependencies` table");
-        if (parse_dependencies(dev_deps, dependencies->dev_dependencies, &dependencies->dev_dependencies_len, error, error_sz) != CREN_OK)
+        if (parse_dependencies(dev_deps, &dependencies->dev_dependencies, &dependencies->dev_dependencies_len, error, error_sz) != CREN_OK)
         {
             parse_error(error, error_sz, "Error parsing `dev-dependencies` table");
             return CREN_NOK;
@@ -636,13 +636,14 @@ int parse_target_cfg(toml_table_t *table, cren_manifest_target_cfg_t *cfg, char 
     return CREN_OK;
 }
 
-int parse_dependencies(toml_table_t *deps, cren_manifest_dependency_t **dest, size_t *dest_len, char *error, size_t error_sz)
+int parse_dependencies(toml_table_t *deps, cren_manifest_dependency_t ***dest, size_t *dest_len, char *error, size_t error_sz)
 {
     int table_len = toml_table_len(deps);
     log_debug("Found %d dependencies", table_len);
     // init deps
     for (int i = 0; i < table_len; i++)
     {
+        log_trace("Parsing dependency %d", i);
         int keylen;
         const char *key = toml_table_key(deps, i, &keylen);
         log_debug("Parsing dependency `%.*s`", keylen, key);

@@ -70,6 +70,13 @@ int manifest_check(args_manifest_t *args)
         goto cleanup;
     }
 
+    if (cren_manifest_write(manifest, NULL) != CREN_OK)
+    {
+        log_fatal("Failed to write cren manifest");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
     puts("Manifest OK");
 
 cleanup:
