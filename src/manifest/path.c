@@ -69,7 +69,15 @@ string_t *find_manifest_path_in(const char *path)
         string_free(manifest_path);
 
         // search in parent dir
-        return find_manifest_path_in(parent_dir(path));
+        char *parent = parent_dir(path);
+        if (parent == NULL)
+        {
+            log_error("Failed to find parent directory");
+            return NULL;
+        }
+        string_t *res = find_manifest_path_in(parent);
+        free(parent);
+        return res;
     }
 
     // return manifest path

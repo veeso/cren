@@ -16,7 +16,7 @@ cren_manifest_package_t *cren_manifest_package_init()
     package->version = (semver_t){0, 0, 0};
     package->edition = MANIFEST_EDITION_ONE;
     package->language = C11;
-    package->authors = string_list_init();
+    package->authors = NULL;
     package->documentation = NULL;
     package->homepage = NULL;
     package->repository = NULL;

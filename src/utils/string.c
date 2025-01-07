@@ -16,6 +16,35 @@ string_t *string_init()
     return string;
 }
 
+string_t *string_clone(string_t *string)
+{
+    if (string == NULL)
+    {
+        log_error("Attempted to clone a NULL string");
+        return NULL;
+    }
+    string_t *new_string = string_init();
+    if (new_string == NULL)
+    {
+        log_fatal("Failed to allocate memory for string");
+        return NULL;
+    }
+    new_string->data = (char *)malloc(string->length + 1);
+    if (new_string->data == NULL)
+    {
+        log_fatal("Failed to allocate memory for string");
+        string_free(new_string);
+        return NULL;
+    }
+    memcpy(new_string->data, string->data, string->length);
+    new_string->length = string->length;
+    new_string->data[new_string->length] = '\0';
+
+    log_trace("Cloned string: %s, len %zu", new_string->data, new_string->length);
+
+    return new_string;
+}
+
 string_t *string_from_cstr(const char *data)
 {
     string_t *string = string_init();
@@ -24,7 +53,9 @@ string_t *string_from_cstr(const char *data)
         return NULL;
     }
 
-    string->data = (char *)malloc(strlen(data) + 1);
+    size_t data_len = strlen(data);
+
+    string->data = (char *)malloc(data_len + 1);
     if (string->data == NULL)
     {
         log_fatal("Failed to allocate memory for string");
@@ -32,11 +63,9 @@ string_t *string_from_cstr(const char *data)
         return NULL;
     }
 
-    size_t len = strlen(data);
-
-    strncpy(string->data, data, len);
-    string->data[len] = '\0';
-    string->length = len;
+    strncpy(string->data, data, data_len);
+    string->data[data_len] = '\0';
+    string->length = data_len;
 
     log_trace("Created string from c string: %s, len %zu", string->data, string->length);
 

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include <args.h>
+#include <command/manifest.h>
 #include <lib/log.h>
 #include <cren.h>
 
@@ -43,12 +44,21 @@ int main(int argc, char **argv)
   init_log(args->verbose, args->quiet);
 
   // run command
-  // TODO: run
+  int rc = CREN_OK;
+  switch (args->cmd)
+  {
+  case ARGS_CMD_MANIFEST:
+    rc = command_manifest(&args->manifest_cmd);
+    break;
+  default:
+    rc = CREN_OK;
+    break;
+  }
 
   // free args
   args_free(args);
 
-  return CREN_OK;
+  return rc;
 }
 
 void init_log(args_verbose_t verbose, bool quiet)

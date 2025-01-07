@@ -68,14 +68,14 @@ cren_manifest_target_cfg_t *cren_manifest_target_cfg_init()
 
     cfg->name = NULL;
     cfg->path = NULL;
-    cfg->required_features = string_list_init();
+    cfg->required_features = NULL;
 
     log_trace("Initialized new manifest target cfg");
 
     return cfg;
 }
 
-int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t **dest, size_t *len, cren_manifest_target_cfg_t *cfg)
+int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t ***dest, size_t *len, cren_manifest_target_cfg_t *cfg)
 {
     size_t new_size = sizeof(cren_manifest_target_cfg_t *) * (*len + 1);
     cren_manifest_target_cfg_t **new_target = (cren_manifest_target_cfg_t **)realloc(*dest, new_size);
@@ -85,8 +85,8 @@ int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t **dest, size_t *len
         return 1;
     }
 
-    dest = new_target;
-    dest[*len] = cfg;
+    *dest = new_target;
+    (*dest)[*len] = cfg;
     (*len)++;
 
     log_trace("Added new target to targets; new length: %zu", *len);

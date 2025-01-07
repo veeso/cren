@@ -42,7 +42,7 @@ cren_manifest_target_cfg_t *cren_manifest_target_cfg_init();
 /// @param targets
 /// @param cfg
 /// @return 0 on success, 1 on failure
-int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t **dest, size_t *len, cren_manifest_target_cfg_t *cfg);
+int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t ***dest, size_t *len, cren_manifest_target_cfg_t *cfg);
 
 /// @brief free cren manifest targets
 /// @param package

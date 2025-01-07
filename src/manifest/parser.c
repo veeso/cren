@@ -44,8 +44,8 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
 int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t *targets, char *error, size_t error_sz);
 int cren_manifest_parse_dependencies(toml_table_t *manifest, cren_manifest_dependencies_t *dependencies, char *error, size_t error_sz);
 int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_t *features, char *error, size_t error_sz);
-int get_string(toml_table_t *table, const char *key, string_t *dest, bool required);
-int get_string_list(toml_table_t *table, const char *key, string_list_t *dest, bool required);
+int get_string(toml_table_t *table, const char *key, string_t **dest, bool required);
+int get_string_list(toml_table_t *table, const char *key, string_list_t **dest, bool required);
 int get_semver(toml_table_t *table, const char *key, semver_t *dest);
 int get_edition(toml_table_t *table, const char *key, edition_t *dest);
 int get_language(toml_table_t *table, const char *key, language_t *dest);
@@ -131,13 +131,13 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
     }
 
     // Parse `name`
-    if (get_string(package, KEY_PACKAGE_NAME, manifest_package->name, true) != CREN_OK)
+    if (get_string(package, KEY_PACKAGE_NAME, &manifest_package->name, true) != CREN_OK)
     {
         parse_error(error, error_sz, "`name` key not found in `package` table");
         return CREN_NOK;
     }
     // Parse `description`
-    if (get_string(package, KEY_PACKAGE_DESCRIPTION, manifest_package->description, false) != CREN_OK)
+    if (get_string(package, KEY_PACKAGE_DESCRIPTION, &manifest_package->description, false) != CREN_OK)
     {
         parse_error(error, error_sz, "invalid `description` found in `package` table");
         return CREN_NOK;
@@ -171,25 +171,25 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
         return CREN_NOK;
     }
     // Parse `authors`
-    if (get_string_list(package, KEY_PACKAGE_AUTHORS, manifest_package->authors, false) != CREN_OK)
+    if (get_string_list(package, KEY_PACKAGE_AUTHORS, &manifest_package->authors, false) != CREN_OK)
     {
         parse_error(error, error_sz, "invalid `authors` found in `package` table");
         return CREN_NOK;
     }
     // Parse `documentation`
-    if (get_string(package, KEY_PACKAGE_DOCUMENTATION, manifest_package->documentation, false) != CREN_OK)
+    if (get_string(package, KEY_PACKAGE_DOCUMENTATION, &manifest_package->documentation, false) != CREN_OK)
     {
         parse_error(error, error_sz, "invalid `documentation` found in `package` table");
         return CREN_NOK;
     }
     // Parse `homepage`
-    if (get_string(package, KEY_PACKAGE_HOMEPAGE, manifest_package->homepage, false) != CREN_OK)
+    if (get_string(package, KEY_PACKAGE_HOMEPAGE, &manifest_package->homepage, false) != CREN_OK)
     {
         parse_error(error, error_sz, "invalid `homepage` found in `package` table");
         return CREN_NOK;
     }
     // Parse `repository`
-    if (get_string(package, KEY_PACKAGE_REPOSITORY, manifest_package->repository, false) != CREN_OK)
+    if (get_string(package, KEY_PACKAGE_REPOSITORY, &manifest_package->repository, false) != CREN_OK)
     {
         parse_error(error, error_sz, "invalid `repository` found in `package` table");
         return CREN_NOK;
@@ -206,7 +206,7 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
         return CREN_NOK;
     }
     // Parse `license-file`
-    if (manifest_package->license == LICENSE_NONE && get_string(package, KEY_PACKAGE_LICENSE_FILE, manifest_package->license_file, false) != CREN_OK)
+    if (manifest_package->license == LICENSE_NONE && get_string(package, KEY_PACKAGE_LICENSE_FILE, &manifest_package->license_file, false) != CREN_OK)
     {
         parse_error(error, error_sz, "invalid `license-file` found in `package` table");
         return CREN_NOK;
@@ -264,7 +264,8 @@ int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t 
                 cren_manifest_target_cfg_free(cfg);
                 return CREN_NOK;
             }
-            if (cren_manifest_targets_add_cfg(targets->bin, &targets->bin_len, cfg) != CREN_OK)
+            log_trace("Parsed `bin` cfg %p", cfg);
+            if (cren_manifest_targets_add_cfg(&targets->bin, &targets->bin_len, cfg) != CREN_OK)
             {
                 parse_error(error, error_sz, "Error adding `bin` target");
                 cren_manifest_target_cfg_free(cfg);
@@ -291,7 +292,7 @@ int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t 
                 cren_manifest_target_cfg_free(cfg);
                 return CREN_NOK;
             }
-            if (cren_manifest_targets_add_cfg(targets->examples, &targets->examples_len, cfg) != CREN_OK)
+            if (cren_manifest_targets_add_cfg(&targets->examples, &targets->examples_len, cfg) != CREN_OK)
             {
                 parse_error(error, error_sz, "Error adding `examples` target");
                 cren_manifest_target_cfg_free(cfg);
@@ -459,7 +460,7 @@ int cren_manifest_parse_features(toml_table_t *manifest, cren_manifest_features_
 /// @param key
 /// @param dest
 /// @return CREN_OK on success, CREN_NOK on failure
-int get_string(toml_table_t *table, const char *key, string_t *dest, bool required)
+int get_string(toml_table_t *table, const char *key, string_t **dest, bool required)
 {
     log_debug("Getting string `%s` from table", key);
     toml_value_t value = toml_table_string(table, key);
@@ -469,7 +470,8 @@ int get_string(toml_table_t *table, const char *key, string_t *dest, bool requir
         return required ? CREN_NOK : CREN_OK;
     }
 
-    string_append(dest, value.u.s);
+    string_free(*dest);
+    *dest = string_from_cstr(value.u.s);
     free(value.u.s);
 
     log_debug("Got string `%s` from table", key);
@@ -477,7 +479,7 @@ int get_string(toml_table_t *table, const char *key, string_t *dest, bool requir
     return CREN_OK;
 }
 
-int get_string_list(toml_table_t *table, const char *key, string_list_t *dest, bool required)
+int get_string_list(toml_table_t *table, const char *key, string_list_t **dest, bool required)
 {
     log_debug("Getting string list `%s` from table", key);
     toml_array_t *array = toml_table_array(table, key);
@@ -485,6 +487,14 @@ int get_string_list(toml_table_t *table, const char *key, string_list_t *dest, b
     {
         log_debug("Key `%s` not found in table (was required? %d)", key, required);
         return required ? CREN_NOK : CREN_OK;
+    }
+
+    string_list_free(*dest);
+    *dest = string_list_init();
+    if (*dest == NULL)
+    {
+        log_error("Error allocating memory for string list");
+        return CREN_NOK;
     }
 
     int len = toml_array_len(array);
@@ -509,7 +519,7 @@ int get_string_list(toml_table_t *table, const char *key, string_list_t *dest, b
             return CREN_NOK;
         }
 
-        if (string_list_push(dest, item) != CREN_OK)
+        if (string_list_push(*dest, item) != CREN_OK)
         {
             log_error("Error adding string at index %d", i);
             free(value.u.s);
@@ -601,21 +611,21 @@ int parse_target_cfg(toml_table_t *table, cren_manifest_target_cfg_t *cfg, char 
     }
 
     // Parse `name`
-    if (get_string(table, KEY_TARGETS_NAME, cfg->name, true) != CREN_OK)
+    if (get_string(table, KEY_TARGETS_NAME, &cfg->name, true) != CREN_OK)
     {
         parse_error(error, error_sz, "`name` key not found in target table");
         return CREN_NOK;
     }
 
     // Parse `path`
-    if (get_string(table, KEY_TARGETS_PATH, cfg->path, false) != CREN_OK)
+    if (get_string(table, KEY_TARGETS_PATH, &cfg->path, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `path` found in target table");
         return CREN_NOK;
     }
 
     // Parse `required-features`
-    if (get_string_list(table, KEY_TARGETS_REQUIRED_FEATURES, cfg->required_features, false) != CREN_OK)
+    if (get_string_list(table, KEY_TARGETS_REQUIRED_FEATURES, &cfg->required_features, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `required-features` found in target table");
         return CREN_NOK;
@@ -676,13 +686,13 @@ int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependenc
 
     dependency->name = key;
     log_debug("Parsing dependency `%s`", key->data);
-    if (get_string(table, KEY_DEPENDENCY_GIT, dependency->git, false) != CREN_OK)
+    if (get_string(table, KEY_DEPENDENCY_GIT, &dependency->git, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `git` found in dependency table");
         return CREN_NOK;
     }
 
-    if (get_string(table, KEY_DEPENDENCY_LINK, dependency->link, false) != CREN_OK)
+    if (get_string(table, KEY_DEPENDENCY_LINK, &dependency->link, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `link` found in dependency table");
         return CREN_NOK;
@@ -722,14 +732,14 @@ int parse_feature(toml_table_t *table, string_t *name, cren_manifest_features_t 
     }
 
     feature->name = name;
-    if (get_string_list(table, KEY_FEATURES_DEPENDENCIES, feature->dependencies, false) != CREN_OK)
+    if (get_string_list(table, KEY_FEATURES_DEPENDENCIES, &feature->dependencies, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `dependencies` found in feature table");
         cren_manifest_feature_free(feature);
         return CREN_NOK;
     }
 
-    if (get_string_list(table, KEY_FEATURES_DEFINES, feature->defines, false) != CREN_OK)
+    if (get_string_list(table, KEY_FEATURES_DEFINES, &feature->defines, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `defines` found in feature table");
         cren_manifest_feature_free(feature);
