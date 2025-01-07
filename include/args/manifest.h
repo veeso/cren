@@ -4,18 +4,10 @@
 #define CREN_ARGS_MANIFEST_H
 
 /// Command for manifest command
-typedef enum args_manifest_cmd_t args_manifest_cmd_t;
-
-enum args_manifest_cmd_t
+typedef enum args_manifest_cmd_t
 {
     MANIFEST_CMD_CHECK,
     MANIFEST_CMD_UNKNOWN,
-};
-
-/// @brief parse manifest cmd to get the command
-/// @param argc
-/// @param argv
-/// @return args_manifest_cmd
-args_manifest_cmd_t args_manifest_cmd_parse(int argc, char **argv);
+} args_manifest_cmd_t;
 
 #endif // CREN_ARGS_MANIFEST_H

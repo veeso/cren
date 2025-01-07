@@ -9,7 +9,7 @@ $ cren new hello_world --bin
  
 ```
 
-where `hello_world` is the package name, otheriwise if you want a library use:
+where `hello_world` is the package name, otherwise if you want a library use:
 
 ```sh
 $ cren new libfoo --lib
