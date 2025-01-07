@@ -63,7 +63,8 @@ args_t *args_parse_cmd(int argc, char **argv)
     args->quiet = false;
     args->version = false;
     args->verbose = VERBOSE_DEFAULT;
-    args->manifest_cmd = MANIFEST_CMD_UNKNOWN;
+    args->manifest_cmd.cmd = MANIFEST_CMD_UNKNOWN;
+    args->manifest_cmd.path = NULL;
     args->new_cmd.package = NULL;
     args->new_cmd.package_type = INIT_PACKAGE_TYPE_LIB;
     args->new_cmd.language = C11;
@@ -133,6 +134,7 @@ opt_parse_end:
 
 void args_free(args_t *args)
 {
+    string_free(args->manifest_cmd.path);
     string_free(args->new_cmd.package);
     free(args);
 }
@@ -152,6 +154,7 @@ static int args_parse_manifest(args_t *args, char **argv)
     const struct optparse_long longopts[] =
         {
             {"help", 'h', OPTPARSE_NONE},
+            {"path", 'p', OPTPARSE_REQUIRED},
             {0}};
 
     struct optparse options;
@@ -166,6 +169,9 @@ static int args_parse_manifest(args_t *args, char **argv)
         case 'h':
             args->help = true;
             return CREN_OK;
+        case 'p':
+            args->manifest_cmd.path = string_init(options.optarg);
+            break;
         default:
             printf("Unknown option: %c\n", option);
             return CREN_NOK;
@@ -184,7 +190,7 @@ static int args_parse_manifest(args_t *args, char **argv)
     size_t max_len = cmd_len > 16 ? 16 : cmd_len;
     if (strncmp(subargv[0], cmds[0].name, max_len) == 0)
     {
-        args->manifest_cmd = cmds[0].cmd;
+        args->manifest_cmd.cmd = cmds[0].cmd;
     }
     else
     {
@@ -322,6 +328,7 @@ void usage_manifest()
     puts("");
 
     printf("%sOptions:%s\n", COLOR_HEADER, COLOR_RESET);
+    printf("  %s-p, --path %s<PATH>\t\t\t%sPath to manifest file\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
     printf("  %s-h, --help\t\t\t\t%sPrint help\n", COLOR_OPT, COLOR_TEXT);
     puts("");
 
