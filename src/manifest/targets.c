@@ -1,3 +1,4 @@
+#include <cren.h>
 #include <lib/log.h>
 #include <manifest/targets.h>
 
@@ -82,7 +83,7 @@ int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t ***dest, size_t *le
     if (new_target == NULL)
     {
         log_fatal("Failed to reallocate memory for targets");
-        return 1;
+        return CREN_NOK;
     }
 
     *dest = new_target;
@@ -91,7 +92,7 @@ int cren_manifest_targets_add_cfg(cren_manifest_target_cfg_t ***dest, size_t *le
 
     log_trace("Added new target to targets; new length: %zu", *len);
 
-    return 0;
+    return CREN_OK;
 }
 
 void cren_manifest_target_cfg_free(cren_manifest_target_cfg_t *cfg)

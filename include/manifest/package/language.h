@@ -3,6 +3,8 @@
 #ifndef CREN_MANIFEST_LANGUAGE_H
 #define CREN_MANIFEST_LANGUAGE_H
 
+#include <stdbool.h>
+
 /// @brief Language variants
 typedef enum language_t
 {
@@ -31,5 +33,10 @@ language_t language_from_str(const char *str);
 /// @param language
 /// @return string
 const char *language_to_string(language_t language);
+
+/// @brief check if language is C
+/// @param language
+/// @return true if language is C
+bool language_is_c(language_t language);
 
 #endif // CREN_MANIFEST_LANGUAGE_H

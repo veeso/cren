@@ -152,3 +152,8 @@ const char *language_to_string(language_t language)
         return NULL;
     }
 }
+
+bool language_is_c(language_t language)
+{
+    return language == C89 || language == C90 || language == C99 || language == C11 || language == C17 || language == C23;
+}

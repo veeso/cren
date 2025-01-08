@@ -2,13 +2,9 @@
 #include <string.h>
 
 #include <lib/log.h>
+#include <manifest.h>
 #include <manifest/path.h>
-
-#if defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
+#include <utils/fs.h>
 
 string_t *find_manifest_path_in(const char *path);
 char *parent_dir(const char *path);
@@ -130,33 +126,4 @@ char *parent_dir(const char *path)
     parent[last_slash] = '\0';
 
     return parent;
-}
-
-char *get_current_dir()
-{
-    char *buffer = (char *)malloc(sizeof(char) * 4096);
-    if (buffer == NULL)
-    {
-        log_error("Failed to allocate memory for current directory");
-        return NULL;
-    }
-
-#if defined(_WIN32) || defined(_WIN64)
-    if (GetCurrentDirectoryA(4096, buffer) == 0)
-    {
-        log_error("Failed to get current directory");
-        free(buffer);
-        return NULL;
-    }
-#else
-    if (getcwd(buffer, 4096) == NULL)
-    {
-        log_error("Failed to get current directory");
-        free(buffer);
-        return NULL;
-    }
-
-#endif
-
-    return buffer;
 }

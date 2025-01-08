@@ -252,7 +252,7 @@ static int args_parse_new(args_t *args, char **argv)
         return CREN_NOK;
     }
 
-    args->new_cmd.package = string_init(subargv[0]);
+    args->new_cmd.package = string_from_cstr(subargv[0]);
 
     return CREN_OK;
 }

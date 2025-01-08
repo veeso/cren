@@ -11,6 +11,10 @@
 #include <manifest/package.h>
 #include <manifest/targets.h>
 
+#define CREN_MANIFEST_NAME "Cren.toml"
+#define CREN_MANIFEST_SRC "src"
+#define CREN_MANIFEST_INCLUDE "include"
+
 // struct containing the layout of the manifest
 typedef struct cren_manifest_t cren_manifest_t;
 
