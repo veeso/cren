@@ -95,21 +95,22 @@ int serialize_targets(cren_manifest_targets_t *targets, FILE *file)
     {
         println(file, "[lib]");
         serialize_target_cfg(targets->lib, file);
+        println(file, "");
     }
 
     for (size_t i = 0; i < targets->bin_len; i++)
     {
         println(file, "[[bin]]");
         serialize_target_cfg(targets->bin[i], file);
+        println(file, "");
     }
 
     for (size_t i = 0; i < targets->examples_len; i++)
     {
         println(file, "[[example]]");
         serialize_target_cfg(targets->examples[i], file);
+        println(file, "");
     }
-
-    println(file, "");
 
     return CREN_OK;
 }
@@ -158,7 +159,8 @@ int serialize_dependencies(cren_manifest_dependencies_t *dependencies, FILE *fil
         }
     }
 
-    println(file, "");
+    if (dependencies->dependencies_len > 0 || dependencies->dev_dependencies_len > 0)
+        println(file, "");
 
     return CREN_OK;
 }
@@ -248,7 +250,8 @@ int serialize_features(cren_manifest_features_t *features, FILE *file)
         }
     }
 
-    println(file, "");
+    if (features->default_features != NULL || features->features_len > 0)
+        println(file, "");
 
     return CREN_OK;
 }

@@ -53,6 +53,12 @@ The output generated will be:
 $ cd hello_world
  
 $ tree .
+.
+├── Cren.toml
+├── include
+│   └── hello_world.h
+└── src
+    └── hello_world.c
 ```
 
 If we take a look at the output, we can see a file called `Cren.toml`.
