@@ -22,4 +22,6 @@
 
 void print_line_and_progress(size_t current, size_t total, const char *action, const char *line_fmt, ...);
 
+void print_outcome(const char *action, const char *line_fmt, ...);
+
 #endif // UTILS_TERMINAL_H

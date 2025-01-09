@@ -48,7 +48,15 @@ int command_clean(const args_clean_t *args)
         goto cleanup;
     }
 
-    // TODO: check if exists
+    // check if exists
+    dirent_t *dir_stat = dirent_stat(dir_to_clean->data);
+    if (dir_stat == NULL)
+    {
+        log_debug("Target dir does not exist: %s", dir_to_clean->data);
+        rc = CREN_OK;
+        goto cleanup;
+    }
+    dirent_free(dir_stat);
 
     // if release is true, clean only debug
     if (args->release)
@@ -76,9 +84,9 @@ int command_clean(const args_clean_t *args)
     log_debug("Cleaning target dir: %s; %zu items to remove", dir_to_clean->data, files_to_remove);
     rmdir_all(dir_to_clean->data, print_clean_progress, (void *)&progress_ctx);
 
-    printf("%s\r%sFinished%s cren clean\n", CLEAR_LINE, COLOR_HEADER, COLOR_TEXT);
-
 cleanup:
+    print_outcome("Finished", "cren clean");
+
     string_free(dir_to_clean);
     cren_manifest_free(manifest);
     dirent_free(target_dirent);

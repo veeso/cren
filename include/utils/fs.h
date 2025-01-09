@@ -36,6 +36,11 @@ int rmdir_all(const char *path, void (*on_remove_cb)(void *ctx, const char *path
 /// @return
 dirent_t *scan_dir(const char *path);
 
+/// @brief Stat dirent_t at path
+/// @param path
+/// @return dirent_t or NULL if doesn't exist
+dirent_t *dirent_stat(const char *path);
+
 /// @brief Free a dirent_t
 /// @param dir
 void dirent_free(dirent_t *dir);

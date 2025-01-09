@@ -191,6 +191,48 @@ dirent_t *scan_dir_r(dirent_t *parent)
     return parent;
 }
 
+dirent_t *dirent_stat(const char *path)
+{
+#if defined(_WIN32) || defined(_WIN64)
+    WIN32_FIND_DATA find_data;
+    HANDLE find_handle = FindFirstFile(path, &find_data);
+    if (find_handle == INVALID_HANDLE_VALUE)
+    {
+        return NULL;
+    }
+
+    bool is_dir = false;
+    if (is_directory(path, &is_dir) != CREN_OK)
+    {
+        return NULL;
+    }
+    dirent_t *entry = dirent_init(NULL, path, is_dir);
+    if (entry == NULL)
+    {
+        log_error("Failed to initialize dirent for %s", path);
+        return NULL;
+    }
+
+    return entry;
+#else
+    struct stat statbuf;
+    if (stat(path, &statbuf) != 0)
+    {
+        return NULL;
+    }
+
+    bool is_dir = S_ISDIR(statbuf.st_mode) ? true : false;
+    dirent_t *entry = dirent_init(NULL, path, is_dir);
+    if (entry == NULL)
+    {
+        log_error("Failed to initialize dirent for %s", path);
+        return NULL;
+    }
+
+    return entry;
+#endif
+}
+
 int add_child(dirent_t *parent, dirent_t *child)
 {
     size_t new_count = parent->children_count + 1;

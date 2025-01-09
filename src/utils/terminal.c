@@ -39,3 +39,14 @@ void print_line_and_progress(size_t current, size_t total, const char *action, c
     printf("] %zu/%zu", current, total);
     fflush(stdout);
 }
+
+void print_outcome(const char *action, const char *line_fmt, ...)
+{
+    printf("\r%s", CLEAR_LINE);
+    printf("    %s%s%s ", COLOR_HEADER, action, COLOR_TEXT);
+    va_list args;
+    va_start(args, line_fmt);
+    vprintf(line_fmt, args);
+    va_end(args);
+    puts("");
+}
