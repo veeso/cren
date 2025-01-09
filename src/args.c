@@ -487,6 +487,7 @@ void usage_default()
 
     printf("%sCommands:%s\n", COLOR_HEADER, COLOR_RESET);
     printf("  %sbuild\t\t\t\t\t%sBuild package\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %sclean\t\t\t\t\t%sClean target directory\n", COLOR_OPT, COLOR_TEXT);
     printf("  %snew\t\t\t\t\t%sCreate a new Cren package\n", COLOR_OPT, COLOR_TEXT);
     printf("  %smanifest\t\t\t\t%sManage package manifest\n", COLOR_OPT, COLOR_TEXT);
     puts("");
