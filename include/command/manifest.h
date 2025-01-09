@@ -8,6 +8,6 @@
 /// @brief Execute manifest command
 /// @param args
 /// @return int `CREN_OK` on success, `CREN_ERR` on failure
-int command_manifest(args_manifest_t *args);
+int command_manifest(const args_manifest_t *args);
 
 #endif // CREN_COMMAND_MANIFEST_H

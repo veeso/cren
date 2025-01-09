@@ -54,8 +54,7 @@ string_t *find_manifest_path_in(const char *path)
     }
 
     // push manifest name
-    string_append_char(manifest_path, '/');
-    string_append(manifest_path, CREN_MANIFEST_NAME);
+    string_append_path(manifest_path, CREN_MANIFEST_NAME);
 
     // check if manifest exists
     FILE *file = fopen(manifest_path->data, "r");

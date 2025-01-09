@@ -8,6 +8,6 @@
 /// @brief Execute new command
 /// @param args
 /// @return int `CREN_OK` on success, `CREN_ERR` on failure
-int command_new(args_new_t *args);
+int command_new(const args_new_t *args);
 
 #endif // CREN_ARGS_NEW_H

@@ -125,3 +125,24 @@ void string_append_char(string_t *string, char data)
 
     log_trace("Appended char to string: %s, len %zu", string->data, string->length);
 }
+
+void string_append_path(string_t *string, const char *data)
+{
+    if (string == NULL || data == NULL)
+    {
+        log_error("Attempted to append to a NULL string");
+        return;
+    }
+
+#ifdef _WIN32
+#define SEPARATOR '\\'
+#else
+#define SEPARATOR '/'
+#endif
+
+    if (string->length > 0 && string->data[string->length - 1] != SEPARATOR)
+    {
+        string_append_char(string, SEPARATOR);
+    }
+    string_append(string, data);
+}

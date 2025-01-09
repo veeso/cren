@@ -61,3 +61,52 @@ int make_dir(const char *path)
 
     return CREN_OK;
 }
+
+int rmdir_all(const char *path, void (*on_remove_cb)(void *ctx, const char *path), void *ctx)
+{
+    dirent_t *dir = scan_dir(path);
+    if (dir == NULL)
+    {
+        log_error("Failed to scan directory %s", path);
+        return CREN_NOK;
+    }
+
+    for (size_t i = 0; i < dir->children_count; i++)
+    {
+        dirent_t *child = dir->children[i];
+        if (child->is_dir)
+        {
+            rmdir_all(child->path, on_remove_cb, ctx);
+        }
+        else
+        {
+            if (remove(child->path) == -1)
+            {
+                log_error("Failed to remove file %s", child->path);
+                dirent_free(dir);
+                return CREN_NOK;
+            }
+
+            if (on_remove_cb != NULL)
+            {
+                on_remove_cb(ctx, child->path);
+            }
+        }
+    }
+
+    if (rmdir(path) == -1)
+    {
+        log_error("Failed to remove directory %s", path);
+        dirent_free(dir);
+        return CREN_NOK;
+    }
+
+    if (on_remove_cb != NULL)
+    {
+        on_remove_cb(ctx, path);
+    }
+
+    dirent_free(dir);
+
+    return CREN_OK;
+}

@@ -6,21 +6,7 @@
 #include <cren.h>
 #include <lib/optparse.h>
 #include <manifest/package/language.h>
-
-#define COLOR_RESET "\033[0m"
-#define COLOR_BOLD "\033[1m"
-#define COLOR_RED "\033[31m"
-#define COLOR_GREEN "\033[32m"
-#define COLOR_YELLOW "\033[33m"
-#define COLOR_BLUE "\033[34m"
-#define COLOR_MAGENTA "\033[35m"
-#define COLOR_CYAN "\033[36m"
-#define COLOR_WHITE "\033[37m"
-
-#define COLOR_HEADER COLOR_BOLD COLOR_GREEN
-#define COLOR_OPT COLOR_BOLD COLOR_CYAN
-#define COLOR_ARG COLOR_RESET COLOR_CYAN
-#define COLOR_TEXT COLOR_RESET
+#include <utils/terminal.h>
 
 #define OPT_ALL_FEATURES 1
 #define OPT_NO_DEFAULT_FEATURES 2
@@ -29,9 +15,11 @@
 args_t *args_init();
 args_verbose_t get_verbosity(const char *optarg);
 static int args_parse_build(args_t *args, char **argv);
+static int args_parse_clean(args_t *args, char **argv);
 static int args_parse_manifest(args_t *args, char **argv);
 static int args_parse_new(args_t *args, char **argv);
 void usage_build();
+void usage_clean();
 void usage_manifest();
 void usage_new();
 void usage_default();
@@ -47,6 +35,7 @@ args_t *args_parse_cmd(int argc, char **argv)
         int (*parse)(args_t *args, char **);
     } cmds[] = {
         {"build", ARGS_CMD_BUILD, args_parse_build},
+        {"clean", ARGS_CMD_CLEAN, args_parse_clean},
         {"manifest", ARGS_CMD_MANIFEST, args_parse_manifest},
         {"new", ARGS_CMD_NEW, args_parse_new},
     };
@@ -157,6 +146,10 @@ args_t *args_init()
     args->build_cmd.features = NULL;
     args->build_cmd.manifest_path = NULL;
 
+    // clean
+    args->clean_cmd.manifest_path = NULL;
+    args->clean_cmd.target_dir = NULL;
+
     // manifest
     args->manifest_cmd.cmd = MANIFEST_CMD_UNKNOWN;
     args->manifest_cmd.path = NULL;
@@ -176,6 +169,10 @@ void args_free(args_t *args)
     string_free(args->build_cmd.example);
     string_free(args->build_cmd.target_dir);
     string_list_free(args->build_cmd.features);
+
+    // clean
+    string_free(args->clean_cmd.manifest_path);
+    string_free(args->clean_cmd.target_dir);
 
     // manifest
     string_free(args->manifest_cmd.path);
@@ -255,6 +252,49 @@ static int args_parse_build(args_t *args, char **argv)
             break;
         case 't':
             args->build_cmd.target_dir = string_from_cstr(options.optarg);
+            break;
+        default:
+            printf("Unknown option: %c\n", option);
+            return CREN_NOK;
+        }
+    }
+
+    return CREN_OK;
+}
+
+static int args_parse_clean(args_t *args, char **argv)
+{
+
+    // parse options
+    const struct optparse_long longopts[] =
+        {
+            {"help", 'h', OPTPARSE_NONE},
+            {"release", 'r', OPTPARSE_NONE},
+            {"target-dir", 't', OPTPARSE_REQUIRED},
+            {"manifest-path", OPT_MANIFEST_PATH, OPTPARSE_REQUIRED},
+            {0}};
+    ;
+
+    struct optparse options;
+    optparse_init(&options, argv);
+    options.permute = 0;
+
+    int option;
+    while ((option = optparse_long(&options, longopts, NULL)) != -1)
+    {
+        switch (option)
+        {
+        case 'h':
+            args->help = true;
+            return CREN_OK;
+        case 'r':
+            args->clean_cmd.release = true;
+            break;
+        case OPT_MANIFEST_PATH:
+            args->clean_cmd.manifest_path = string_from_cstr(options.optarg);
+            break;
+        case 't':
+            args->clean_cmd.target_dir = string_from_cstr(options.optarg);
             break;
         default:
             printf("Unknown option: %c\n", option);
@@ -416,6 +456,9 @@ void usage(const args_t *args)
     case ARGS_CMD_BUILD:
         usage_build();
         break;
+    case ARGS_CMD_CLEAN:
+        usage_clean();
+        break;
     case ARGS_CMD_MANIFEST:
         usage_manifest();
         break;
@@ -468,6 +511,23 @@ void usage_build()
     printf("  %s-F, --features %s<FEATURES>\t\t%sComma separated list of features to activate\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
     printf("  %s--all-features\t\t\t%sBuild with all features\n", COLOR_OPT, COLOR_TEXT);
     printf("  %s--no-default-features\t\t\t%sDo not build with default features\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-t, --target-dir %s<TARGET_DIR>\t\t%sSet target directory\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s--manifest-path %s<PATH>\t\t%sPath to manifest file\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-h, --help\t\t\t\t%sPrint help\n", COLOR_OPT, COLOR_TEXT);
+
+    puts("");
+}
+
+void usage_clean()
+{
+    puts("Clean target directory");
+    puts("");
+
+    printf("%sUsage: %scren clean %s[OPTIONS]\n", COLOR_HEADER, COLOR_OPT, COLOR_ARG);
+    puts("");
+
+    printf("%sOptions:%s\n", COLOR_HEADER, COLOR_RESET);
+    printf("  %s-r, --release\t\t\t\t%sKeep release artifacts\n", COLOR_OPT, COLOR_TEXT);
     printf("  %s-t, --target-dir %s<TARGET_DIR>\t\t%sSet target directory\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
     printf("  %s--manifest-path %s<PATH>\t\t%sPath to manifest file\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
     printf("  %s-h, --help\t\t\t\t%sPrint help\n", COLOR_OPT, COLOR_TEXT);

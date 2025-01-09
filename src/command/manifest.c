@@ -4,9 +4,9 @@
 #include <manifest.h>
 #include <manifest/path.h>
 
-int manifest_check(args_manifest_t *args);
+int manifest_check(const args_manifest_t *args);
 
-int command_manifest(args_manifest_t *args)
+int command_manifest(const args_manifest_t *args)
 {
     switch (args->cmd)
     {
@@ -17,7 +17,7 @@ int command_manifest(args_manifest_t *args)
     }
 }
 
-int manifest_check(args_manifest_t *args)
+int manifest_check(const args_manifest_t *args)
 {
     int rc = CREN_OK;
 

@@ -6,6 +6,7 @@
 
 #include <args.h>
 #include <command/build.h>
+#include <command/clean.h>
 #include <command/manifest.h>
 #include <command/new.h>
 #include <cren.h>
@@ -53,6 +54,9 @@ int main(int argc, char **argv)
   {
   case ARGS_CMD_BUILD:
     rc = command_build(&args->build_cmd);
+    break;
+  case ARGS_CMD_CLEAN:
+    rc = command_clean(&args->clean_cmd);
     break;
   case ARGS_CMD_MANIFEST:
     rc = command_manifest(&args->manifest_cmd);

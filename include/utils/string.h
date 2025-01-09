@@ -41,4 +41,9 @@ void string_append(string_t *string, const char *data);
 /// @param data
 void string_append_char(string_t *string, char data);
 
+/// @brief append a path to a string
+/// @param string
+/// @param data
+void string_append_path(string_t *string, const char *data);
+
 #endif // UTILS_STRING_H

@@ -3,9 +3,9 @@
 #include <manifest.h>
 #include <lib/log.h>
 
-void log_opts(args_build_t *args);
+void log_opts(const args_build_t *args);
 
-int command_build(args_build_t *args)
+int command_build(const args_build_t *args)
 {
     // log
     log_opts(args);
@@ -22,7 +22,7 @@ int command_build(args_build_t *args)
     return CREN_OK;
 }
 
-void log_opts(args_build_t *args)
+void log_opts(const args_build_t *args)
 {
     log_debug("Build options:");
     log_debug("all-features: %d", args->all_features);

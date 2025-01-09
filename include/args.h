@@ -6,6 +6,7 @@
 #include <stdbool.h>
 
 #include <args/build.h>
+#include <args/clean.h>
 #include <args/manifest.h>
 #include <args/new.h>
 
@@ -24,6 +25,7 @@ typedef enum args_verbose_t
 typedef enum args_cmd_t
 {
     ARGS_CMD_BUILD,
+    ARGS_CMD_CLEAN,
     ARGS_CMD_MANIFEST,
     ARGS_CMD_NEW,
     ARGS_CMD_RUN,
@@ -40,6 +42,7 @@ struct args_t
     args_cmd_t cmd;
     // subcommands
     args_build_t build_cmd;
+    args_clean_t clean_cmd;
     args_manifest_t manifest_cmd;
     args_new_t new_cmd;
 

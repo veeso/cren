@@ -10,15 +10,15 @@
 
 string_t *get_wrkdir();
 string_t *get_project_dir(string_t *wrkdir, string_t *package);
-int init_manifest(args_new_t *args, string_t *project_dir, string_t *main_src);
-string_t *init_main_src(args_new_t *args, string_t *project_dir);
-int init_main_src_c(args_new_t *args, FILE *file);
-int init_main_src_cpp(args_new_t *args, FILE *file);
-int init_main_include(args_new_t *args, string_t *project_dir);
-int init_main_include_c(args_new_t *args, FILE *file);
-int init_main_include_cpp(args_new_t *args, FILE *file);
+int init_manifest(const args_new_t *args, string_t *project_dir, string_t *main_src);
+string_t *init_main_src(const args_new_t *args, string_t *project_dir);
+int init_main_src_c(const args_new_t *args, FILE *file);
+int init_main_src_cpp(const args_new_t *args, FILE *file);
+int init_main_include(const args_new_t *args, string_t *project_dir);
+int init_main_include_c(const args_new_t *args, FILE *file);
+int init_main_include_cpp(const args_new_t *args, FILE *file);
 
-int command_new(args_new_t *args)
+int command_new(const args_new_t *args)
 {
     int rc = CREN_OK;
     string_t *wrkdir = NULL;
@@ -113,13 +113,12 @@ string_t *get_project_dir(string_t *wrkdir, string_t *package)
         return NULL;
     }
 
-    string_append_char(project_dir, '/');
-    string_append(project_dir, package->data);
+    string_append_path(project_dir, package->data);
 
     return project_dir;
 }
 
-int init_manifest(args_new_t *args, string_t *project_dir, string_t *main_src)
+int init_manifest(const args_new_t *args, string_t *project_dir, string_t *main_src)
 {
     int rc = CREN_OK;
     cren_manifest_t *manifest = NULL;
@@ -134,8 +133,7 @@ int init_manifest(args_new_t *args, string_t *project_dir, string_t *main_src)
         rc = CREN_NOK;
         goto cleanup;
     }
-    string_append_char(manifest_path, '/');
-    string_append(manifest_path, CREN_MANIFEST_NAME);
+    string_append_path(manifest_path, CREN_MANIFEST_NAME);
 
     // init manifest
     manifest = cren_manifest_init();
@@ -235,7 +233,7 @@ cleanup:
     return rc;
 }
 
-string_t *init_main_src(args_new_t *args, string_t *project_dir)
+string_t *init_main_src(const args_new_t *args, string_t *project_dir)
 {
     // make src path
     int rc = CREN_OK;
@@ -247,8 +245,7 @@ string_t *init_main_src(args_new_t *args, string_t *project_dir)
         rc = CREN_NOK;
         goto cleanup;
     }
-    string_append_char(main_src, '/');
-    string_append(main_src, CREN_MANIFEST_SRC);
+    string_append_path(main_src, CREN_MANIFEST_SRC);
     // mkdir src
     if (make_dir(main_src->data) != CREN_OK)
     {
@@ -260,8 +257,7 @@ string_t *init_main_src(args_new_t *args, string_t *project_dir)
     bool is_c = args->language == LANGUAGE_UNKNOWN || language_is_c(args->language);
 
     // append / and package name and .c/.cpp
-    string_append_char(main_src, '/');
-    string_append(main_src, args->package->data);
+    string_append_path(main_src, args->package->data);
     if (is_c)
     {
         string_append(main_src, ".c");
@@ -303,7 +299,7 @@ cleanup:
     return main_src;
 }
 
-int init_main_src_c(args_new_t *args, FILE *file)
+int init_main_src_c(const args_new_t *args, FILE *file)
 {
     log_debug("Init main src c");
 
@@ -330,7 +326,7 @@ int init_main_src_c(args_new_t *args, FILE *file)
     return CREN_OK;
 }
 
-int init_main_src_cpp(args_new_t *args, FILE *file)
+int init_main_src_cpp(const args_new_t *args, FILE *file)
 {
     log_debug("Init main src cpp");
 
@@ -357,7 +353,7 @@ int init_main_src_cpp(args_new_t *args, FILE *file)
     return CREN_OK;
 }
 
-int init_main_include(args_new_t *args, string_t *project_dir)
+int init_main_include(const args_new_t *args, string_t *project_dir)
 {
     // make include path
     int rc = CREN_OK;
@@ -373,8 +369,7 @@ int init_main_include(args_new_t *args, string_t *project_dir)
     }
 
     // append / and include and / and package name and .h/.hpp
-    string_append_char(main_include, '/');
-    string_append(main_include, CREN_MANIFEST_INCLUDE);
+    string_append_path(main_include, CREN_MANIFEST_INCLUDE);
     // mkdir include
     if (make_dir(main_include->data) != CREN_OK)
     {
@@ -382,8 +377,7 @@ int init_main_include(args_new_t *args, string_t *project_dir)
         rc = CREN_NOK;
         goto cleanup;
     }
-    string_append_char(main_include, '/');
-    string_append(main_include, args->package->data);
+    string_append_path(main_include, args->package->data);
     if (is_c)
     {
         string_append(main_include, ".h");
@@ -421,7 +415,7 @@ cleanup:
     return rc;
 }
 
-int init_main_include_c(args_new_t *args, FILE *file)
+int init_main_include_c(const args_new_t *args, FILE *file)
 {
     log_debug("Init main include c");
 
@@ -441,7 +435,7 @@ int init_main_include_c(args_new_t *args, FILE *file)
     return CREN_OK;
 }
 
-int init_main_include_cpp(args_new_t *args, FILE *file)
+int init_main_include_cpp(const args_new_t *args, FILE *file)
 {
     log_debug("Init main include cpp");
 

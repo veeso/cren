@@ -5,6 +5,6 @@
 
 #include <args/build.h>
 
-int command_build(args_build_t *args);
+int command_build(const args_build_t *args);
 
 #endif // CREN_COMMAND_BUILD_H
