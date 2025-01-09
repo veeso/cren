@@ -28,4 +28,6 @@ void string_list_free(string_list_t *list);
 /// @return 0 on success, 1 on failure
 int string_list_push(string_list_t *list, string_t *str);
 
+string_list_t *string_list_from_cstr(const char *data, const char *delim);
+
 #endif // CREN_UTILS_CHAR_LIST_H

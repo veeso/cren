@@ -30,6 +30,11 @@ struct cren_manifest_t
 /// @return cren_manifest
 cren_manifest_t *cren_manifest_init();
 
+/// @brief Load cren manifest file from path
+/// @param path (if NULL, use default path)
+/// @return cren_manifest
+cren_manifest_t *cren_manifest_load(const char *path);
+
 /// @brief Parse a cren manifest file
 /// @param manifest
 /// @param file to parse

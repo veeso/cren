@@ -21,68 +21,17 @@ int manifest_check(args_manifest_t *args)
 {
     int rc = CREN_OK;
 
-    string_t *cren_manifest_path = NULL;
-    FILE *file = NULL;
-    cren_manifest_t *manifest = NULL;
-    // get cren manifest or use provided arg
-    if (args->path == NULL)
-    {
-        cren_manifest_path = manifest_path();
-    }
-    else
-    {
-        cren_manifest_path = string_clone(args->path);
-    }
-
-    if (cren_manifest_path == NULL)
-    {
-        log_fatal("Failed to get cren manifest path");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
-    log_info("Checking cren manifest: %.*s", cren_manifest_path->length, cren_manifest_path->data);
-
-    // open file
-    file = fopen(cren_manifest_path->data, "r");
-    if (file == NULL)
-    {
-        log_fatal("Failed to open cren manifest: %.*s", cren_manifest_path->length, cren_manifest_path->data);
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
-    // read manifest
-    manifest = cren_manifest_init();
+    cren_manifest_t *manifest = cren_manifest_load(args->path != NULL ? args->path->data : NULL);
     if (manifest == NULL)
     {
-        log_fatal("Failed to init cren manifest");
-        rc = CREN_NOK;
-        goto cleanup;
+        log_error("Failed to load manifest");
+        return CREN_NOK;
     }
 
-    // parse manifest
-    char error[4096];
-    if (cren_manifest_parse(manifest, file, error, 4096) != CREN_OK)
-    {
-        log_fatal("Failed to parse cren manifest: %s", error);
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
-    if (cren_manifest_write(manifest, NULL) != CREN_OK)
-    {
-        log_fatal("Failed to write cren manifest");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
+    rc = cren_manifest_write(manifest, NULL);
 
     puts("Manifest OK");
 
-cleanup:
-    if (file != NULL)
-        fclose(file);
-    string_free(cren_manifest_path);
     cren_manifest_free(manifest);
 
     return rc;

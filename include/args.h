@@ -5,6 +5,7 @@
 
 #include <stdbool.h>
 
+#include <args/build.h>
 #include <args/manifest.h>
 #include <args/new.h>
 
@@ -38,6 +39,7 @@ struct args_t
     // cmd for subcommands
     args_cmd_t cmd;
     // subcommands
+    args_build_t build_cmd;
     args_manifest_t manifest_cmd;
     args_new_t new_cmd;
 

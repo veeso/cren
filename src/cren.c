@@ -5,15 +5,18 @@
 #include <stdlib.h>
 
 #include <args.h>
+#include <command/build.h>
 #include <command/manifest.h>
 #include <command/new.h>
-#include <lib/log.h>
 #include <cren.h>
+#include <lib/log.h>
 
 void init_log(args_verbose_t verbose, bool quiet);
 
 int main(int argc, char **argv)
 {
+  // init log quiet
+  log_set_quiet(true);
   // get args
   args_t *args = args_parse_cmd(argc, argv);
   if (args == NULL)
@@ -48,6 +51,9 @@ int main(int argc, char **argv)
   int rc = CREN_OK;
   switch (args->cmd)
   {
+  case ARGS_CMD_BUILD:
+    rc = command_build(&args->build_cmd);
+    break;
   case ARGS_CMD_MANIFEST:
     rc = command_manifest(&args->manifest_cmd);
     break;

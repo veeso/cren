@@ -4,8 +4,8 @@
 
 #include <args.h>
 #include <cren.h>
-#include <manifest/package/language.h>
 #include <lib/optparse.h>
+#include <manifest/package/language.h>
 
 #define COLOR_RESET "\033[0m"
 #define COLOR_BOLD "\033[1m"
@@ -22,9 +22,16 @@
 #define COLOR_ARG COLOR_RESET COLOR_CYAN
 #define COLOR_TEXT COLOR_RESET
 
+#define OPT_ALL_FEATURES 1
+#define OPT_NO_DEFAULT_FEATURES 2
+#define OPT_MANIFEST_PATH 3
+
+args_t *args_init();
 args_verbose_t get_verbosity(const char *optarg);
+static int args_parse_build(args_t *args, char **argv);
 static int args_parse_manifest(args_t *args, char **argv);
 static int args_parse_new(args_t *args, char **argv);
+void usage_build();
 void usage_manifest();
 void usage_new();
 void usage_default();
@@ -39,6 +46,7 @@ args_t *args_parse_cmd(int argc, char **argv)
         args_cmd_t cmd;
         int (*parse)(args_t *args, char **);
     } cmds[] = {
+        {"build", ARGS_CMD_BUILD, args_parse_build},
         {"manifest", ARGS_CMD_MANIFEST, args_parse_manifest},
         {"new", ARGS_CMD_NEW, args_parse_new},
     };
@@ -53,21 +61,11 @@ args_t *args_parse_cmd(int argc, char **argv)
             {0}};
 
     // init args
-    args_t *args = (args_t *)malloc(sizeof(args_t));
+    args_t *args = args_init();
     if (args == NULL)
     {
         return NULL;
     }
-    args->cmd = ARGS_CMD_UNKNOWN;
-    args->help = false;
-    args->quiet = false;
-    args->version = false;
-    args->verbose = VERBOSE_DEFAULT;
-    args->manifest_cmd.cmd = MANIFEST_CMD_UNKNOWN;
-    args->manifest_cmd.path = NULL;
-    args->new_cmd.package = NULL;
-    args->new_cmd.package_type = INIT_PACKAGE_TYPE_LIB;
-    args->new_cmd.language = C11;
 
     // parse command
     optparse_init(&options, argv);
@@ -132,11 +130,139 @@ opt_parse_end:
     return args;
 }
 
+args_t *args_init()
+{
+    args_t *args = (args_t *)malloc(sizeof(args_t));
+    if (args == NULL)
+    {
+        return NULL;
+    }
+    args->cmd = ARGS_CMD_UNKNOWN;
+    args->help = false;
+    args->quiet = false;
+    args->version = false;
+    args->verbose = VERBOSE_DEFAULT;
+
+    // build
+    args->build_cmd.all_targets = false;
+    args->build_cmd.all_features = false;
+    args->build_cmd.no_default_features = false;
+    args->build_cmd.bins = false;
+    args->build_cmd.examples = false;
+    args->build_cmd.lib = false;
+    args->build_cmd.release = false;
+    args->build_cmd.bin = NULL;
+    args->build_cmd.example = NULL;
+    args->build_cmd.target_dir = NULL;
+    args->build_cmd.features = NULL;
+    args->build_cmd.manifest_path = NULL;
+
+    // manifest
+    args->manifest_cmd.cmd = MANIFEST_CMD_UNKNOWN;
+    args->manifest_cmd.path = NULL;
+
+    // new
+    args->new_cmd.package = NULL;
+    args->new_cmd.package_type = INIT_PACKAGE_TYPE_LIB;
+    args->new_cmd.language = C11;
+
+    return args;
+}
+
 void args_free(args_t *args)
 {
+    // build
+    string_free(args->build_cmd.bin);
+    string_free(args->build_cmd.example);
+    string_free(args->build_cmd.target_dir);
+    string_list_free(args->build_cmd.features);
+
+    // manifest
     string_free(args->manifest_cmd.path);
+
+    // new
     string_free(args->new_cmd.package);
+
     free(args);
+}
+
+static int args_parse_build(args_t *args, char **argv)
+{
+
+    // parse options
+    const struct optparse_long longopts[] =
+        {
+            {"help", 'h', OPTPARSE_NONE},
+            {"release", 'r', OPTPARSE_NONE},
+            {"all-targets", 'a', OPTPARSE_NONE},
+            {"bin", 'b', OPTPARSE_REQUIRED},
+            {"bins", 'B', OPTPARSE_NONE},
+            {"example", 'e', OPTPARSE_REQUIRED},
+            {"examples", 'E', OPTPARSE_NONE},
+            {"lib", 'l', OPTPARSE_NONE},
+            {"features", 'F', OPTPARSE_REQUIRED},
+            {"all-features", OPT_ALL_FEATURES, OPTPARSE_NONE},
+            {"no-default-features", OPT_NO_DEFAULT_FEATURES, OPTPARSE_NONE},
+            {"target-dir", 't', OPTPARSE_REQUIRED},
+            {"manifest-path", OPT_MANIFEST_PATH, OPTPARSE_REQUIRED},
+            {0}};
+    ;
+
+    struct optparse options;
+    optparse_init(&options, argv);
+    options.permute = 0;
+
+    int option;
+    while ((option = optparse_long(&options, longopts, NULL)) != -1)
+    {
+        switch (option)
+        {
+        case 'h':
+            args->help = true;
+            return CREN_OK;
+        case 'r':
+            args->build_cmd.release = true;
+            break;
+        case 'a':
+            args->build_cmd.all_targets = true;
+            break;
+        case 'b':
+            args->build_cmd.bin = string_from_cstr(options.optarg);
+            break;
+        case 'B':
+            args->build_cmd.bins = true;
+            break;
+        case 'e':
+            args->build_cmd.example = string_from_cstr(options.optarg);
+            break;
+        case 'E':
+            args->build_cmd.examples = true;
+            break;
+        case 'l':
+            args->build_cmd.lib = true;
+            break;
+        case 'F':
+            args->build_cmd.features = string_list_from_cstr(options.optarg, ",");
+            break;
+        case OPT_ALL_FEATURES:
+            args->build_cmd.all_features = true;
+            break;
+        case OPT_NO_DEFAULT_FEATURES:
+            args->build_cmd.no_default_features = true;
+            break;
+        case OPT_MANIFEST_PATH:
+            args->build_cmd.manifest_path = string_from_cstr(options.optarg);
+            break;
+        case 't':
+            args->build_cmd.target_dir = string_from_cstr(options.optarg);
+            break;
+        default:
+            printf("Unknown option: %c\n", option);
+            return CREN_NOK;
+        }
+    }
+
+    return CREN_OK;
 }
 
 static int args_parse_manifest(args_t *args, char **argv)
@@ -287,6 +413,9 @@ void usage(const args_t *args)
 {
     switch (args->cmd)
     {
+    case ARGS_CMD_BUILD:
+        usage_build();
+        break;
     case ARGS_CMD_MANIFEST:
         usage_manifest();
         break;
@@ -314,8 +443,35 @@ void usage_default()
     puts("");
 
     printf("%sCommands:%s\n", COLOR_HEADER, COLOR_RESET);
+    printf("  %sbuild\t\t\t\t\t%sBuild package\n", COLOR_OPT, COLOR_TEXT);
     printf("  %snew\t\t\t\t\t%sCreate a new Cren package\n", COLOR_OPT, COLOR_TEXT);
     printf("  %smanifest\t\t\t\t%sManage package manifest\n", COLOR_OPT, COLOR_TEXT);
+    puts("");
+}
+
+void usage_build()
+{
+    puts("Build package");
+    puts("");
+
+    printf("%sUsage: %scren build %s[OPTIONS]\n", COLOR_HEADER, COLOR_OPT, COLOR_ARG);
+    puts("");
+
+    printf("%sOptions:%s\n", COLOR_HEADER, COLOR_RESET);
+    printf("  %s-r, --release\t\t\t\t%sRelease build\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-a, --all-targets\t\t\t%sBuild all targets\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-b, --bin %s<TARGET>\t\t\t%sBuild binary target\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-B, --bins\t\t\t\t%sBuild binary targets\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-e, --example %s<TARGET>\t\t%sBuild example target\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-E, --examples\t\t\t%sBuild example targets\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-l, --lib\t\t\t\t%sBuild library target\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-F, --features %s<FEATURES>\t\t%sComma separated list of features to activate\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s--all-features\t\t\t%sBuild with all features\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s--no-default-features\t\t\t%sDo not build with default features\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-t, --target-dir %s<TARGET_DIR>\t\t%sSet target directory\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s--manifest-path %s<PATH>\t\t%sPath to manifest file\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-h, --help\t\t\t\t%sPrint help\n", COLOR_OPT, COLOR_TEXT);
+
     puts("");
 }
 
