@@ -76,6 +76,8 @@ int command_clean(const args_clean_t *args)
     log_debug("Cleaning target dir: %s; %zu items to remove", dir_to_clean->data, files_to_remove);
     rmdir_all(dir_to_clean->data, print_clean_progress, (void *)&progress_ctx);
 
+    printf("%s\r%sFinished%s cren clean\n", CLEAR_LINE, COLOR_HEADER, COLOR_TEXT);
+
 cleanup:
     string_free(dir_to_clean);
     cren_manifest_free(manifest);

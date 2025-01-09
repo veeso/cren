@@ -147,6 +147,7 @@ args_t *args_init()
     args->build_cmd.manifest_path = NULL;
 
     // clean
+    args->clean_cmd.release = false;
     args->clean_cmd.manifest_path = NULL;
     args->clean_cmd.target_dir = NULL;
 

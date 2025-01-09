@@ -6,7 +6,7 @@ TARGET_DIR_RELEASE="./target/release"
 
 create_files_in_target_dir() {
     mkdir -p $1
-    for i in 0..1000; do
+    for i in {0..1000}; do
         touch $1/file_$i
     done
 }

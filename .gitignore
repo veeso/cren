@@ -3,6 +3,7 @@
 
 # build
 build/
+target/
 
 chatgpt_*.md
 

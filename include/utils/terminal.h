@@ -18,6 +18,8 @@
 #define COLOR_ARG COLOR_RESET COLOR_CYAN
 #define COLOR_TEXT COLOR_RESET
 
+#define CLEAR_LINE "\033[2K"
+
 void print_line_and_progress(size_t current, size_t total, const char *action, const char *line_fmt, ...);
 
 #endif // UTILS_TERMINAL_H

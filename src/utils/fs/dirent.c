@@ -115,6 +115,8 @@ dirent_t *scan_dir_r(dirent_t *parent)
             return NULL;
         }
 
+        free(full_path);
+
     } while (FindNextFile(find_handle, &find_data));
 #else
 
@@ -148,6 +150,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
         {
             log_error("Failed to check if %s is a directory", full_path);
             free(full_path);
+            closedir(dir);
             return NULL;
         }
 
@@ -156,6 +159,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
         {
             log_error("Failed to initialize dirent for %s", full_path);
             free(full_path);
+            closedir(dir);
             return NULL;
         }
 
@@ -164,6 +168,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
         {
             log_error("Failed to add child to parent");
             free(full_path);
+            closedir(dir);
             return NULL;
         }
 
@@ -172,9 +177,14 @@ dirent_t *scan_dir_r(dirent_t *parent)
         {
             log_error("Failed to scan directory %s", full_path);
             free(full_path);
+            closedir(dir);
             return NULL;
         }
+
+        free(full_path);
     }
+
+    closedir(dir);
 
 #endif
 
