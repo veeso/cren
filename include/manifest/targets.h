@@ -32,11 +32,11 @@ struct cren_manifest_targets_t
 
 /// @brief initializes a new cren_manifest_targets
 /// @return pointer to targets
-cren_manifest_targets_t *cren_manifest_targets_init();
+cren_manifest_targets_t *cren_manifest_targets_init(void);
 
 /// @brief initializes a new cren_manifest_target_cfg
 /// @return pointer to target cfg
-cren_manifest_target_cfg_t *cren_manifest_target_cfg_init();
+cren_manifest_target_cfg_t *cren_manifest_target_cfg_init(void);
 
 /// @brief add new target to targets
 /// @param targets

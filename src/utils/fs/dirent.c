@@ -63,7 +63,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
     HANDLE find_handle = FindFirstFile(parent->path, &find_data);
     if (find_handle == INVALID_HANDLE_VALUE)
     {
-        log_error("Failed to open directory %s", path);
+        log_error("Failed to open directory %s", parent->path);
         return NULL;
     }
 
@@ -261,7 +261,7 @@ int is_directory(const char *path, bool *is_dir)
     {
         return CREN_NOK; // Error accessing the path
     }
-    *is_dir = attributes & FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+    *is_dir = attributes & FILE_ATTRIBUTE_DIRECTORY ? true : false;
 #else
     struct stat statbuf;
     if (stat(path, &statbuf) != 0)

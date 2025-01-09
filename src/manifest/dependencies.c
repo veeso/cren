@@ -2,7 +2,7 @@
 #include <lib/log.h>
 #include <manifest/dependencies.h>
 
-cren_manifest_dependencies_t *cren_manifest_dependencies_init()
+cren_manifest_dependencies_t *cren_manifest_dependencies_init(void)
 {
     cren_manifest_dependencies_t *dependencies = (cren_manifest_dependencies_t *)malloc(sizeof(cren_manifest_dependencies_t));
     if (dependencies == NULL)
@@ -48,7 +48,7 @@ void cren_manifest_dependencies_free(cren_manifest_dependencies_t *dependencies)
     log_trace("Freed manifest dependencies");
 }
 
-cren_manifest_dependency_t *cren_manifest_dependency_init()
+cren_manifest_dependency_t *cren_manifest_dependency_init(void)
 {
     cren_manifest_dependency_t *dependency = (cren_manifest_dependency_t *)malloc(sizeof(cren_manifest_dependency_t));
     if (dependency == NULL)

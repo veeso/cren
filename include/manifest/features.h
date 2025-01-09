@@ -28,11 +28,11 @@ struct cren_manifest_feature_t
 
 /// @brief init cren manifest features
 /// @return features
-cren_manifest_features_t *cren_manifest_features_init();
+cren_manifest_features_t *cren_manifest_features_init(void);
 
 /// @brief init cren manifest feature
 /// @return feature
-cren_manifest_feature_t *cren_manifest_feature_init();
+cren_manifest_feature_t *cren_manifest_feature_init(void);
 
 /// @brief add feature to features
 /// @param features

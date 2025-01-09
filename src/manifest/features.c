@@ -2,7 +2,7 @@
 #include <lib/log.h>
 #include <manifest/features.h>
 
-cren_manifest_features_t *cren_manifest_features_init()
+cren_manifest_features_t *cren_manifest_features_init(void)
 {
     cren_manifest_features_t *features = (cren_manifest_features_t *)malloc(sizeof(cren_manifest_features_t));
     if (features == NULL)
@@ -67,7 +67,7 @@ void cren_manifest_feature_free(cren_manifest_feature_t *feature)
     log_trace("Freed manifest feature");
 }
 
-cren_manifest_feature_t *cren_manifest_feature_init()
+cren_manifest_feature_t *cren_manifest_feature_init(void)
 {
     cren_manifest_feature_t *feature = (cren_manifest_feature_t *)malloc(sizeof(cren_manifest_feature_t));
     if (feature == NULL)

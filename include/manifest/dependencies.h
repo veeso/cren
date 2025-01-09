@@ -34,11 +34,11 @@ struct cren_manifest_dependency_t
 
 /// @brief init cren manifest dependencies
 /// @return cren manifest dependencies
-cren_manifest_dependencies_t *cren_manifest_dependencies_init();
+cren_manifest_dependencies_t *cren_manifest_dependencies_init(void);
 
 /// @brief Init a dependency cfg
 /// @return pointer to dependency cfg
-cren_manifest_dependency_t *cren_manifest_dependency_init();
+cren_manifest_dependency_t *cren_manifest_dependency_init(void);
 
 /// @brief Add new dependency to dependencies
 /// @param dest

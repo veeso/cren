@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #endif
 
-char *get_current_dir()
+char *get_current_dir(void)
 {
     char *buffer = (char *)malloc(sizeof(char) * 4096);
     if (buffer == NULL)

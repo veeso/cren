@@ -15,7 +15,7 @@ struct string_t
 
 /// @brief init a new string
 /// @return string
-string_t *string_init();
+string_t *string_init(void);
 
 /// @brief Clone a string
 /// @param string

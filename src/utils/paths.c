@@ -4,7 +4,7 @@
 #include <manifest/path.h>
 #include <utils/paths.h>
 
-string_t *target_dir()
+string_t *target_dir(void)
 {
     // get manifest path
     string_t *target_dir = NULL;
@@ -41,7 +41,7 @@ cleanup:
     return target_dir;
 }
 
-string_t *target_debug_dir()
+string_t *target_debug_dir(void)
 {
     string_t *target_dir_path = target_dir();
     if (target_dir_path == NULL)
@@ -54,7 +54,7 @@ string_t *target_debug_dir()
     return target_dir_path;
 }
 
-string_t *target_release_dir()
+string_t *target_release_dir(void)
 {
     string_t *target_dir_path = target_dir();
     if (target_dir_path == NULL)

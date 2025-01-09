@@ -1,7 +1,7 @@
 #include <lib/log.h>
 #include <manifest/package.h>
 
-cren_manifest_package_t *cren_manifest_package_init()
+cren_manifest_package_t *cren_manifest_package_init(void)
 {
     cren_manifest_package_t *package = (cren_manifest_package_t *)malloc(sizeof(cren_manifest_package_t));
 

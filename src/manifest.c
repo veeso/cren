@@ -5,7 +5,7 @@
 #include <manifest.h>
 #include <manifest/path.h>
 
-cren_manifest_t *cren_manifest_init()
+cren_manifest_t *cren_manifest_init(void)
 {
     cren_manifest_t *manifest = (cren_manifest_t *)malloc(sizeof(cren_manifest_t));
 

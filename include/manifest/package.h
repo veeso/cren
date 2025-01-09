@@ -32,7 +32,7 @@ struct cren_manifest_package_t
 
 /// @brief initializes a new cren_manifest_package
 /// @return pointer to manifest_package
-cren_manifest_package_t *cren_manifest_package_init();
+cren_manifest_package_t *cren_manifest_package_init(void);
 
 /// @brief free cren manifest package
 /// @param package

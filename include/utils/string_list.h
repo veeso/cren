@@ -16,7 +16,7 @@ struct string_list_t
 };
 
 /// @brief init a char list
-string_list_t *string_list_init();
+string_list_t *string_list_init(void);
 
 /// @brief clean a char list
 /// @param list

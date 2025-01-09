@@ -12,17 +12,17 @@
 #define OPT_NO_DEFAULT_FEATURES 2
 #define OPT_MANIFEST_PATH 3
 
-args_t *args_init();
+args_t *args_init(void);
 args_verbose_t get_verbosity(const char *optarg);
 static int args_parse_build(args_t *args, char **argv);
 static int args_parse_clean(args_t *args, char **argv);
 static int args_parse_manifest(args_t *args, char **argv);
 static int args_parse_new(args_t *args, char **argv);
-void usage_build();
-void usage_clean();
-void usage_manifest();
-void usage_new();
-void usage_default();
+void usage_build(void);
+void usage_clean(void);
+void usage_manifest(void);
+void usage_new(void);
+void usage_default(void);
 
 args_t *args_parse_cmd(int argc, char **argv)
 {
@@ -119,7 +119,7 @@ opt_parse_end:
     return args;
 }
 
-args_t *args_init()
+args_t *args_init(void)
 {
     args_t *args = (args_t *)malloc(sizeof(args_t));
     if (args == NULL)
@@ -337,7 +337,7 @@ static int args_parse_manifest(args_t *args, char **argv)
             args->help = true;
             return CREN_OK;
         case 'p':
-            args->manifest_cmd.path = string_init(options.optarg);
+            args->manifest_cmd.path = string_from_cstr(options.optarg);
             break;
         default:
             printf("Unknown option: %c\n", option);
@@ -472,7 +472,7 @@ void usage(const args_t *args)
     }
 }
 
-void usage_default()
+void usage_default(void)
 {
     puts("C package manager");
     puts("");
@@ -494,7 +494,7 @@ void usage_default()
     puts("");
 }
 
-void usage_build()
+void usage_build(void)
 {
     puts("Build package");
     puts("");
@@ -520,7 +520,7 @@ void usage_build()
     puts("");
 }
 
-void usage_clean()
+void usage_clean(void)
 {
     puts("Clean target directory");
     puts("");
@@ -537,7 +537,7 @@ void usage_clean()
     puts("");
 }
 
-void usage_manifest()
+void usage_manifest(void)
 {
     puts("Manage package manifest");
     puts("");
@@ -555,7 +555,7 @@ void usage_manifest()
     puts("");
 }
 
-void usage_new()
+void usage_new(void)
 {
     puts("Create a new Cren package");
     puts("");

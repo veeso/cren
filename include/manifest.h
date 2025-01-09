@@ -28,7 +28,7 @@ struct cren_manifest_t
 
 /// @brief Init a new manifest
 /// @return cren_manifest
-cren_manifest_t *cren_manifest_init();
+cren_manifest_t *cren_manifest_init(void);
 
 /// @brief Load cren manifest file from path
 /// @param path (if NULL, use default path)

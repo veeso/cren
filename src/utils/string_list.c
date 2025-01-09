@@ -2,7 +2,7 @@
 #include <lib/log.h>
 #include <utils/string_list.h>
 
-string_list_t *string_list_init()
+string_list_t *string_list_init(void)
 {
     string_list_t *list = (string_list_t *)malloc(sizeof(string_list_t));
     if (list == NULL)

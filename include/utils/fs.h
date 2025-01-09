@@ -19,7 +19,7 @@ struct dirent_t
 
 /// @brief Get the current directory
 /// @return The current directory or NULL if failed. Must be freed by the caller
-char *get_current_dir();
+char *get_current_dir(void);
 
 /// @brief Create a directory
 /// @param path

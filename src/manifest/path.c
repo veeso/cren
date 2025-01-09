@@ -8,9 +8,9 @@
 
 string_t *find_manifest_path_in(const char *path);
 char *parent_dir(const char *path);
-char *get_current_dir();
+char *get_current_dir(void);
 
-string_t *manifest_path()
+string_t *manifest_path(void)
 {
     // get current dir
     char *current_dir = get_current_dir();

@@ -8,7 +8,7 @@
 #include <utils/fs.h>
 #include <utils/string.h>
 
-string_t *get_wrkdir();
+string_t *get_wrkdir(void);
 string_t *get_project_dir(string_t *wrkdir, string_t *package);
 int init_manifest(const args_new_t *args, string_t *project_dir, string_t *main_src);
 string_t *init_main_src(const args_new_t *args, string_t *project_dir);
@@ -88,7 +88,7 @@ cleanup:
     return rc;
 }
 
-string_t *get_wrkdir()
+string_t *get_wrkdir(void)
 {
     // get current wrkdir
     char *wrkdir_cstr = get_current_dir();

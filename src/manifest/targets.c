@@ -2,7 +2,7 @@
 #include <lib/log.h>
 #include <manifest/targets.h>
 
-cren_manifest_targets_t *cren_manifest_targets_init()
+cren_manifest_targets_t *cren_manifest_targets_init(void)
 {
     cren_manifest_targets_t *targets = (cren_manifest_targets_t *)malloc(sizeof(cren_manifest_targets_t));
     if (targets == NULL)
@@ -58,7 +58,7 @@ void cren_manifest_targets_free(cren_manifest_targets_t *targets)
     log_trace("Freed manifest targets");
 }
 
-cren_manifest_target_cfg_t *cren_manifest_target_cfg_init()
+cren_manifest_target_cfg_t *cren_manifest_target_cfg_init(void)
 {
     cren_manifest_target_cfg_t *cfg = (cren_manifest_target_cfg_t *)malloc(sizeof(cren_manifest_target_cfg_t));
     if (cfg == NULL)
