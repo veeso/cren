@@ -5,9 +5,9 @@
 #include <manifest.h>
 #include <manifest/path.h>
 #include <utils/fs.h>
+#include <utils/paths.h>
 
 string_t *find_manifest_path_in(const char *path);
-char *parent_dir(const char *path);
 char *get_current_dir(void);
 
 string_t *manifest_path(void)
@@ -64,65 +64,18 @@ string_t *find_manifest_path_in(const char *path)
         string_free(manifest_path);
 
         // search in parent dir
-        char *parent = parent_dir(path);
+        string_t *parent = parent_dir(path);
         if (parent == NULL)
         {
             log_error("Failed to find parent directory");
             return NULL;
         }
-        string_t *res = find_manifest_path_in(parent);
-        free(parent);
+        string_t *res = find_manifest_path_in(parent->data);
+        string_free(parent);
         return res;
     }
 
     // return manifest path
     fclose(file);
     return manifest_path;
-}
-
-char *parent_dir(const char *path)
-{
-    if (path == NULL)
-    {
-        log_error("Path is NULL");
-        return NULL;
-    }
-
-    size_t len = strlen(path);
-    if (len == 0)
-    {
-        log_error("Path is empty");
-        return NULL;
-    }
-
-    // find last slash
-    size_t last_slash = 0;
-    for (size_t i = len - 1; i > 0; i--)
-    {
-        if (path[i] == '/' || path[i] == '\\')
-        {
-            last_slash = i;
-            break;
-        }
-    }
-
-    // check if slash was found
-    if (last_slash == 0)
-    {
-        log_error("Failed to find parent directory");
-        return NULL;
-    }
-
-    // copy parent dir
-    char *parent = (char *)malloc(sizeof(char) * last_slash + 1);
-    if (parent == NULL)
-    {
-        log_error("Failed to allocate memory for parent directory");
-        return NULL;
-    }
-
-    strncpy(parent, path, last_slash);
-    parent[last_slash] = '\0';
-
-    return parent;
 }

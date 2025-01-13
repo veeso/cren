@@ -4,6 +4,56 @@
 #include <manifest/path.h>
 #include <utils/paths.h>
 
+string_t *parent_dir(const char *path)
+{
+    if (path == NULL)
+    {
+        log_error("Path is NULL");
+        return NULL;
+    }
+
+    size_t len = strlen(path);
+    if (len == 0)
+    {
+        log_error("Path is empty");
+        return NULL;
+    }
+
+    // find last slash
+    size_t last_slash = 0;
+    for (size_t i = len - 1; i > 0; i--)
+    {
+        if (path[i] == '/' || path[i] == '\\')
+        {
+            last_slash = i;
+            break;
+        }
+    }
+
+    // check if slash was found
+    if (last_slash == 0)
+    {
+        log_error("Failed to find parent directory");
+        return NULL;
+    }
+
+    // copy parent dir
+    char *parent = (char *)malloc(sizeof(char) * last_slash + 1);
+    if (parent == NULL)
+    {
+        log_error("Failed to allocate memory for parent directory");
+        return NULL;
+    }
+
+    strncpy(parent, path, last_slash);
+    parent[last_slash] = '\0';
+
+    string_t *parent_dir = string_from_cstr(parent);
+    free(parent);
+
+    return parent_dir;
+}
+
 string_t *target_dir(void)
 {
     // get manifest path

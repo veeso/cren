@@ -97,3 +97,16 @@ string_list_t *string_list_from_cstr(const char *data, const char *delim)
 
     return list;
 }
+
+bool string_list_contains(string_list_t *list, const char *str)
+{
+    for (size_t i = 0; i < list->nitems; i++)
+    {
+        if (strcmp(list->items[i]->data, str) == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

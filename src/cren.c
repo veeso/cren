@@ -94,6 +94,7 @@ void init_log(args_verbose_t verbose, bool quiet)
     log_set_level(LOG_WARN);
     break;
   case VERBOSE_ERROR:
+  case VERBOSE_DEFAULT:
     log_set_level(LOG_ERROR);
     break;
   case VERBOSE_FATAL:
