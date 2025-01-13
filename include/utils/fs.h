@@ -5,6 +5,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct dirent_t dirent_t;
 
@@ -12,6 +13,7 @@ struct dirent_t
 {
     char *path;
     bool is_dir;
+    time_t mtime;
     dirent_t **children;
     size_t children_count;
     dirent_t *parent;

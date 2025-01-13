@@ -14,15 +14,16 @@
 #include <unistd.h>
 #endif
 
-dirent_t *dirent_init(dirent_t *parent, const char *path, bool is_dir);
+dirent_t *dirent_init(dirent_t *parent, const char *path, bool is_dir, time_t mtime);
 dirent_t *scan_dir_r(dirent_t *parent);
 int add_child(dirent_t *parent, dirent_t *child);
 int is_directory(const char *path, bool *is_dir);
+time_t get_mtime(const char *path);
 
 dirent_t *scan_dir(const char *path)
 {
     // init parent
-    dirent_t *parent = dirent_init(NULL, path, true);
+    dirent_t *parent = dirent_init(NULL, path, true, get_mtime(path));
     if (parent == NULL)
     {
         log_error("Failed to initialize parent dirent");
@@ -154,7 +155,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
             return NULL;
         }
 
-        dirent_t *child = dirent_init(parent, full_path, is_dir);
+        dirent_t *child = dirent_init(parent, full_path, is_dir, get_mtime(full_path));
         if (child == NULL)
         {
             log_error("Failed to initialize dirent for %s", full_path);
@@ -206,7 +207,7 @@ dirent_t *dirent_stat(const char *path)
     {
         return NULL;
     }
-    dirent_t *entry = dirent_init(NULL, path, is_dir);
+    dirent_t *entry = dirent_init(NULL, path, is_dir, get_mtime(path));
     if (entry == NULL)
     {
         log_error("Failed to initialize dirent for %s", path);
@@ -222,7 +223,7 @@ dirent_t *dirent_stat(const char *path)
     }
 
     bool is_dir = S_ISDIR(statbuf.st_mode) ? true : false;
-    dirent_t *entry = dirent_init(NULL, path, is_dir);
+    dirent_t *entry = dirent_init(NULL, path, is_dir, statbuf.st_mtime);
     if (entry == NULL)
     {
         log_error("Failed to initialize dirent for %s", path);
@@ -274,13 +275,14 @@ int is_directory(const char *path, bool *is_dir)
     return CREN_OK;
 }
 
-dirent_t *dirent_init(dirent_t *parent, const char *path, bool is_dir)
+dirent_t *dirent_init(dirent_t *parent, const char *path, bool is_dir, time_t mtime)
 {
     dirent_t *entry = (dirent_t *)malloc(sizeof(dirent_t));
     entry->children = NULL;
 
     entry->children_count = 0;
     entry->is_dir = is_dir;
+    entry->mtime = mtime;
 
     size_t path_len = strlen(path);
     entry->path = (char *)malloc(sizeof(char) * (path_len + 1));
@@ -342,4 +344,30 @@ size_t dirent_count(dirent_t *entry)
     }
 
     return count;
+}
+
+time_t get_mtime(const char *path)
+{
+#if defined(_WIN32) || defined(_WIN64)
+    WIN32_FIND_DATA find_data;
+    HANDLE find_handle = FindFirstFile(path, &find_data);
+    if (find_handle == INVALID_HANDLE_VALUE)
+    {
+        return 0;
+    }
+
+    FILETIME ft = find_data.ftLastWriteTime;
+    ULARGE_INTEGER ull;
+    ull.LowPart = ft.dwLowDateTime;
+    ull.HighPart = ft.dwHighDateTime;
+    return ull.QuadPart / 10000000ULL - 11644473600ULL;
+#else
+    struct stat statbuf;
+    if (stat(path, &statbuf) != 0)
+    {
+        return 0;
+    }
+
+    return statbuf.st_mtime;
+#endif
 }
