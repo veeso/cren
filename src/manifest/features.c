@@ -145,50 +145,49 @@ cren_manifest_feature_t *cren_manifest_feature_clone(cren_manifest_feature_t *fe
     }
 
     clone->name = string_clone(feature->name);
-    if (clone->name == NULL)
+    if (feature->dependencies != NULL)
     {
-        log_error("Failed to clone feature name");
-        cren_manifest_feature_free(clone);
-        return NULL;
-    }
-
-    clone->dependencies = string_list_init();
-    if (clone->dependencies == NULL)
-    {
-        log_error("Failed to clone feature dependencies");
-        cren_manifest_feature_free(clone);
-        return NULL;
-    }
-
-    for (size_t i = 0; i < feature->dependencies->nitems; i++)
-    {
-        string_t *dependency = string_clone(feature->dependencies->items[i]);
-        if (dependency == NULL)
+        clone->dependencies = string_list_init();
+        if (clone->dependencies == NULL)
         {
-            log_error("Failed to clone feature dependency");
+            log_error("Failed to clone feature dependencies");
             cren_manifest_feature_free(clone);
             return NULL;
         }
-        string_list_push(clone->dependencies, dependency);
+
+        for (size_t i = 0; i < feature->dependencies->nitems; i++)
+        {
+            string_t *dependency = string_clone(feature->dependencies->items[i]);
+            if (dependency == NULL)
+            {
+                log_error("Failed to clone feature dependency");
+                cren_manifest_feature_free(clone);
+                return NULL;
+            }
+            string_list_push(clone->dependencies, dependency);
+        }
     }
 
-    clone->defines = string_list_init();
-    if (clone->defines == NULL)
+    if (feature->defines != NULL)
     {
-        log_error("Failed to clone feature defines");
-        cren_manifest_feature_free(clone);
-        return NULL;
-    }
-    for (size_t i = 0; i < feature->defines->nitems; i++)
-    {
-        string_t *define = string_clone(feature->defines->items[i]);
-        if (define == NULL)
+        clone->defines = string_list_init();
+        if (clone->defines == NULL)
         {
-            log_error("Failed to clone feature define");
+            log_error("Failed to clone feature defines");
             cren_manifest_feature_free(clone);
             return NULL;
         }
-        string_list_push(clone->defines, define);
+        for (size_t i = 0; i < feature->defines->nitems; i++)
+        {
+            string_t *define = string_clone(feature->defines->items[i]);
+            if (define == NULL)
+            {
+                log_error("Failed to clone feature define");
+                cren_manifest_feature_free(clone);
+                return NULL;
+            }
+            string_list_push(clone->defines, define);
+        }
     }
 
     return clone;
