@@ -16,7 +16,7 @@ struct source_t
 /// @brief Initialize the source object.
 /// @param src The source file.
 /// @return The source object.
-source_t *source_init(const char *src);
+source_t *source_init(const char *src, const char *target_dir);
 
 /// @brief Free the source object.
 /// @param source The source object to free.

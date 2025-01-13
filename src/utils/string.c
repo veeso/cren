@@ -16,7 +16,7 @@ string_t *string_init(void)
     return string;
 }
 
-string_t *string_clone(string_t *string)
+string_t *string_clone(const string_t *string)
 {
     if (string == NULL)
     {

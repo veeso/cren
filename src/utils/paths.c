@@ -54,6 +54,109 @@ string_t *parent_dir(const char *path)
     return parent_dir;
 }
 
+string_t *file_name(const char *path)
+{
+    if (path == NULL)
+    {
+        log_error("Path is NULL");
+        return NULL;
+    }
+
+    size_t len = strlen(path);
+    if (len == 0)
+    {
+        log_error("Path is empty");
+        return NULL;
+    }
+
+    // find last slash
+    size_t last_slash = 0;
+    for (size_t i = len - 1; i > 0; i--)
+    {
+        if (path[i] == '/' || path[i] == '\\')
+        {
+            last_slash = i;
+            break;
+        }
+    }
+
+    // check if slash was found
+    if (last_slash == 0)
+    {
+        log_error("Failed to find file name");
+        return NULL;
+    }
+
+    // copy file name
+    char *file = (char *)malloc(sizeof(char) * (len - last_slash + 1));
+    if (file == NULL)
+    {
+        log_error("Failed to allocate memory for file name");
+        return NULL;
+    }
+
+    strncpy(file, path + last_slash + 1, len - last_slash);
+    file[len - last_slash] = '\0';
+
+    string_t *file_name = string_from_cstr(file);
+    free(file);
+
+    return file_name;
+}
+
+string_t *base_name(const char *path)
+{
+    string_t *filename = file_name(path);
+    if (filename == NULL)
+    {
+        return NULL;
+    }
+
+    size_t len = filename->length;
+    if (len == 0)
+    {
+        log_error("File name is empty");
+        string_free(filename);
+        return NULL;
+    }
+
+    // find last dot
+    size_t last_dot = 0;
+    for (size_t i = len - 1; i > 0; i--)
+    {
+        if (filename->data[i] == '.')
+        {
+            last_dot = i;
+            break;
+        }
+    }
+
+    // check if dot was found
+    if (last_dot == 0)
+    {
+        log_error("Failed to find base name");
+        string_free(filename);
+        return NULL;
+    }
+
+    // copy base name
+    char *base = (char *)malloc(sizeof(char) * last_dot + 1);
+    if (base == NULL)
+    {
+        log_error("Failed to allocate memory for base name");
+        string_free(filename);
+        return NULL;
+    }
+
+    strncpy(base, filename->data, last_dot);
+
+    string_t *base_name = string_from_cstr(base);
+    string_free(filename);
+    free(base);
+
+    return base_name;
+}
+
 string_t *target_dir(void)
 {
     // get manifest path

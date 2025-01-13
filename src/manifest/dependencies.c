@@ -102,3 +102,66 @@ void cren_manifest_dependency_free(cren_manifest_dependency_t *dependency)
 
     log_trace("Freed manifest dependency");
 }
+
+cren_manifest_dependency_t *cren_manifest_dependency_clone(cren_manifest_dependency_t *dependency)
+{
+    if (dependency == NULL)
+    {
+        log_error("Feature is NULL");
+        return NULL;
+    }
+
+    cren_manifest_dependency_t *clone = cren_manifest_dependency_init();
+    if (clone == NULL)
+    {
+        log_error("Failed to clone feature");
+        return NULL;
+    }
+
+    clone->name = string_clone(dependency->name);
+    if (clone->name == NULL)
+    {
+        log_error("Failed to clone feature name");
+        cren_manifest_dependency_free(clone);
+        return NULL;
+    }
+
+    clone->git = string_clone(dependency->git);
+    if (clone->git == NULL)
+    {
+        log_error("Failed to clone feature git");
+        cren_manifest_dependency_free(clone);
+        return NULL;
+    }
+
+    clone->link = string_clone(dependency->link);
+    if (clone->link == NULL)
+    {
+        log_error("Failed to clone feature link");
+        cren_manifest_dependency_free(clone);
+        return NULL;
+    }
+
+    clone->optional = dependency->optional;
+
+    clone->defines = string_list_init();
+    if (clone->defines == NULL)
+    {
+        log_error("Failed to clone feature defines");
+        cren_manifest_dependency_free(clone);
+        return NULL;
+    }
+    for (size_t i = 0; i < dependency->defines->nitems; i++)
+    {
+        string_t *define = string_clone(dependency->defines->items[i]);
+        if (define == NULL)
+        {
+            log_error("Failed to clone feature define");
+            cren_manifest_dependency_free(clone);
+            return NULL;
+        }
+        string_list_push(clone->defines, define);
+    }
+
+    return clone;
+}

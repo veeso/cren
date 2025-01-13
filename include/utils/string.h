@@ -21,7 +21,7 @@ string_t *string_init(void);
 /// @brief Clone a string
 /// @param string
 /// @return string
-string_t *string_clone(string_t *string);
+string_t *string_clone(const string_t *string);
 
 /// @brief create a string from a c string
 /// @param data

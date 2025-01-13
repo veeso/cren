@@ -37,11 +37,6 @@ cren_manifest_feature_t *cren_manifest_feature_init(void);
 /// @brief clone cren manifest features
 /// @param features
 /// @return cloned features
-cren_manifest_feature_t *cren_manifest_dependency_clone(cren_manifest_feature_t *feature);
-
-/// @brief clone cren manifest features
-/// @param features
-/// @return cloned features
 cren_manifest_feature_t *cren_manifest_feature_clone(cren_manifest_feature_t *feature);
 
 /// @brief get feature by name

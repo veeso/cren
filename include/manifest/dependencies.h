@@ -40,6 +40,11 @@ cren_manifest_dependencies_t *cren_manifest_dependencies_init(void);
 /// @return pointer to dependency cfg
 cren_manifest_dependency_t *cren_manifest_dependency_init(void);
 
+/// @brief clone cren manifest dependency
+/// @param dep
+/// @return cloned dep
+cren_manifest_dependency_t *cren_manifest_dependency_clone(cren_manifest_dependency_t *dep);
+
 /// @brief Add new dependency to dependencies
 /// @param dest
 /// @param len

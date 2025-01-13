@@ -79,3 +79,26 @@ string_t *find_manifest_path_in(const char *path)
     fclose(file);
     return manifest_path;
 }
+
+string_t *get_project_dir(const char *manifest)
+{
+    string_t *manifest_path_s = manifest != NULL ? string_from_cstr(manifest) : manifest_path();
+    if (manifest_path_s == NULL)
+    {
+        log_error("Error getting manifest path");
+        return NULL;
+    }
+    string_t *project_dir = parent_dir(manifest_path_s->data);
+    if (project_dir == NULL)
+    {
+        log_error("Error getting project dir");
+        string_free(manifest_path_s);
+        return NULL;
+    }
+
+    string_free(manifest_path_s);
+
+    log_debug("Project dir: %s", project_dir->data);
+
+    return project_dir;
+}

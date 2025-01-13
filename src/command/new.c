@@ -9,7 +9,7 @@
 #include <utils/string.h>
 
 string_t *get_wrkdir(void);
-string_t *get_project_dir(string_t *wrkdir, string_t *package);
+string_t *new_project_dir(string_t *wrkdir, string_t *package);
 int init_manifest(const args_new_t *args, string_t *project_dir, string_t *main_src);
 string_t *init_main_src(const args_new_t *args, string_t *project_dir);
 int init_main_src_c(const args_new_t *args, FILE *file);
@@ -40,7 +40,7 @@ int command_new(const args_new_t *args)
     }
 
     // project_dir = wrkdir + args->package
-    project_dir = get_project_dir(wrkdir, args->package);
+    project_dir = new_project_dir(wrkdir, args->package);
     if (project_dir == NULL)
     {
         log_error("Failed to clone wrkdir");
@@ -104,7 +104,7 @@ string_t *get_wrkdir(void)
     return wrkdir;
 }
 
-string_t *get_project_dir(string_t *wrkdir, string_t *package)
+string_t *new_project_dir(string_t *wrkdir, string_t *package)
 {
     string_t *project_dir = string_clone(wrkdir);
     if (project_dir == NULL)

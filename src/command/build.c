@@ -9,16 +9,15 @@
 
 void log_opts(const args_build_t *args);
 build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manifest);
-string_t *get_project_dir(const args_build_t *args, const cren_manifest_t *manifest);
 int configure_include_dirs(build_t *build_args, const string_t *project_dir);
 int configure_target_dir(build_t *build_args, const args_build_t *args, const string_t *project_dir);
 int configure_source_files(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest, const string_t *project_dir);
 int add_source_files(build_t *build_args, const dirent_t *source_files);
-int configure_defines(build_t *build_args, const cren_manifest_feature_t **features, size_t len);
+int configure_defines(build_t *build_args, cren_manifest_feature_t **features, size_t len);
 int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest);
-int configure_links(build_t *build_args, const cren_manifest_dependency_t **dependencies, size_t len);
-cren_manifest_feature_t **get_enabled_feature(const args_build_t *args, const cren_manifest_t *manifest, size_t *len);
-cren_manifest_dependency_t **get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len);
+int configure_links(build_t *build_args, cren_manifest_dependency_t **dependencies, size_t len);
+int get_enabled_feature(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len);
+int get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len);
 
 int command_build(const args_build_t *args)
 {
@@ -80,15 +79,17 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     log_debug("Language: %s", language_to_string(build_args->language));
 
     // get project dir
-    project_dir = get_project_dir(args, manifest);
+    project_dir = get_project_dir(args->manifest_path ? args->manifest_path->data : NULL);
     if (project_dir == NULL)
     {
         log_error("Error getting project dir");
         rc = CREN_NOK;
         goto cleanup;
     }
+    log_debug("Project dir: %s", project_dir->data);
 
     // include dir
+    log_debug("Configuring include dirs");
     if (configure_include_dirs(build_args, project_dir) != CREN_OK)
     {
         log_error("Error configuring include dirs");
@@ -97,6 +98,7 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     }
 
     // target dir
+    log_debug("Configuring target dir");
     if (configure_target_dir(build_args, args, project_dir) != CREN_OK)
     {
         log_error("Error configuring target dir");
@@ -105,6 +107,7 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     }
 
     // targets
+    log_debug("Configuring targets");
     if (configure_targets(build_args, args, manifest) != CREN_OK)
     {
         log_error("Error configuring targets");
@@ -113,6 +116,7 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     }
 
     // source files
+    log_debug("Configuring source files");
     if (configure_source_files(build_args, args, manifest, project_dir) != CREN_OK)
     {
         log_error("Error configuring source files");
@@ -121,8 +125,8 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     }
 
     // enabled features
-    enabled_features = get_enabled_feature(args, manifest, &enabled_features_len);
-    if (enabled_features == NULL)
+    log_debug("Configuring enabled features");
+    if (get_enabled_feature(args, manifest, &enabled_features, &enabled_features_len) != CREN_OK)
     {
         log_error("Error getting enabled features");
         rc = CREN_NOK;
@@ -130,6 +134,7 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     }
 
     // defines
+    log_debug("Configuring defines");
     if (configure_defines(build_args, enabled_features, enabled_features_len) != CREN_OK)
     {
         log_error("Error configuring defines");
@@ -138,8 +143,8 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     }
 
     // resolve dependencies
-    enabled_dependencies = get_enabled_dependencies(args, manifest, &enabled_dependencies_len, enabled_features, enabled_features_len);
-    if (enabled_dependencies == NULL)
+    log_debug("Configuring enabled dependencies");
+    if (get_enabled_dependencies(args, manifest, &enabled_dependencies, &enabled_dependencies_len, enabled_features, enabled_features_len) != CREN_OK)
     {
         log_error("Error getting enabled dependencies");
         rc = CREN_NOK;
@@ -147,6 +152,7 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     }
 
     // links
+    log_debug("Configuring links");
     if (configure_links(build_args, enabled_dependencies, enabled_dependencies_len) != CREN_OK)
     {
         log_error("Error configuring links");
@@ -175,29 +181,6 @@ cleanup:
         free(enabled_dependencies);
 
     return build_args;
-}
-
-string_t *get_project_dir(const args_build_t *args, const cren_manifest_t *manifest)
-{
-    string_t *manifest_path_s = args->manifest_path != NULL ? args->manifest_path : manifest_path();
-    if (manifest_path_s == NULL)
-    {
-        log_error("Error getting manifest path");
-        return NULL;
-    }
-    string_t *project_dir = parent_dir(manifest_path_s->data);
-    if (project_dir == NULL)
-    {
-        log_error("Error getting project dir");
-        string_free(manifest_path_s);
-        return NULL;
-    }
-
-    string_free(manifest_path_s);
-
-    log_debug("Project dir: %s", project_dir->data);
-
-    return project_dir;
 }
 
 int configure_include_dirs(build_t *build_args, const string_t *project_dir)
@@ -262,10 +245,9 @@ int configure_target_dir(build_t *build_args, const args_build_t *args, const st
     return CREN_OK;
 }
 
-int configure_defines(build_t *build_args, const cren_manifest_feature_t **features, size_t len)
+int configure_defines(build_t *build_args, cren_manifest_feature_t **features, size_t len)
 {
     log_debug("Configuring defines");
-    int rc = CREN_OK;
     build_args->defines = string_list_init();
     if (build_args->defines == NULL)
     {
@@ -291,56 +273,65 @@ int configure_defines(build_t *build_args, const cren_manifest_feature_t **featu
     return CREN_OK;
 }
 
-cren_manifest_feature_t **get_enabled_feature(const args_build_t *args, const cren_manifest_t *manifest, size_t *len)
+int get_enabled_feature(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len)
 {
     // get enabled features
     int rc = CREN_OK;
     cren_manifest_feature_t **enabled_features_obj = NULL;
-    string_list_t *enabled_features = string_list_init();
+    string_list_t *enabled_features_str = string_list_init();
     if (enabled_features == NULL)
     {
         log_error("Error initializing enabled features");
-        return CREN_NOK;
+        rc = CREN_NOK;
+        goto cleanup;
     }
     // if default features are enabled, add them
-    if (args->no_default_features == false)
+    if (!args->no_default_features && manifest->features->default_features != NULL)
     {
+        log_debug("Adding default features");
         for (size_t i = 0; i < manifest->features->default_features->nitems; i++)
         {
             string_t *feature = string_clone(manifest->features->default_features->items[i]);
+            log_debug("Feature: %s", feature->data);
             if (feature == NULL)
             {
                 log_error("Error cloning feature");
                 rc = CREN_NOK;
                 goto cleanup;
             }
-            string_list_push(enabled_features, feature);
+            string_list_push(enabled_features_str, feature);
         }
     }
     // add other features
-    for (size_t i = 0; i < args->features->nitems; i++)
+    if (args->features != NULL)
     {
-        if (!string_list_contains(enabled_features, args->features->items[i]->data))
+        log_debug("Adding features");
+        for (size_t i = 0; i < args->features->nitems; i++)
         {
-            string_t *feature = string_clone(args->features->items[i]);
-            if (feature == NULL)
+            if (!string_list_contains(enabled_features_str, args->features->items[i]->data))
             {
-                log_error("Error cloning feature");
-                rc = CREN_NOK;
-                goto cleanup;
+                string_t *feature = string_clone(args->features->items[i]);
+                if (feature == NULL)
+                {
+                    log_error("Error cloning feature");
+                    rc = CREN_NOK;
+                    goto cleanup;
+                }
+                string_list_push(enabled_features_str, feature);
             }
-            string_list_push(enabled_features, feature);
         }
     }
 
+    log_debug("Enabled features: %lu", enabled_features_str->nitems);
+
     // iterate over enabled features
-    for (size_t i = 0; i < enabled_features->nitems; i++)
+    for (size_t i = 0; i < enabled_features_str->nitems; i++)
     {
         // get feature
-        cren_manifest_feature_t *feature = cren_manifest_features_get_feature(manifest->features, enabled_features->items[i]->data);
+        cren_manifest_feature_t *feature = cren_manifest_features_get_feature(manifest->features, enabled_features_str->items[i]->data);
         if (feature == NULL)
         {
-            log_error("Error getting feature %s", enabled_features->items[i]->data);
+            log_error("Error getting feature %s", enabled_features_str->items[i]->data);
             rc = CREN_NOK;
             goto cleanup;
         }
@@ -364,10 +355,9 @@ cren_manifest_feature_t **get_enabled_feature(const args_build_t *args, const cr
         enabled_features_obj[i] = feature_clone;
     }
 
-    *len = enabled_features->nitems;
-
 cleanup:
-    string_list_free(enabled_features);
+    *len = enabled_features_str->nitems;
+    string_list_free(enabled_features_str);
     if (rc != CREN_OK)
     {
         for (size_t i = 0; i < *len; i++)
@@ -376,24 +366,20 @@ cleanup:
         }
         if (enabled_features_obj)
             free(enabled_features_obj);
-        return NULL;
+        return CREN_NOK;
     }
 
-    return enabled_features_obj;
+    *enabled_features = enabled_features_obj;
+
+    return rc;
 }
 
-cren_manifest_dependency_t **get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len)
+int get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len)
 {
     // get enabled features
     int rc = CREN_OK;
     *len = 0;
     cren_manifest_dependency_t **enabled_dependencies = NULL;
-    string_list_t *dependencies = string_list_init();
-    if (dependencies == NULL)
-    {
-        log_error("Error initializing enabled features");
-        return CREN_NOK;
-    }
 
     // add dependencies
     for (size_t i = 0; i < manifest->dependencies->dependencies_len; i++)
@@ -416,7 +402,7 @@ cren_manifest_dependency_t **get_enabled_dependencies(const args_build_t *args, 
             log_debug("Dependency %s is not enabled", dep->name->data);
             continue;
         }
-    dep_checked:
+    dep_checked:;
 
         // add dependency
         cren_manifest_dependency_t **tmp = realloc(enabled_dependencies, sizeof(cren_manifest_dependency_t *) * (*len + 1));
@@ -446,10 +432,12 @@ cleanup:
         }
         if (enabled_dependencies)
             free(enabled_dependencies);
-        return NULL;
+        return CREN_NOK;
     }
 
-    return enabled_dependencies;
+    *dependencies = enabled_dependencies;
+
+    return rc;
 }
 
 int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest)
@@ -457,7 +445,7 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
     // bins enabled
     if (args->all_targets || args->bins)
     {
-
+        log_debug("Adding bins");
         for (size_t i = 0; i < manifest->targets->bin_len; i++)
         {
             // check if target is enabled
@@ -475,6 +463,7 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
     // examples enabled
     if (args->all_targets || args->examples)
     {
+        log_debug("Adding examples");
         for (size_t i = 0; i < manifest->targets->examples_len; i++)
         {
             // check if target is enabled
@@ -490,8 +479,9 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
     }
 
     // lib enabled
-    if (args->all_targets || args->lib)
+    if (manifest->targets->lib != NULL && (args->all_targets || args->lib))
     {
+        log_debug("Adding lib");
         if (build_add_target(build_args, manifest->targets->lib->path->data) != CREN_OK)
         {
             log_error("Error adding target %s", manifest->targets->lib->name->data);
@@ -565,8 +555,6 @@ int add_source_files(build_t *build_args, const dirent_t *source_files)
                 log_error("Error adding source file %s", child->path);
                 return CREN_NOK;
             }
-
-            log_debug("Added source file %s", child->path);
         }
 
     next:
@@ -576,7 +564,7 @@ int add_source_files(build_t *build_args, const dirent_t *source_files)
     return CREN_OK;
 }
 
-int configure_links(build_t *build_args, const cren_manifest_dependency_t **dependencies, size_t len)
+int configure_links(build_t *build_args, cren_manifest_dependency_t **dependencies, size_t len)
 {
     if (build_args->links == NULL)
     {
@@ -624,8 +612,11 @@ void log_opts(const args_build_t *args)
     if (args->target_dir)
         log_debug("target-dir: %s", args->target_dir->data);
     log_debug("features:");
-    for (size_t i = 0; i < args->features->nitems; i++)
+    if (args->features != NULL)
     {
-        log_debug("- %s", args->features->items[i]->data);
+        for (size_t i = 0; i < args->features->nitems; i++)
+        {
+            log_debug("- %s", args->features->items[i]->data);
+        }
     }
 }

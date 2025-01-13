@@ -260,6 +260,12 @@ static int args_parse_build(args_t *args, char **argv)
         }
     }
 
+    // if no targets are specified, build all
+    if (!args->build_cmd.bins && !args->build_cmd.examples && !args->build_cmd.lib && !args->build_cmd.bin && !args->build_cmd.example)
+    {
+        args->build_cmd.all_targets = true;
+    }
+
     return CREN_OK;
 }
 
