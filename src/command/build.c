@@ -14,7 +14,7 @@ int configure_target_dir(build_t *build_args, const args_build_t *args, const st
 int configure_source_files(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest, const string_t *project_dir);
 int add_source_files(build_t *build_args, const dirent_t *source_files);
 int configure_defines(build_t *build_args, cren_manifest_feature_t **features, size_t len);
-int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest);
+int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest, const char *project_dir);
 int configure_links(build_t *build_args, cren_manifest_dependency_t **dependencies, size_t len);
 int get_enabled_feature(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len);
 int get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len);
@@ -108,7 +108,7 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
 
     // targets
     log_debug("Configuring targets");
-    if (configure_targets(build_args, args, manifest) != CREN_OK)
+    if (configure_targets(build_args, args, manifest, project_dir->data) != CREN_OK)
     {
         log_error("Error configuring targets");
         rc = CREN_NOK;
@@ -440,7 +440,7 @@ cleanup:
     return rc;
 }
 
-int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest)
+int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest, const char *project_dir)
 {
     // bins enabled
     if (args->all_targets || args->bins)
@@ -451,7 +451,7 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
             // check if target is enabled
             if (args->bin == NULL || strcmp(args->bin->data, manifest->targets->bin[i]->name->data) == 0)
             {
-                if (build_add_target(build_args, manifest->targets->bin[i]->path->data) != CREN_OK)
+                if (build_add_target(build_args, manifest->targets->bin[i]->path->data, project_dir) != CREN_OK)
                 {
                     log_error("Error adding target %s", manifest->targets->bin[i]->name->data);
                     return CREN_NOK;
@@ -469,7 +469,7 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
             // check if target is enabled
             if (args->example == NULL || strcmp(args->example->data, manifest->targets->examples[i]->name->data) == 0)
             {
-                if (build_add_target(build_args, manifest->targets->examples[i]->path->data) != CREN_OK)
+                if (build_add_target(build_args, manifest->targets->examples[i]->path->data, project_dir) != CREN_OK)
                 {
                     log_error("Error adding target %s", manifest->targets->examples[i]->name->data);
                     return CREN_NOK;
@@ -482,7 +482,7 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
     if (manifest->targets->lib != NULL && (args->all_targets || args->lib))
     {
         log_debug("Adding lib");
-        if (build_add_target(build_args, manifest->targets->lib->path->data) != CREN_OK)
+        if (build_add_target(build_args, manifest->targets->lib->path->data, project_dir) != CREN_OK)
         {
             log_error("Error adding target %s", manifest->targets->lib->name->data);
             return CREN_NOK;
@@ -543,6 +543,7 @@ int add_source_files(build_t *build_args, const dirent_t *source_files)
             // source must not be a target
             for (size_t i = 0; i < build_args->targets_len; i++)
             {
+                log_trace("Comparing %s with %s", build_args->targets[i]->src->data, child->path);
                 if (strcmp(build_args->targets[i]->src->data, child->path) == 0)
                 {
                     log_debug("Skipping source file %s (is a target)", child->path);

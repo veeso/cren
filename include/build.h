@@ -54,7 +54,7 @@ int build_add_source(build_t *build, const char *src);
 /// @param build
 /// @param target
 /// @return CREN_OK on success, CREN_NOK on failure.
-int build_add_target(build_t *build, const char *target);
+int build_add_target(build_t *build, const char *target, const char *project_dir);
 
 /// @brief compile the project.
 /// @param build The build object.

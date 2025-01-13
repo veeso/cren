@@ -88,15 +88,19 @@ int build_add_source(build_t *build, const char *src)
     return CREN_OK;
 }
 
-int build_add_target(build_t *build, const char *target)
+int build_add_target(build_t *build, const char *target, const char *project_dir)
 {
-    if (build == NULL || build->target_dir == NULL)
+    if (build == NULL || build->target_dir == NULL || project_dir == NULL)
     {
         log_error("Attempted to add a target file to a NULL build object.");
         return CREN_NOK;
     }
 
-    source_t *source = source_init(target, build->target_dir->data);
+    string_t *source_path = string_from_cstr(project_dir);
+    string_append_path(source_path, target);
+
+    source_t *source = source_init(source_path->data, build->target_dir->data);
+    string_free(source_path);
     if (source == NULL)
     {
         log_error("Failed to initialize source object.");
