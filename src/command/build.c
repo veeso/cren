@@ -4,6 +4,7 @@
 #include <manifest.h>
 #include <manifest/path.h>
 #include <lib/log.h>
+#include <utils/fs.h>
 #include <utils/paths.h>
 
 void log_opts(const args_build_t *args);
@@ -11,10 +12,13 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
 string_t *get_project_dir(const args_build_t *args, const cren_manifest_t *manifest);
 int configure_include_dirs(build_t *build_args, const string_t *project_dir);
 int configure_target_dir(build_t *build_args, const args_build_t *args, const string_t *project_dir);
-int configure_source_files(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest);
+int configure_source_files(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest, const string_t *project_dir);
+int add_source_files(build_t *build_args, const dirent_t *source_files);
 int configure_defines(build_t *build_args, const cren_manifest_feature_t **features, size_t len);
 int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest);
+int configure_links(build_t *build_args, const cren_manifest_dependency_t **dependencies, size_t len);
 cren_manifest_feature_t **get_enabled_feature(const args_build_t *args, const cren_manifest_t *manifest, size_t *len);
+cren_manifest_dependency_t **get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len);
 
 int command_build(const args_build_t *args)
 {
@@ -59,6 +63,8 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
     build_t *build_args = build_init();
     cren_manifest_feature_t **enabled_features = NULL;
     size_t enabled_features_len = 0;
+    cren_manifest_dependency_t **enabled_dependencies = NULL;
+    size_t enabled_dependencies_len = 0;
     int rc = CREN_OK;
     if (build_args == NULL)
     {
@@ -98,18 +104,18 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
         goto cleanup;
     }
 
-    // source files
-    if (configure_source_files(build_args, args, manifest) != CREN_OK)
-    {
-        log_error("Error configuring source files");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
     // targets
     if (configure_targets(build_args, args, manifest) != CREN_OK)
     {
         log_error("Error configuring targets");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // source files
+    if (configure_source_files(build_args, args, manifest, project_dir) != CREN_OK)
+    {
+        log_error("Error configuring source files");
         rc = CREN_NOK;
         goto cleanup;
     }
@@ -123,11 +129,27 @@ build_t *init_build_args(const args_build_t *args, const cren_manifest_t *manife
         goto cleanup;
     }
 
-    // configure defines
     // defines
     if (configure_defines(build_args, enabled_features, enabled_features_len) != CREN_OK)
     {
         log_error("Error configuring defines");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // resolve dependencies
+    enabled_dependencies = get_enabled_dependencies(args, manifest, &enabled_dependencies_len, enabled_features, enabled_features_len);
+    if (enabled_dependencies == NULL)
+    {
+        log_error("Error getting enabled dependencies");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // links
+    if (configure_links(build_args, enabled_dependencies, enabled_dependencies_len) != CREN_OK)
+    {
+        log_error("Error configuring links");
         rc = CREN_NOK;
         goto cleanup;
     }
@@ -145,6 +167,12 @@ cleanup:
     }
     if (enabled_features)
         free(enabled_features);
+    for (size_t i = 0; i < enabled_dependencies_len; i++)
+    {
+        cren_manifest_dependency_free(enabled_dependencies[i]);
+    }
+    if (enabled_dependencies)
+        free(enabled_dependencies);
 
     return build_args;
 }
@@ -346,10 +374,237 @@ cleanup:
         {
             cren_manifest_feature_free(enabled_features_obj[i]);
         }
+        if (enabled_features_obj)
+            free(enabled_features_obj);
         return NULL;
     }
 
     return enabled_features_obj;
+}
+
+cren_manifest_dependency_t **get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len)
+{
+    // get enabled features
+    int rc = CREN_OK;
+    *len = 0;
+    cren_manifest_dependency_t **enabled_dependencies = NULL;
+    string_list_t *dependencies = string_list_init();
+    if (dependencies == NULL)
+    {
+        log_error("Error initializing enabled features");
+        return CREN_NOK;
+    }
+
+    // add dependencies
+    for (size_t i = 0; i < manifest->dependencies->dependencies_len; i++)
+    {
+        // if optional, check if feature is enabled
+        cren_manifest_dependency_t *dep = manifest->dependencies->dependencies[i];
+        if (dep->optional)
+        {
+            // check if in enabled features
+            for (size_t j = 0; j < enabled_features_len; j++)
+            {
+                cren_manifest_feature_t *feature = enabled_features[j];
+                if (string_list_contains(feature->dependencies, dep->name->data))
+                {
+                    log_debug("Dependency %s is enabled", dep->name->data);
+                    goto dep_checked;
+                }
+            }
+
+            log_debug("Dependency %s is not enabled", dep->name->data);
+            continue;
+        }
+    dep_checked:
+
+        // add dependency
+        cren_manifest_dependency_t **tmp = realloc(enabled_dependencies, sizeof(cren_manifest_dependency_t *) * (*len + 1));
+        if (tmp == NULL)
+        {
+            log_error("Error reallocating enabled dependencies");
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+        enabled_dependencies = tmp;
+        enabled_dependencies[*len] = cren_manifest_dependency_clone(dep);
+        if (enabled_dependencies[*len] == NULL)
+        {
+            log_error("Error cloning dependency");
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+        (*len)++;
+    }
+
+cleanup:
+    if (rc != CREN_OK)
+    {
+        for (size_t i = 0; i < *len; i++)
+        {
+            cren_manifest_dependency_free(enabled_dependencies[i]);
+        }
+        if (enabled_dependencies)
+            free(enabled_dependencies);
+        return NULL;
+    }
+
+    return enabled_dependencies;
+}
+
+int configure_targets(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest)
+{
+    // bins enabled
+    if (args->all_targets || args->bins)
+    {
+
+        for (size_t i = 0; i < manifest->targets->bin_len; i++)
+        {
+            // check if target is enabled
+            if (args->bin == NULL || strcmp(args->bin->data, manifest->targets->bin[i]->name->data) == 0)
+            {
+                if (build_add_target(build_args, manifest->targets->bin[i]->path->data) != CREN_OK)
+                {
+                    log_error("Error adding target %s", manifest->targets->bin[i]->name->data);
+                    return CREN_NOK;
+                }
+            }
+        }
+    }
+
+    // examples enabled
+    if (args->all_targets || args->examples)
+    {
+        for (size_t i = 0; i < manifest->targets->examples_len; i++)
+        {
+            // check if target is enabled
+            if (args->example == NULL || strcmp(args->example->data, manifest->targets->examples[i]->name->data) == 0)
+            {
+                if (build_add_target(build_args, manifest->targets->examples[i]->path->data) != CREN_OK)
+                {
+                    log_error("Error adding target %s", manifest->targets->examples[i]->name->data);
+                    return CREN_NOK;
+                }
+            }
+        }
+    }
+
+    // lib enabled
+    if (args->all_targets || args->lib)
+    {
+        if (build_add_target(build_args, manifest->targets->lib->path->data) != CREN_OK)
+        {
+            log_error("Error adding target %s", manifest->targets->lib->name->data);
+            return CREN_NOK;
+        }
+    }
+
+    return CREN_OK;
+}
+
+int configure_source_files(build_t *build_args, const args_build_t *args, const cren_manifest_t *manifest, const string_t *project_dir)
+{
+    if (build_args->targets_len == 0)
+    {
+        log_error("No targets specified");
+        return CREN_NOK;
+    }
+
+    // get source dir
+    string_t *src_dir = string_clone(project_dir);
+    if (src_dir == NULL)
+    {
+        log_error("Error cloning project dir");
+        return CREN_NOK;
+    }
+    string_append_path(src_dir, CREN_MANIFEST_SRC);
+    // scan source files
+    log_debug("Scanning source files in %s", src_dir->data);
+    dirent_t *source_files = scan_dir(src_dir->data);
+    string_free(src_dir);
+    if (source_files == NULL)
+    {
+        log_error("Error scanning source files");
+        return CREN_NOK;
+    }
+
+    // recurse over source files
+    int rc = add_source_files(build_args, source_files);
+    dirent_free(source_files);
+
+    return rc;
+}
+
+int add_source_files(build_t *build_args, const dirent_t *source_files)
+{
+    // iterate over source files
+    for (size_t i = 0; i < source_files->children_count; i++)
+    {
+        dirent_t *child = source_files->children[i];
+        if (child->is_dir)
+        {
+            if (add_source_files(build_args, child) != CREN_OK)
+            {
+                return CREN_NOK;
+            }
+        }
+        else if (str_ends_with(child->path, ".c") || str_ends_with(child->path, ".cpp")) // if ends with .c or .cpp
+        {
+            // source must not be a target
+            for (size_t i = 0; i < build_args->targets_len; i++)
+            {
+                if (strcmp(build_args->targets[i]->src->data, child->path) == 0)
+                {
+                    log_debug("Skipping source file %s (is a target)", child->path);
+                    goto next;
+                }
+            }
+
+            if (build_add_source(build_args, child->path) != CREN_OK)
+            {
+                log_error("Error adding source file %s", child->path);
+                return CREN_NOK;
+            }
+
+            log_debug("Added source file %s", child->path);
+        }
+
+    next:
+        continue;
+    }
+
+    return CREN_OK;
+}
+
+int configure_links(build_t *build_args, const cren_manifest_dependency_t **dependencies, size_t len)
+{
+    if (build_args->links == NULL)
+    {
+        build_args->links = string_list_init();
+        if (build_args->links == NULL)
+        {
+            log_error("Error initializing links");
+            return CREN_NOK;
+        }
+    }
+
+    for (size_t i = 0; i < len; i++)
+    {
+        cren_manifest_dependency_t *dep = dependencies[i];
+        if (dep->link != NULL)
+        {
+            string_t *link = string_clone(dep->link);
+            if (link == NULL)
+            {
+                log_error("Error cloning link");
+                return CREN_NOK;
+            }
+            string_list_push(build_args->links, link);
+            log_debug("Added link %s", link->data);
+        }
+    }
+
+    return CREN_OK;
 }
 
 void log_opts(const args_build_t *args)

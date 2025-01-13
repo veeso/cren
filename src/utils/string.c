@@ -146,3 +146,22 @@ void string_append_path(string_t *string, const char *data)
     }
     string_append(string, data);
 }
+
+bool str_ends_with(const char *str, const char *suffix)
+{
+    if (!str || !suffix)
+    {
+        return false; // Handle NULL pointers
+    }
+
+    size_t str_len = strlen(str);
+    size_t suffix_len = strlen(suffix);
+
+    if (suffix_len > str_len)
+    {
+        return false; // Suffix is longer than the string
+    }
+
+    // Compare the end of the string with the suffix
+    return strcmp(str + str_len - suffix_len, suffix) == 0;
+}

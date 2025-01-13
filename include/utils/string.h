@@ -3,6 +3,7 @@
 #ifndef UTILS_STRING_H
 #define UTILS_STRING_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef struct string_t string_t;
@@ -45,5 +46,7 @@ void string_append_char(string_t *string, char data);
 /// @param string
 /// @param data
 void string_append_path(string_t *string, const char *data);
+
+bool str_ends_with(const char *str, const char *suffix);
 
 #endif // UTILS_STRING_H

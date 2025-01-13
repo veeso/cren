@@ -30,6 +30,8 @@ struct build_t
     string_list_t *include_dirs;
     /// @brief target dir
     string_t *target_dir;
+    /// @brief links
+    string_list_t *links;
     /// @brief Release build
     bool release;
 };
@@ -45,8 +47,14 @@ void build_free(build_t *build);
 /// @brief Add a source file to the build.
 /// @param build
 /// @param src
-/// @return
-int add_source(build_t *build, const char *src);
+/// @return CREN_OK on success, CREN_NOK on failure.
+int build_add_source(build_t *build, const char *src);
+
+/// @brief Add a target file to the build.
+/// @param build
+/// @param target
+/// @return CREN_OK on success, CREN_NOK on failure.
+int build_add_target(build_t *build, const char *target);
 
 /// @brief compile the project.
 /// @param build The build object.
