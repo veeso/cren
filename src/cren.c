@@ -16,8 +16,6 @@ void init_log(args_verbose_t verbose, bool quiet);
 
 int main(int argc, char **argv)
 {
-  // init log quiet
-  log_set_quiet(true);
   // get args
   args_t *args = args_parse_cmd(argc, argv);
   if (args == NULL)
