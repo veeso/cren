@@ -92,7 +92,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
             return NULL;
         }
 
-        dirent_t *entry = dirent_init(parent, full_path, is_dir);
+        dirent_t *entry = dirent_init(parent, full_path, is_dir, get_mtime(full_path));
         if (entry == NULL)
         {
             log_error("Failed to initialize dirent for %s", full_path);
