@@ -28,6 +28,13 @@ string_t *string_clone(const string_t *string);
 /// @return string
 string_t *string_from_cstr(const char *data);
 
+/// @brief create a string from a substring
+/// @param str
+/// @param start
+/// @param len
+/// @return string
+string_t *string_from_substr(const char *str, size_t start, size_t len);
+
 /// @brief free a string
 /// @param string
 void string_free(string_t *string);

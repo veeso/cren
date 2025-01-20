@@ -34,6 +34,7 @@ const char *KEY_DEV_DEPENDENCIES = "dev-dependencies";
 const char *KEY_DEPENDENCY_GIT = "git";
 const char *KEY_DEPENDENCY_LINK = "link";
 const char *KEY_DEPENDENCY_OPTIONAL = "optional";
+const char *KEY_DEPENDENCY_PLATFORMS = "platforms";
 
 const char *KEY_FEATURES_DEFAULT = "default";
 const char *KEY_FEATURES_DEFINES = "defines";
@@ -130,6 +131,18 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
         return CREN_NOK;
     }
 
+    // Parse `edition`
+    if (get_edition(package, KEY_PACKAGE_EDITION, &manifest_package->edition) != CREN_OK)
+    {
+        parse_error(error, error_sz, "`edition` key not found in `package` table");
+        return CREN_NOK;
+    }
+    if (manifest_package->edition != MANIFEST_EDITION_ONE)
+    {
+        parse_error(error, error_sz, "incompatible `edition` found in `package` table");
+        return CREN_NOK;
+    }
+
     // Parse `name`
     if (get_string(package, KEY_PACKAGE_NAME, &manifest_package->name, true) != CREN_OK)
     {
@@ -148,12 +161,7 @@ int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t 
         parse_error(error, error_sz, "invalid `version` found in `package` table");
         return CREN_NOK;
     }
-    // Parse `edition`
-    if (get_edition(package, KEY_PACKAGE_EDITION, &manifest_package->edition) != CREN_OK)
-    {
-        parse_error(error, error_sz, "`edition` key not found in `package` table");
-        return CREN_NOK;
-    }
+
     if (manifest_package->edition == MANIFEST_EDITION_UNKNOWN)
     {
         parse_error(error, error_sz, "invalid `edition` found in `package` table");
@@ -710,6 +718,43 @@ int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependenc
         log_debug("`optional` not found in dependency table");
         dependency->optional = false;
     }
+
+    string_list_t *platforms_str = NULL;
+    if (get_string_list(table, KEY_DEPENDENCY_PLATFORMS, &platforms_str, false) != CREN_OK)
+    {
+        parse_error(error, error_sz, "Invalid `platforms` found in dependency table");
+        return CREN_NOK;
+    }
+
+    // parse platforms
+    if (platforms_str != NULL)
+    {
+        dependency->platforms = (platform_t **)malloc(sizeof(platform_t *) * platforms_str->nitems);
+        if (dependency->platforms == NULL)
+        {
+            parse_error(error, error_sz, "Cannot allocate memory for platforms");
+            string_list_free(platforms_str);
+            return CREN_NOK;
+        }
+
+        // parse each platform
+        for (size_t i = 0; i < platforms_str->nitems; i++)
+        {
+            log_debug("parsing platform %s", platforms_str->items[i]->data);
+            platform_t *platform = platform_parse(platforms_str->items[i]->data);
+            if (platform == NULL)
+            {
+                log_error("Error parsing platform %s", platforms_str->items[i]->data);
+                parse_error(error, error_sz, "Error parsing platform");
+                string_list_free(platforms_str);
+                return CREN_NOK;
+            }
+
+            dependency->platforms[i] = platform;
+            dependency->platforms_len = i + 1;
+        }
+    }
+    string_list_free(platforms_str);
 
     log_debug("Parsed dependency `%s`", key->data);
 

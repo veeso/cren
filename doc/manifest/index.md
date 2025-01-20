@@ -172,6 +172,40 @@ Each dependency must be identified by its `name` and may contain these fields:
 - `link`: link option for the compiler (e.g. `-lm`)
 - `optional`: makes the dependency to be feature-gated. (See [features](#features)).
 - `defines`: a list of defines to build the library
+- `platforms`: a list of platforms where the dependency will be used for. It is a list of triplets (e.g. `x86_64-unknown-linux-gnu`) or aliases (e.g. `linux`). See [Platforms](#platforms).
+
+### Platforms
+
+Platforms are used to specify the platforms where the dependency will be used for.
+
+There are two ways to specify platforms:
+
+- **Alias**
+- **Triplet**
+
+#### Alias
+
+Alias are used to specify a group of platforms. The following aliases are supported:
+
+- `windows`: all windows platforms
+- `linux`: all linux platforms
+- `macos`: all macos platforms
+- `freebsd`: all freebsd platforms
+- `android`: all android platforms
+- `ios`: all ios platforms
+
+#### Triplet
+
+Triplets are used to specify a single platform. A triplet is composed by three or four parts:
+
+- `arch`: the architecture of the platform
+- `vendor`: the vendor of the platform
+- `os`: the operating system of the platform
+- `abi` (optional): the ABI of the platform
+
+They are separated by `-`, and can contain wildcards as `unknown`.
+
+Note that they are always lowercase, case-sensitive and **parsed from left to right**.
 
 ## Features
 

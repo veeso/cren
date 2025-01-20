@@ -72,6 +72,31 @@ string_t *string_from_cstr(const char *data)
     return string;
 }
 
+string_t *string_from_substr(const char *str, size_t start, size_t len)
+{
+    string_t *string = string_init();
+    if (string == NULL)
+    {
+        return NULL;
+    }
+
+    string->data = (char *)malloc(len + 1);
+    if (string->data == NULL)
+    {
+        log_fatal("Failed to allocate memory for string");
+        string_free(string);
+        return NULL;
+    }
+
+    strncpy(string->data, str + start, len);
+    string->data[len] = '\0';
+    string->length = len;
+
+    log_trace("Created string from substring: %s, len %zu", string->data, string->length);
+
+    return string;
+}
+
 void string_free(string_t *string)
 {
     if (string == NULL)

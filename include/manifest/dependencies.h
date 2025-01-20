@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include <manifest/dependencies/platform.h>
 #include <utils/string_list.h>
 #include <utils/string.h>
 
@@ -30,6 +31,8 @@ struct cren_manifest_dependency_t
     string_t *link;
     bool optional;
     string_list_t *defines;
+    platform_t **platforms;
+    size_t platforms_len;
 };
 
 /// @brief init cren manifest dependencies

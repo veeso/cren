@@ -21,6 +21,7 @@ int main(int argc, char **argv)
   if (args == NULL)
   {
     puts("Failed to parse arguments");
+    args_free(args);
     return CREN_NOK;
   }
 
@@ -28,19 +29,22 @@ int main(int argc, char **argv)
   if (args->help)
   {
     usage(args);
+    args_free(args);
     return CREN_OK;
   }
   // check if version
   if (args->version)
   {
     printf("Cren %s\n", CREN_VERSION);
+    args_free(args);
     return CREN_OK;
   }
   // check if command is unknown
   if (args->cmd == ARGS_CMD_UNKNOWN)
   {
     usage(args);
-    return CREN_OK;
+    args_free(args);
+    return CREN_NOK;
   }
 
   // init log
