@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <utils/string.h>
+
 typedef struct dirent_t dirent_t;
 
 struct dirent_t
@@ -38,10 +40,21 @@ int rmdir_all(const char *path, void (*on_remove_cb)(void *ctx, const char *path
 /// @return
 dirent_t *scan_dir(const char *path);
 
+/// @brief Scan a directory with a depth
+/// @param path
+/// @param depth
+/// @return dirent_t
+dirent_t *scan_dir_with_depth(const char *path, size_t depth);
+
 /// @brief Stat dirent_t at path
 /// @param path
 /// @return dirent_t or NULL if doesn't exist
 dirent_t *dirent_stat(const char *path);
+
+/// @brief Get the filename of a dirent_t
+/// @param entry
+/// @return The filename
+string_t *dirent_filename(const dirent_t *entry);
 
 /// @brief Free a dirent_t
 /// @param dir

@@ -157,7 +157,7 @@ build_environment_t *build_environment_init(void)
 string_t *get_cc()
 {
     // all compilers array
-    string_t *compilers[] = {
+    const char *compilers[] = {
         CC_GCC,
         CC_CLANG,
         CC_MSVC,
@@ -181,9 +181,10 @@ string_t *get_cc()
     // get the compiler from the environment
     for (size_t i = 0; i < 19; i++)
     {
-        string_t *cc = env_get(compilers[i]);
+        string_t *cc = env_get_from_path(compilers[i]);
         if (cc != NULL)
         {
+            log_info("Found %s in PATH", cc->data);
             return cc;
         }
     }
@@ -194,7 +195,7 @@ string_t *get_cc()
 string_t *get_cxx()
 {
     // all compilers array
-    string_t *compilers[] = {
+    const char *compilers[] = {
         CXX_GCC,
         CXX_CLANG,
         CXX_MSVC,
@@ -217,7 +218,7 @@ string_t *get_cxx()
     // get the compiler from the environment
     for (size_t i = 0; i < 18; i++)
     {
-        string_t *cxx = env_get(compilers[i]);
+        string_t *cxx = env_get_from_path(compilers[i]);
         if (cxx != NULL)
         {
             return cxx;
@@ -230,7 +231,7 @@ string_t *get_cxx()
 string_t *get_ld()
 {
     // all linkers array
-    string_t *linkers[] = {
+    const char *linkers[] = {
         LD_GNU,
         LD_GOLD,
         LD_LLD,
@@ -251,7 +252,7 @@ string_t *get_ld()
     // get the linker from the environment
     for (size_t i = 0; i < 16; i++)
     {
-        string_t *ld = env_get(linkers[i]);
+        string_t *ld = env_get_from_path(linkers[i]);
         if (ld != NULL)
         {
             return ld;
