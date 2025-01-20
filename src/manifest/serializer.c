@@ -218,6 +218,26 @@ int serialize_dependency(cren_manifest_dependency_t *dependency, FILE *file)
         print(file, "]");
     }
 
+    if (dependency->platforms != NULL)
+    {
+        if (!first)
+        {
+            print(file, ", ");
+        }
+        print(file, "platforms = [");
+        for (int i = 0; i < dependency->platforms_len; i++)
+        {
+            string_t *platform_str = platform_to_string(dependency->platforms[i]);
+            print(file, "\"%s\"", platform_str->data);
+            string_free(platform_str);
+            if (i < dependency->platforms_len - 1)
+            {
+                print(file, ", ");
+            }
+        }
+        print(file, "]");
+    }
+
     println(file, " }");
 
     return CREN_OK;

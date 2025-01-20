@@ -62,6 +62,8 @@ cren_manifest_dependency_t *cren_manifest_dependency_init(void)
     dependency->link = NULL;
     dependency->optional = false;
     dependency->defines = NULL;
+    dependency->platforms = NULL;
+    dependency->platforms_len = 0;
 
     log_trace("Initialized manifest dependency");
 
@@ -98,6 +100,14 @@ void cren_manifest_dependency_free(cren_manifest_dependency_t *dependency)
     string_free(dependency->git);
     string_free(dependency->link);
     string_list_free(dependency->defines);
+    for (size_t i = 0; i < dependency->platforms_len; i++)
+    {
+        platform_free(dependency->platforms[i]);
+    }
+    if (dependency->platforms != NULL)
+    {
+        free(dependency->platforms);
+    }
     free(dependency);
 
     log_trace("Freed manifest dependency");
@@ -174,6 +184,29 @@ cren_manifest_dependency_t *cren_manifest_dependency_clone(cren_manifest_depende
             string_list_push(clone->defines, define);
         }
     }
+
+    if (dependency->platforms != NULL)
+    {
+        clone->platforms = (platform_t **)malloc(dependency->platforms_len * sizeof(platform_t *));
+        if (clone->platforms == NULL)
+        {
+            log_error("Failed to clone feature platforms");
+            cren_manifest_dependency_free(clone);
+            return NULL;
+        }
+        for (size_t i = 0; i < dependency->platforms_len; i++)
+        {
+            platform_t *platform = platform_clone(dependency->platforms[i]);
+            if (platform == NULL)
+            {
+                log_error("Failed to clone feature platform");
+                cren_manifest_dependency_free(clone);
+                return NULL;
+            }
+            clone->platforms[i] = platform;
+        }
+    }
+    clone->platforms_len = dependency->platforms_len;
 
     return clone;
 }

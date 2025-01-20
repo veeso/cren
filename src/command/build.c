@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include <build.h>
 #include <command/build.h>
 #include <cren.h>
@@ -18,6 +20,7 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
 int configure_links(build_t *build_args, cren_manifest_dependency_t **dependencies, size_t len);
 int get_enabled_feature(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len);
 int get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len);
+bool is_platform_enabled(platform_t *local, platform_t **platforms, size_t len);
 
 int command_build(const args_build_t *args)
 {
@@ -380,6 +383,22 @@ int get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *ma
     int rc = CREN_OK;
     *len = 0;
     cren_manifest_dependency_t **enabled_dependencies = NULL;
+    platform_t *local = platform_local();
+    if (local == NULL)
+    {
+        log_error("Error getting local platform");
+        return CREN_NOK;
+    }
+    // log platform
+    string_t *local_platform_str = platform_to_string(local);
+    if (local_platform_str == NULL)
+    {
+        log_error("Error getting local platform string");
+        platform_free(local);
+        return CREN_NOK;
+    }
+    log_info("Local platform: %s", local_platform_str->data);
+    string_free(local_platform_str);
 
     // add dependencies
     for (size_t i = 0; i < manifest->dependencies->dependencies_len; i++)
@@ -402,6 +421,14 @@ int get_enabled_dependencies(const args_build_t *args, const cren_manifest_t *ma
             log_debug("Dependency %s is not enabled", dep->name->data);
             continue;
         }
+
+        // if platform is defined, check if it matches
+        if (dep->platforms != NULL && !is_platform_enabled(local, dep->platforms, dep->platforms_len))
+        {
+            log_debug("Platform not enabled");
+            continue;
+        }
+
     dep_checked:;
 
         // add dependency
@@ -434,6 +461,7 @@ cleanup:
             free(enabled_dependencies);
         return CREN_NOK;
     }
+    platform_free(local);
 
     *dependencies = enabled_dependencies;
 
@@ -594,6 +622,28 @@ int configure_links(build_t *build_args, cren_manifest_dependency_t **dependenci
     }
 
     return CREN_OK;
+}
+
+bool is_platform_enabled(platform_t *local, platform_t **platforms, size_t len)
+{
+    if (len == 0)
+    {
+        return true;
+    }
+
+    for (size_t i = 0; i < len; i++)
+    {
+        if (platform_matches(local, platforms[i]))
+        {
+            string_t *platform_str = platform_to_string(platforms[i]);
+            log_debug("Platform matches %s", platform_str->data);
+            string_free(platform_str);
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void log_opts(const args_build_t *args)
