@@ -62,16 +62,41 @@
 #define LD_ZIG "zig"      // Zig integrato con LLVM Linker
 #define LD_EMCC "emcc"    // Emscripten Linker (WebAssembly)
 
-string_t *get_cc(void);
-string_t *get_cxx(void);
+build_compiler_t *compiler_init(const char *path, build_compiler_family_t family);
+build_compiler_t *get_cc(void);
+build_compiler_t *get_cxx(void);
 string_t *get_ld(void);
+
+build_compiler_t *compiler_init(const char *path, build_compiler_family_t family)
+{
+    build_compiler_t *compiler = (build_compiler_t *)malloc(sizeof(build_compiler_t));
+    if (compiler == NULL)
+    {
+        log_fatal("Failed to allocate memory for compiler");
+        return NULL;
+    }
+
+    compiler->path = string_from_cstr(path);
+    compiler->family = family;
+
+    return compiler;
+}
+
+void compiler_free(build_compiler_t *compiler)
+{
+    if (compiler != NULL)
+    {
+        string_free(compiler->path);
+        free(compiler);
+    }
+}
 
 void build_environment_free(build_environment_t *env)
 {
     if (env != NULL)
     {
-        string_free(env->cc);
-        string_free(env->cxx);
+        compiler_free(env->cc);
+        compiler_free(env->cxx);
         string_free(env->ld);
         free(env);
     }
@@ -102,19 +127,9 @@ build_environment_t *build_environment_init(void)
     }
 
     // get the compiler CC
-    env->cc = env_get(ENV_CC);
-    if (env->cc == NULL)
-    {
-        // get from path
-        env->cc = get_cc();
-    }
+    env->cc = get_cc();
     // get the compiler CXX
-    env->cxx = env_get(ENV_CXX);
-    if (env->cxx == NULL)
-    {
-        // get from path
-        env->cxx = get_cxx();
-    }
+    env->cxx = get_cxx();
     // get the linker LD
     env->ld = env_get(ENV_LD);
     if (env->ld == NULL)
@@ -140,11 +155,11 @@ build_environment_t *build_environment_init(void)
 
     if (env->cc != NULL)
     {
-        log_info("CC: %s", env->cc->data);
+        log_info("CC: %s", env->cc->path->data);
     }
     if (env->cxx != NULL)
     {
-        log_info("CXX: %s", env->cxx->data);
+        log_info("CXX: %s", env->cxx->path->data);
     }
     if (env->ld != NULL)
     {
@@ -154,75 +169,112 @@ build_environment_t *build_environment_init(void)
     return env;
 }
 
-string_t *get_cc()
+build_compiler_t *get_cc()
 {
+    string_t *env_cc = env_get(ENV_CC);
+    if (env_cc != NULL)
+    {
+        build_compiler_t *compiler = compiler_init(env_cc->data, COMPILER_FAMILY_GCC);
+        string_free(env_cc);
+        return compiler;
+    }
+
     // all compilers array
-    const char *compilers[] = {
-        CC_GCC,
-        CC_CLANG,
-        CC_MSVC,
-        CC_INTEL,
-        CC_INTELLLVM,
-        CC_PGI,
-        CC_ARM,
-        CC_CRAY,
-        CC_TINYC,
-        CC_BORLAND,
-        CC_SUN,
-        CC_HP,
-        CC_IBM,
-        CC_MINGW,
-        CC_CYGGCC,
-        CC_LCC,
-        CC_WATCOM,
-        CC_ZIG,
-        CC_EMCC};
+    static const struct
+    {
+        const char *name;
+        build_compiler_family_t family;
+    } compilers[] = {
+        {CC_GCC, COMPILER_FAMILY_GCC},
+        {CC_CLANG, COMPILER_FAMILY_GCC},
+        {CC_MSVC, COMPILER_FAMILY_MSVC},
+        {CC_INTEL, COMPILER_FAMILY_GCC},
+        {CC_INTELLLVM, COMPILER_FAMILY_GCC},
+        {CC_PGI, COMPILER_FAMILY_GCC},
+        {CC_ARM, COMPILER_FAMILY_GCC},
+        {CC_CRAY, COMPILER_FAMILY_GCC},
+        {CC_TINYC, COMPILER_FAMILY_GCC},
+        {CC_BORLAND, COMPILER_FAMILY_GCC},
+        {CC_SUN, COMPILER_FAMILY_GCC},
+        {CC_HP, COMPILER_FAMILY_GCC},
+        {CC_IBM, COMPILER_FAMILY_GCC},
+        {CC_MINGW, COMPILER_FAMILY_GCC},
+        {CC_CYGGCC, COMPILER_FAMILY_GCC},
+        {CC_LCC, COMPILER_FAMILY_GCC},
+        {CC_WATCOM, COMPILER_FAMILY_GCC},
+        {CC_ZIG, COMPILER_FAMILY_GCC},
+        {CC_EMCC, COMPILER_FAMILY_GCC}
+
+    };
 
     // get the compiler from the environment
     for (size_t i = 0; i < 19; i++)
     {
-        string_t *cc = env_get_from_path(compilers[i]);
-        if (cc != NULL)
+        string_t *cc = env_get_from_path(compilers[i].name);
+        if (cc == NULL)
         {
-            log_info("Found %s in PATH", cc->data);
-            return cc;
+            continue;
         }
+        log_info("Found %s in PATH", cc->data);
+
+        build_compiler_t *compiler = compiler_init(cc->data, compilers[i].family);
+        string_free(cc);
+        return compiler;
     }
 
     return NULL;
 }
 
-string_t *get_cxx()
+build_compiler_t *get_cxx()
 {
+    string_t *env_cxx = env_get(ENV_CXX);
+    if (env_cxx != NULL)
+    {
+        build_compiler_t *compiler = compiler_init(env_cxx->data, COMPILER_FAMILY_GCC);
+        string_free(env_cxx);
+        return compiler;
+    }
+
     // all compilers array
-    const char *compilers[] = {
-        CXX_GCC,
-        CXX_CLANG,
-        CXX_MSVC,
-        CXX_INTEL,
-        CXX_INTELLLVM,
-        CXX_PGI,
-        CXX_ARM,
-        CXX_CRAY,
-        CXX_TINYC,
-        CXX_BORLAND,
-        CXX_SUN,
-        CXX_HP,
-        CXX_IBM,
-        CXX_MINGW,
-        CXX_CYGGCC,
-        CXX_WATCOM,
-        CXX_ZIG,
-        CXX_EMCC};
+    static const struct
+    {
+        const char *name;
+        build_compiler_family_t family;
+    } compilers[] = {
+        {CXX_GCC, COMPILER_FAMILY_GCC},
+        {CXX_CLANG, COMPILER_FAMILY_GCC},
+        {CXX_MSVC, COMPILER_FAMILY_MSVC},
+        {CXX_INTEL, COMPILER_FAMILY_GCC},
+        {CXX_INTELLLVM, COMPILER_FAMILY_GCC},
+        {CXX_PGI, COMPILER_FAMILY_GCC},
+        {CXX_ARM, COMPILER_FAMILY_GCC},
+        {CXX_CRAY, COMPILER_FAMILY_GCC},
+        {CXX_TINYC, COMPILER_FAMILY_GCC},
+        {CXX_BORLAND, COMPILER_FAMILY_GCC},
+        {CXX_SUN, COMPILER_FAMILY_GCC},
+        {CXX_HP, COMPILER_FAMILY_GCC},
+        {CXX_IBM, COMPILER_FAMILY_GCC},
+        {CXX_MINGW, COMPILER_FAMILY_GCC},
+        {CXX_CYGGCC, COMPILER_FAMILY_GCC},
+        {CXX_WATCOM, COMPILER_FAMILY_GCC},
+        {CXX_ZIG, COMPILER_FAMILY_GCC},
+        {CXX_EMCC, COMPILER_FAMILY_GCC},
+    };
 
     // get the compiler from the environment
     for (size_t i = 0; i < 18; i++)
     {
-        string_t *cxx = env_get_from_path(compilers[i]);
-        if (cxx != NULL)
+        string_t *cxx = env_get_from_path(compilers[i].name);
+        if (cxx == NULL)
         {
-            return cxx;
+            continue;
         }
+
+        log_info("Found %s in PATH", cxx->data);
+        build_compiler_t *compiler = compiler_init(cxx->data, compilers[i].family);
+        string_free(cxx);
+
+        return compiler;
     }
 
     return NULL;

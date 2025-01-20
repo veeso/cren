@@ -5,12 +5,27 @@
 
 #include <utils/string.h>
 
+/// @brief The compiler family. Used to determine the compiler flags.
+typedef enum build_compiler_family_t
+{
+    COMPILER_FAMILY_GCC,
+    COMPILER_FAMILY_MSVC,
+} build_compiler_family_t;
+
+typedef struct build_compiler_t build_compiler_t;
+
+struct build_compiler_t
+{
+    string_t *path;
+    build_compiler_family_t family;
+};
+
 typedef struct build_environment_t build_environment_t;
 
 struct build_environment_t
 {
-    string_t *cc;
-    string_t *cxx;
+    build_compiler_t *cc;
+    build_compiler_t *cxx;
     string_t *ld;
 };
 
