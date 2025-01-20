@@ -1,4 +1,5 @@
 #include <build.h>
+#include <build/environment.h>
 #include <cren.h>
 #include <lib/log.h>
 
@@ -130,5 +131,17 @@ int build_compile(build_t *build)
     }
 
     log_info("Compiling project...");
-    return CREN_OK;
+    // get build env
+    int rc = CREN_OK;
+    build_environment_t *env = build_environment_init();
+    if (env == NULL)
+    {
+        log_error("Failed to initialize build environment.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+cleanup:
+    build_environment_free(env);
+    return rc;
 }
