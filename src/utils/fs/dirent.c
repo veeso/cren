@@ -104,16 +104,16 @@ dirent_t *scan_dir_r(dirent_t *parent, size_t depth, size_t max_depth)
             return NULL;
         }
 
-        dirent_t *entry = dirent_init(parent, full_path, is_dir, get_mtime(full_path));
-        if (entry == NULL)
+        dirent_t *child = dirent_init(parent, full_path, is_dir, get_mtime(full_path));
+        if (child == NULL)
         {
             log_error("Failed to initialize dirent for %s", full_path);
             free(full_path);
             return NULL;
         }
 
-        // add entry to parent
-        if (add_child(parent, entry) != CREN_OK)
+        // add child to parent
+        if (add_child(parent, child) != CREN_OK)
         {
             log_error("Failed to add child to parent");
             dirent_free(child);
@@ -122,7 +122,7 @@ dirent_t *scan_dir_r(dirent_t *parent, size_t depth, size_t max_depth)
         }
 
         // scan recursively if directory
-        if (is_dir && scan_dir_r(entry, depth + 1, max_depth) == NULL)
+        if (is_dir && scan_dir_r(child, depth + 1, max_depth) == NULL)
         {
             log_warn("Failed to scan directory %s", full_path);
             free(full_path);
