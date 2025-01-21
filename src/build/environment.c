@@ -169,7 +169,7 @@ build_environment_t *build_environment_init(void)
     return env;
 }
 
-build_compiler_t *get_cc()
+build_compiler_t *get_cc(void)
 {
     string_t *env_cc = env_get(ENV_CC);
     if (env_cc != NULL)
@@ -225,7 +225,7 @@ build_compiler_t *get_cc()
     return NULL;
 }
 
-build_compiler_t *get_cxx()
+build_compiler_t *get_cxx(void)
 {
     string_t *env_cxx = env_get(ENV_CXX);
     if (env_cxx != NULL)
@@ -280,7 +280,7 @@ build_compiler_t *get_cxx()
     return NULL;
 }
 
-string_t *get_ld()
+string_t *get_ld(void)
 {
     // all linkers array
     const char *linkers[] = {
