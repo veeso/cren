@@ -16,14 +16,16 @@ typedef struct build_object_args_t
     const build_compiler_t *compiler;
     const string_t *objects_dir;
     const source_t *source;
+    size_t progress_steps;
 } build_object_args_t;
 
-int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len);
+int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len, size_t progress_steps);
 int build_object(void *args);
 string_t *compile_object_command(const build_object_args_t *args);
 build_compiler_t *get_build_compiler(const build_t *build, const build_environment_t *env);
 bool should_build_object(const source_t *source);
-void advance_build_object_progress(const build_t *build, const source_t *source);
+void advance_build_object_progress(const build_t *build, const source_t *source, const size_t progress_steps);
+size_t get_progress_steps(const build_t *build);
 
 #define OBJECTS_DIR "objects"
 
@@ -172,6 +174,8 @@ int build_compile(build_t *build)
         goto cleanup;
     }
 
+    const size_t progress_steps = get_progress_steps(build);
+
     // TODO: build dependencies
 
     // make objects dir
@@ -179,7 +183,7 @@ int build_compile(build_t *build)
     string_append_path(objects_dir, OBJECTS_DIR);
 
     // build objects
-    if (build_objects(build, env, objects_dir, build->sources, build->sources_len) != CREN_OK)
+    if (build_objects(build, env, objects_dir, build->sources, build->sources_len, progress_steps) != CREN_OK)
     {
         log_error("Failed to build objects.");
         rc = CREN_NOK;
@@ -187,7 +191,7 @@ int build_compile(build_t *build)
     }
 
     // build targets
-    if (build_objects(build, env, objects_dir, build->targets, build->targets_len) != CREN_OK)
+    if (build_objects(build, env, objects_dir, build->targets, build->targets_len, progress_steps) != CREN_OK)
     {
         log_error("Failed to build targets.");
         rc = CREN_NOK;
@@ -206,7 +210,7 @@ cleanup:
     return rc;
 }
 
-int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len)
+int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len, const size_t progress_steps)
 {
     int rc = CREN_OK;
     thrd_t *threads = NULL;
@@ -267,6 +271,7 @@ int build_objects(const build_t *build, const build_environment_t *env, const st
         build_object_args->compiler = compiler;
         build_object_args->objects_dir = objects_dir;
         build_object_args->source = source;
+        build_object_args->progress_steps = progress_steps;
 
         // start thread
         if (thrd_create(&threads[i], build_object, (void *)build_object_args) != thrd_success)
@@ -314,7 +319,7 @@ int build_object(void *ctx)
     if (!should_build_object(args->source))
     {
         log_info("skipping source %s, because unchanged since last build", args->source->src->data);
-        advance_build_object_progress(args->build, args->source);
+        advance_build_object_progress(args->build, args->source, args->progress_steps);
         rc = CREN_OK;
         goto cleanup;
     }
@@ -336,7 +341,7 @@ int build_object(void *ctx)
         goto cleanup;
     }
 
-    advance_build_object_progress(args->build, args->source);
+    advance_build_object_progress(args->build, args->source, args->progress_steps);
 
 cleanup:
     free(args);
@@ -445,7 +450,7 @@ build_compiler_t *get_build_compiler(const build_t *build, const build_environme
     }
 }
 
-void advance_build_object_progress(const build_t *build, const source_t *source)
+void advance_build_object_progress(const build_t *build, const source_t *source, const size_t progress_steps)
 {
     // lock
     mtx_lock(&build_objects_mutex);
@@ -454,7 +459,7 @@ void advance_build_object_progress(const build_t *build, const source_t *source)
 
     print_line_and_progress(
         build_objects_count,
-        build->sources_len + build->targets_len,
+        progress_steps,
         "Building objects",
         "%sBuilding%s object %s",
         COLOR_HEADER,
@@ -462,4 +467,15 @@ void advance_build_object_progress(const build_t *build, const source_t *source)
         source->obj->data);
 
     mtx_unlock(&build_objects_mutex);
+}
+
+size_t get_progress_steps(const build_t *build)
+{
+    size_t steps = 0;
+
+    steps += build->sources_len;
+    steps += build->targets_len;
+    steps += 1; // for linking
+
+    return steps;
 }
