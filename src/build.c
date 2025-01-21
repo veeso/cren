@@ -7,6 +7,7 @@
 #include <lib/log.h>
 #include <utils/cmd.h>
 #include <utils/fs.h>
+#include <utils/paths.h>
 #include <utils/terminal.h>
 
 typedef struct build_object_args_t
@@ -322,6 +323,8 @@ cleanup:
 int build_object(void *ctx)
 {
     string_t *command = NULL;
+    string_t *object_path = NULL;
+    string_t *parent = NULL;
     build_object_args_t *args = (build_object_args_t *)ctx;
     log_debug("building src %s", args->source->src->data);
     int rc = CREN_OK;
@@ -334,6 +337,31 @@ int build_object(void *ctx)
         goto cleanup;
     }
 
+    // init dir
+    object_path = string_clone(args->objects_dir);
+    string_append_path(object_path, args->source->obj->data);
+    if (object_path == NULL)
+    {
+        log_error("Failed to create object path.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+    // get parent dir
+    log_debug("getting parent dir for object %s", object_path->data);
+    parent = parent_dir(object_path->data);
+    if (parent == NULL)
+    {
+        log_error("Failed to get parent dir for object %s", object_path->data);
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+    // create parent dir
+    log_debug("creating object dir %s", parent->data);
+    if (make_dir_recursive(parent->data) != CREN_OK)
+    {
+        log_warn("Failed to create parent dir for object %s", object_path->data);
+    }
+
     command = compile_object_command(args);
     if (command == NULL)
     {
@@ -343,6 +371,7 @@ int build_object(void *ctx)
     }
 
     // execute
+    log_info("CC %s", command->data);
     const int exec_rc = cmd_exec(command->data);
     if (exec_rc != 0)
     {
@@ -356,6 +385,8 @@ int build_object(void *ctx)
 cleanup:
     free(args);
     string_free(command);
+    string_free(object_path);
+    string_free(parent);
 
     return rc;
 }
@@ -429,7 +460,8 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     int exit_rc = 0;
 
     string_t *target_path = NULL;
-    string_t *command = string_from_cstr(env->ld->data);
+    build_compiler_t *compiler = get_build_compiler(build, env);
+    string_t *command = string_from_cstr(compiler->path->data);
     if (command == NULL)
     {
         log_error("Failed to create command string.");
@@ -452,7 +484,6 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
         COLOR_RESET,
         target->target_name->data);
 
-    build_compiler_t *compiler = get_build_compiler(build, env);
     char option_symbol = '-';
     if (compiler->family == COMPILER_FAMILY_MSVC)
     {
@@ -476,6 +507,12 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     string_append_char(command, option_symbol);
     string_append(command, "o ");
     string_append(command, target_path->data);
+
+    // push standard
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "std=");
+    string_append(command, language_to_string(build->language));
 
     // push dependencies
     for (size_t i = 0; i < build->links->nitems; i++)

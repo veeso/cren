@@ -16,6 +16,7 @@ void init_log(args_verbose_t verbose, bool quiet);
 
 int main(int argc, char **argv)
 {
+  log_set_quiet(true);
   // get args
   args_t *args = args_parse_cmd(argc, argv);
   if (args == NULL)
@@ -96,10 +97,10 @@ void init_log(args_verbose_t verbose, bool quiet)
     log_set_level(LOG_WARN);
     break;
   case VERBOSE_ERROR:
-  case VERBOSE_DEFAULT:
     log_set_level(LOG_ERROR);
     break;
   case VERBOSE_FATAL:
+  case VERBOSE_DEFAULT:
     log_set_level(LOG_FATAL);
     break;
   default:

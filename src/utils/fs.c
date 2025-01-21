@@ -47,13 +47,13 @@ int make_dir(const char *path)
 #if defined(_WIN32) || defined(_WIN64)
     if (CreateDirectoryA(path, NULL) == 0)
     {
-        log_error("Failed to create directory %s", path);
+        log_warn("Failed to create directory %s", path);
         return CREN_NOK;
     }
 #else
     if (mkdir(path, 0755) == -1)
     {
-        log_error("Failed to create directory %s", path);
+        log_warn("Failed to create directory %s", path);
         return CREN_NOK;
     }
 #endif
