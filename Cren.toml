@@ -14,4 +14,3 @@ path = "src/cren.c"
 
 
 [dependencies]
-pthread = { link = "pthread", platforms = ["linux", "macos", "android", "ios"] }
