@@ -18,12 +18,12 @@ typedef struct build_object_args_t
     const source_t *source;
 } build_object_args_t;
 
-int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir);
+int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len);
 int build_object(void *args);
 string_t *compile_object_command(const build_object_args_t *args);
 build_compiler_t *get_build_compiler(const build_t *build, const build_environment_t *env);
 bool should_build_object(const source_t *source);
-void advance_build_object_progress(const build_t *build);
+void advance_build_object_progress(const build_t *build, const source_t *source);
 
 #define OBJECTS_DIR "objects"
 
@@ -174,26 +174,42 @@ int build_compile(build_t *build)
 
     // TODO: build dependencies
 
-    // build objects
+    // make objects dir
     objects_dir = string_clone(build->target_dir);
     string_append_path(objects_dir, OBJECTS_DIR);
-    if (build_objects(build, env, objects_dir) != CREN_OK)
+
+    // build objects
+    if (build_objects(build, env, objects_dir, build->sources, build->sources_len) != CREN_OK)
     {
         log_error("Failed to build objects.");
         rc = CREN_NOK;
         goto cleanup;
     }
 
+    // build targets
+    if (build_objects(build, env, objects_dir, build->targets, build->targets_len) != CREN_OK)
+    {
+        log_error("Failed to build targets.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // TODO: link targets
+
+    // Build OK
+    print_outcome("Finished", "cren build");
+
 cleanup:
     string_free(objects_dir);
     build_environment_free(env);
+
     return rc;
 }
 
-int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir)
+int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len)
 {
     int rc = CREN_OK;
-    thrd_t **threads = NULL;
+    thrd_t *threads = NULL;
     size_t threads_len = 0;
     build_compiler_t *compiler = get_build_compiler(build, env);
     if (compiler == NULL)
@@ -208,7 +224,7 @@ int build_objects(const build_t *build, const build_environment_t *env, const st
     if (objects_stat == NULL)
     {
         log_debug("Objects directory (%s) does not exist, creating it.", objects_dir->data);
-        if (make_dir(objects_dir->data) != CREN_OK)
+        if (make_dir_recursive(objects_dir->data) != CREN_OK)
         {
             log_error("Failed to create objects directory.");
             rc = CREN_NOK;
@@ -226,7 +242,7 @@ int build_objects(const build_t *build, const build_environment_t *env, const st
     }
 
     // create thread list
-    threads = (thrd_t **)malloc(sizeof(thrd_t *) * build->sources_len);
+    threads = (thrd_t *)malloc(sizeof(thrd_t) * sources_len);
     if (threads == NULL)
     {
         log_error("Failed to allocate memory for threads.");
@@ -234,19 +250,9 @@ int build_objects(const build_t *build, const build_environment_t *env, const st
         goto cleanup;
     }
 
-    for (size_t i = 0; i < build->sources_len; i++)
+    for (size_t i = 0; i < sources_len; i++)
     {
-        source_t *source = build->sources[i];
-
-        // start thread for `build_object`
-        thrd_t *thread = (thrd_t *)malloc(sizeof(thrd_t));
-        if (thread == NULL)
-        {
-            log_error("Failed to allocate memory for thread.");
-            rc = CREN_NOK;
-            goto cleanup;
-        }
-        threads_len++;
+        source_t *source = sources[i];
 
         // build object args
         build_object_args_t *build_object_args = malloc(sizeof(build_object_args_t));
@@ -263,12 +269,13 @@ int build_objects(const build_t *build, const build_environment_t *env, const st
         build_object_args->source = source;
 
         // start thread
-        if (thrd_create(thread, build_object, (void *)build_object_args) != thrd_success)
+        if (thrd_create(&threads[i], build_object, (void *)build_object_args) != thrd_success)
         {
             log_error("Failed to create thread for source %s", source->src->data);
             rc = CREN_NOK;
             goto cleanup;
         }
+        threads_len++;
     }
 
 cleanup:
@@ -279,8 +286,7 @@ cleanup:
         {
             log_debug("joining thread %zu", i);
             int thread_res = 0;
-            thrd_join(*threads[i], &thread_res);
-            free(threads[i]);
+            thrd_join(threads[i], &thread_res);
             log_debug("joined thread %zu", i);
             if (thread_res != CREN_OK)
             {
@@ -300,6 +306,7 @@ cleanup:
 
 int build_object(void *ctx)
 {
+    string_t *command = NULL;
     build_object_args_t *args = (build_object_args_t *)ctx;
     log_debug("building src %s", args->source->src->data);
     int rc = CREN_OK;
@@ -307,12 +314,12 @@ int build_object(void *ctx)
     if (!should_build_object(args->source))
     {
         log_info("skipping source %s, because unchanged since last build", args->source->src->data);
-        advance_build_object_progress(args->build);
+        advance_build_object_progress(args->build, args->source);
         rc = CREN_OK;
         goto cleanup;
     }
 
-    string_t *command = compile_object_command(args);
+    command = compile_object_command(args);
     if (command == NULL)
     {
         log_error("Failed to create compile command for source %s", args->source->src->data);
@@ -329,10 +336,11 @@ int build_object(void *ctx)
         goto cleanup;
     }
 
-    advance_build_object_progress(args->build);
+    advance_build_object_progress(args->build, args->source);
 
 cleanup:
     free(args);
+    string_free(command);
 
     return rc;
 }
@@ -364,7 +372,8 @@ string_t *compile_object_command(const build_object_args_t *args)
     // std options
     char common_opts[2048] = {0};
     sprintf(common_opts,
-            " %cstd=%s %co %s ",
+            " %cc %cstd=%s %co %s ",
+            option_symbol,
             option_symbol,
             language_to_string(args->build->language),
             option_symbol,
@@ -418,6 +427,9 @@ bool should_build_object(const source_t *source)
         return false;
     }
 
+    dirent_free(obj_stat);
+    dirent_free(src_stat);
+
     return true;
 }
 
@@ -433,7 +445,7 @@ build_compiler_t *get_build_compiler(const build_t *build, const build_environme
     }
 }
 
-void advance_build_object_progress(const build_t *build)
+void advance_build_object_progress(const build_t *build, const source_t *source)
 {
     // lock
     mtx_lock(&build_objects_mutex);
@@ -442,11 +454,12 @@ void advance_build_object_progress(const build_t *build)
 
     print_line_and_progress(
         build_objects_count,
-        build->sources_len,
+        build->sources_len + build->targets_len,
         "Building objects",
-        "Building object %zu/%zu",
-        build_objects_count,
-        build->sources_len);
+        "%sBuilding%s object %s",
+        COLOR_HEADER,
+        COLOR_RESET,
+        source->obj->data);
 
     mtx_unlock(&build_objects_mutex);
 }

@@ -3,6 +3,7 @@
 #include <cren.h>
 #include <lib/log.h>
 #include <utils/fs.h>
+#include <utils/paths.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
@@ -60,6 +61,44 @@ int make_dir(const char *path)
     log_debug("Created directory %s", path);
 
     return CREN_OK;
+}
+
+int make_dir_recursive(const char *path)
+{
+    // get the parent directory
+    dirent_t *parent_stat = NULL;
+    string_t *parent = parent_dir(path);
+    int rc = CREN_OK;
+    if (parent == NULL)
+    {
+        log_error("Failed to get parent directory of %s", path);
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // if the parent directory doesn't exist, create it
+    parent_stat = dirent_stat(parent->data);
+    if (parent_stat == NULL)
+    {
+        if (make_dir_recursive(parent->data) == CREN_NOK)
+        {
+            log_error("Failed to create parent directory %s", parent->data);
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+    }
+
+cleanup:
+
+    dirent_free(parent_stat);
+    string_free(parent);
+
+    if (rc != CREN_OK)
+    {
+        return CREN_NOK;
+    }
+
+    return make_dir(path);
 }
 
 int rmdir_all(const char *path, void (*on_remove_cb)(void *ctx, const char *path), void *ctx)

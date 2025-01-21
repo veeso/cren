@@ -30,6 +30,11 @@ char *get_current_dir(void);
 /// @return CREN_OK on success, CREN_NOK on failure
 int make_dir(const char *path);
 
+/// @brief Create a directory recursively
+/// @param path
+/// @return CREN_OK on success, CREN_NOK on failure
+int make_dir_recursive(const char *path);
+
 /// @brief Remove a directory and its content
 /// @param path
 /// @return CREN_OK on success, CREN_NOK on failure
