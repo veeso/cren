@@ -21,6 +21,7 @@ typedef struct build_object_args_t
 
 int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len, size_t progress_steps);
 int build_object(void *args);
+int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t *target, const size_t progress_steps);
 string_t *compile_object_command(const build_object_args_t *args);
 build_compiler_t *get_build_compiler(const build_t *build, const build_environment_t *env);
 bool should_build_object(const source_t *source);
@@ -33,7 +34,7 @@ size_t get_progress_steps(const build_t *build);
 mtx_t build_objects_mutex;
 
 // THREAD_SAFE objects count
-int build_objects_count = 0;
+int build_progress = 0;
 
 build_t *build_init(void)
 {
@@ -121,18 +122,18 @@ int build_add_source(build_t *build, const char *src)
     return CREN_OK;
 }
 
-int build_add_target(build_t *build, const char *target, const char *project_dir)
+int build_add_target(build_t *build, const char *target, const char *src_path, const char *project_dir)
 {
-    if (build == NULL || build->target_dir == NULL || project_dir == NULL)
+    if (build == NULL || build->target_dir == NULL || target == NULL || src_path == NULL || project_dir == NULL)
     {
         log_error("Attempted to add a target file to a NULL build object.");
         return CREN_NOK;
     }
 
     string_t *source_path = string_from_cstr(project_dir);
-    string_append_path(source_path, target);
+    string_append_path(source_path, src_path);
 
-    source_t *source = source_init(source_path->data, build->target_dir->data);
+    source_t *source = target_init(source_path->data, build->target_dir->data, target);
     string_free(source_path);
     if (source == NULL)
     {
@@ -198,7 +199,16 @@ int build_compile(build_t *build)
         goto cleanup;
     }
 
-    // TODO: link targets
+    // link targets
+    for (size_t i = 0; i < build->targets_len; i++)
+    {
+        if (link_target(build, env, objects_dir, build->targets[i], progress_steps) != CREN_OK)
+        {
+            log_error("Failed to link target %s", build->targets[i]->target_name->data);
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+    }
 
     // Build OK
     print_outcome("Finished", "cren build");
@@ -413,6 +423,129 @@ string_t *compile_object_command(const build_object_args_t *args)
     return command;
 }
 
+int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t *target, const size_t progress_steps)
+{
+    int rc = CREN_OK;
+    int exit_rc = 0;
+
+    string_t *target_path = NULL;
+    string_t *command = string_from_cstr(env->ld->data);
+    if (command == NULL)
+    {
+        log_error("Failed to create command string.");
+        return CREN_NOK;
+    }
+    if (target->target_name == NULL)
+    {
+        log_error("Target name is NULL.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // print progress
+    print_line_and_progress(
+        ++build_progress,
+        progress_steps,
+        "Building objects",
+        "%sLinking%s %s",
+        COLOR_HEADER,
+        COLOR_RESET,
+        target->target_name->data);
+
+    build_compiler_t *compiler = get_build_compiler(build, env);
+    char option_symbol = '-';
+    if (compiler->family == COMPILER_FAMILY_MSVC)
+    {
+        option_symbol = '/';
+    }
+
+    // make command
+
+    target_path = string_clone(build->target_dir);
+    if (target_path == NULL)
+    {
+        log_error("Failed to clone target path.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    string_append_path(target_path, target->target_name->data);
+
+    // push command
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "o ");
+    string_append(command, target_path->data);
+
+    // push dependencies
+    for (size_t i = 0; i < build->links->nitems; i++)
+    {
+        string_append(command, " ");
+        string_append_char(command, option_symbol);
+        string_append(command, "l");
+        string_append(command, build->links->items[i]->data);
+    }
+
+    // link libc
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "lc");
+
+    // push objects
+    for (size_t i = 0; i < build->sources_len; i++)
+    {
+        string_t *object_path = string_clone(objects_dir);
+        if (object_path == NULL)
+        {
+            log_error("Failed to clone object path.");
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+        string_append_path(object_path, build->sources[i]->obj->data);
+
+        string_append(command, " ");
+        string_append(command, object_path->data);
+
+        string_free(object_path);
+    }
+    // push object for target
+    string_t *target_object_path = string_clone(objects_dir);
+    if (target_object_path == NULL)
+    {
+        log_error("Failed to clone target object path.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+    string_append_path(target_object_path, target->obj->data);
+
+    string_append(command, " ");
+    string_append(command, target_object_path->data);
+
+    // free
+    string_free(target_object_path);
+
+    // execute
+    exit_rc = cmd_exec(command->data);
+
+cleanup:
+
+    string_free(command);
+    string_free(target_path);
+
+    if (rc != CREN_OK)
+    {
+        log_error("Failed to link target %s", target->target_name->data);
+    }
+
+    if (exit_rc != 0)
+    {
+        log_error("Failed to link target %s", target->target_name->data);
+        rc = CREN_NOK;
+    }
+
+    return rc;
+}
+
 bool should_build_object(const source_t *source)
 {
     // stat object and source
@@ -455,10 +588,10 @@ void advance_build_object_progress(const build_t *build, const source_t *source,
     // lock
     mtx_lock(&build_objects_mutex);
 
-    build_objects_count++;
+    build_progress++;
 
     print_line_and_progress(
-        build_objects_count,
+        build_progress,
         progress_steps,
         "Building objects",
         "%sBuilding%s object %s",

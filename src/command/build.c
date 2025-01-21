@@ -479,7 +479,8 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
             // check if target is enabled
             if (args->bin == NULL || strcmp(args->bin->data, manifest->targets->bin[i]->name->data) == 0)
             {
-                if (build_add_target(build_args, manifest->targets->bin[i]->path->data, project_dir) != CREN_OK)
+                cren_manifest_target_cfg_t *cfg = manifest->targets->bin[i];
+                if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir) != CREN_OK)
                 {
                     log_error("Error adding target %s", manifest->targets->bin[i]->name->data);
                     return CREN_NOK;
@@ -497,7 +498,8 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
             // check if target is enabled
             if (args->example == NULL || strcmp(args->example->data, manifest->targets->examples[i]->name->data) == 0)
             {
-                if (build_add_target(build_args, manifest->targets->examples[i]->path->data, project_dir) != CREN_OK)
+                cren_manifest_target_cfg_t *cfg = manifest->targets->examples[i];
+                if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir) != CREN_OK)
                 {
                     log_error("Error adding target %s", manifest->targets->examples[i]->name->data);
                     return CREN_NOK;
@@ -510,7 +512,8 @@ int configure_targets(build_t *build_args, const args_build_t *args, const cren_
     if (manifest->targets->lib != NULL && (args->all_targets || args->lib))
     {
         log_debug("Adding lib");
-        if (build_add_target(build_args, manifest->targets->lib->path->data, project_dir) != CREN_OK)
+        cren_manifest_target_cfg_t *cfg = manifest->targets->lib;
+        if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir) != CREN_OK)
         {
             log_error("Error adding target %s", manifest->targets->lib->name->data);
             return CREN_NOK;

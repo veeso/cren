@@ -52,9 +52,11 @@ int build_add_source(build_t *build, const char *src);
 
 /// @brief Add a target file to the build.
 /// @param build
-/// @param target
+/// @param target name
+/// @param src path
+/// @param project dir
 /// @return CREN_OK on success, CREN_NOK on failure.
-int build_add_target(build_t *build, const char *target, const char *project_dir);
+int build_add_target(build_t *build, const char *target, const char *src_path, const char *project_dir);
 
 /// @brief compile the project.
 /// @param build The build object.
