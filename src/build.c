@@ -7,7 +7,6 @@
 #endif // __STDC_NO_THREADS__
 
 #include <build.h>
-#include <build/environment.h>
 #include <cren.h>
 #include <lib/log.h>
 #include <utils/cmd.h>
@@ -162,9 +161,16 @@ int build_add_target(build_t *build, const char *target, const char *src_path, c
     return CREN_OK;
 }
 
-int build_compile(build_t *build)
+int build_compile(build_t *project_build)
 {
-    if (build == NULL)
+    // init vars
+    int rc = CREN_OK;
+    string_t *objects_dir = NULL;
+    build_environment_t *env = NULL;
+    build_t **dependencies = NULL;
+    size_t dependencies_len = 0;
+
+    if (project_build == NULL)
     {
         log_error("Attempted to compile a NULL build object.");
         return CREN_NOK;
@@ -172,9 +178,7 @@ int build_compile(build_t *build)
 
     log_info("Compiling project...");
     // get build env
-    int rc = CREN_OK;
-    build_environment_t *env = build_environment_init();
-    string_t *objects_dir = NULL;
+    env = build_environment_init();
     if (env == NULL)
     {
         log_error("Failed to initialize build environment.");
@@ -182,12 +186,55 @@ int build_compile(build_t *build)
         goto cleanup;
     }
 
-    const size_t progress_steps = get_progress_steps(build);
+    // TODO: get dependendencies artifacts
 
-    // TODO: build dependencies
+    size_t progress_steps = get_progress_steps(project_build);
+    // for each dependency
+    for (size_t i = 0; i < dependencies_len; i++)
+    {
+        progress_steps += get_progress_steps(dependencies[i]);
+    }
 
+    // build dependencies
+    for (size_t i = 0; i < dependencies_len; i++)
+    {
+        if ((rc = build_project(dependencies[i], env, progress_steps)) != CREN_OK)
+        {
+            log_error("Failed to build dependency.");
+            goto cleanup;
+        }
+    }
+
+    // build project
+    if ((rc = build_project(project_build, env, progress_steps)) != CREN_OK)
+    {
+        log_error("Failed to build project.");
+        goto cleanup;
+    }
+
+    // Build OK
+    print_outcome("Finished", "cren build");
+
+cleanup:
+    string_free(objects_dir);
+    build_environment_free(env);
+    if (dependencies != NULL)
+    {
+        for (size_t i = 0; i < dependencies_len; i++)
+        {
+            build_free(dependencies[i]);
+        }
+        free(dependencies);
+    }
+
+    return rc;
+}
+
+int build_project(const build_t *build, const build_environment_t *env, const size_t progress_steps)
+{
     // make objects dir
-    objects_dir = string_clone(build->target_dir);
+    int rc = CREN_OK;
+    string_t *objects_dir = string_clone(build->target_dir);
     string_append_path(objects_dir, OBJECTS_DIR);
 
     // build objects
@@ -217,12 +264,8 @@ int build_compile(build_t *build)
         }
     }
 
-    // Build OK
-    print_outcome("Finished", "cren build");
-
 cleanup:
     string_free(objects_dir);
-    build_environment_free(env);
 
     return rc;
 }
@@ -519,7 +562,7 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     string_append(command, " ");
     string_append_char(command, option_symbol);
     string_append(command, "o ");
-    string_append(command, target_path->data);
+    string_append(command, target_path->data); // TODO: build library if target is a library
 
     // Wall
     string_append(command, " ");
