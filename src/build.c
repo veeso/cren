@@ -5,6 +5,7 @@
 #include <build/environment.h>
 #include <cren.h>
 #include <lib/log.h>
+#include <lib/tinycthread.h>
 #include <utils/cmd.h>
 #include <utils/fs.h>
 #include <utils/paths.h>
@@ -210,6 +211,8 @@ int build_compile(build_t *build)
             goto cleanup;
         }
     }
+
+    // TODO: release build
 
     // Build OK
     print_outcome("Finished", "cren build");
