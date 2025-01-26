@@ -33,6 +33,7 @@ build_compiler_t *get_build_compiler(const build_t *build, const build_environme
 bool should_build_object(const source_t *source);
 void advance_build_object_progress(const build_t *build, const source_t *source, const size_t progress_steps);
 size_t get_progress_steps(const build_t *build);
+void append_release_opts(string_t *command, const build_compiler_t *compiler);
 
 #define OBJECTS_DIR "objects"
 
@@ -215,8 +216,6 @@ int build_compile(build_t *build)
             goto cleanup;
         }
     }
-
-    // TODO: release build
 
     // Build OK
     print_outcome("Finished", "cren build");
@@ -425,7 +424,8 @@ string_t *compile_object_command(const build_object_args_t *args)
     // std options
     char common_opts[2048] = {0};
     sprintf(common_opts,
-            " %cc %cstd=%s %co %s ",
+            " %cc %cWall %cstd=%s %co %s ",
+            option_symbol,
             option_symbol,
             option_symbol,
             language_to_string(args->build->language),
@@ -450,6 +450,12 @@ string_t *compile_object_command(const build_object_args_t *args)
         string_append_char(command, option_symbol);
         string_append(command, "I");
         string_append(command, args->build->include_dirs->items[i]->data);
+    }
+
+    // release opts
+    if (args->build->release)
+    {
+        append_release_opts(command, args->compiler);
     }
 
     // push source
@@ -515,6 +521,11 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     string_append(command, "o ");
     string_append(command, target_path->data);
 
+    // Wall
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "Wall");
+
     // push standard
     string_append(command, " ");
     string_append_char(command, option_symbol);
@@ -534,6 +545,12 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     string_append(command, " ");
     string_append_char(command, option_symbol);
     string_append(command, "lc");
+
+    // release opts
+    if (build->release)
+    {
+        append_release_opts(command, compiler);
+    }
 
     // push objects
     for (size_t i = 0; i < build->sources_len; i++)
@@ -588,6 +605,19 @@ cleanup:
     }
 
     return rc;
+}
+
+void append_release_opts(string_t *command, const build_compiler_t *compiler)
+{
+
+    if (compiler->family == COMPILER_FAMILY_MSVC)
+    {
+        string_append(command, " /O2 /GL /Gy /Ot");
+    }
+    else
+    {
+        string_append(command, " -O3 -march=native -s -flto");
+    }
 }
 
 bool should_build_object(const source_t *source)
