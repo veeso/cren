@@ -9,7 +9,7 @@
 void print_line_and_progress(size_t current, size_t total, const char *action, const char *line_fmt, ...)
 {
     if (current > 0)
-        printf("\r");
+        printf("\r\r%s", CLEAR_LINE);
     printf("  ");
     va_list args;
     va_start(args, line_fmt);
@@ -19,7 +19,7 @@ void print_line_and_progress(size_t current, size_t total, const char *action, c
     // current : total = progress : PROGRESS_BAR_SIZE
     const size_t progress = (current * PROGRESS_BAR_SIZE) / total;
 
-    printf("\n\r    %s%s [", CLEAR_LINE, action);
+    printf("\n\r%s   %s [", CLEAR_LINE, action);
     for (size_t i = 0; i < PROGRESS_BAR_SIZE; i++)
     {
         if (progress > 0 && i < progress - 1)

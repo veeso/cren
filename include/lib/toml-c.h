@@ -15,6 +15,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+
+#ifndef _STRNLEN_DEFINED
+#define _STRNLEN_DEFINED
+size_t strnlen(const char *s, size_t maxlen)
+{
+    size_t len = 0;
+    while (len < maxlen && s[len] != '\0')
+    {
+        len++;
+    }
+    return len;
+}
+#endif
 
 typedef struct toml_table_t toml_table_t;
 typedef struct toml_array_t toml_array_t;

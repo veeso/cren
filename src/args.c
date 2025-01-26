@@ -572,7 +572,7 @@ void usage_new(void)
     printf("%sOptions:%s\n", COLOR_HEADER, COLOR_RESET);
     printf("  %s-l, --lib\t\t\t\t%sCreate a new library package\n", COLOR_OPT, COLOR_TEXT);
     printf("  %s-b, --bin\t\t\t\t%sCreate a new binary package\n", COLOR_OPT, COLOR_TEXT);
-    printf("  %s-L, --language %s<LANGUAGE>\t%sSet package language\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-L, --language %s<LANGUAGE>\t\t%sSet package language\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
     printf("  %s-h, --help\t\t\t\t%sPrint help\n", COLOR_OPT, COLOR_TEXT);
     puts("");
 

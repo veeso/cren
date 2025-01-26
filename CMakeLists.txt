@@ -13,3 +13,8 @@ file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.c)
 add_executable(cren ${SOURCES})
 
 target_compile_options(cren PRIVATE -Wall -pedantic)
+
+
+# link pthread
+find_package(Threads REQUIRED)
+target_link_libraries(cren PRIVATE Threads::Threads)

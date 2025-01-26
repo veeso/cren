@@ -4,6 +4,7 @@
 #include <cren.h>
 #include <lib/log.h>
 #include <utils/fs.h>
+#include <utils/string.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
@@ -15,12 +16,17 @@
 #endif
 
 dirent_t *dirent_init(dirent_t *parent, const char *path, bool is_dir, time_t mtime);
-dirent_t *scan_dir_r(dirent_t *parent);
+dirent_t *scan_dir_r(dirent_t *parent, size_t depth, size_t max_depth);
 int add_child(dirent_t *parent, dirent_t *child);
 int is_directory(const char *path, bool *is_dir);
 time_t get_mtime(const char *path);
 
 dirent_t *scan_dir(const char *path)
+{
+    return scan_dir_with_depth(path, 255);
+}
+
+dirent_t *scan_dir_with_depth(const char *path, size_t depth)
 {
     // init parent
     dirent_t *parent = dirent_init(NULL, path, true, get_mtime(path));
@@ -34,23 +40,29 @@ dirent_t *scan_dir(const char *path)
     bool is_dir = false;
     if (is_directory(path, &is_dir) != CREN_OK)
     {
-        log_error("Failed to check if %s is a directory", path);
+        log_warn("Failed to check if %s is a directory", path);
+        dirent_free(parent);
         return NULL;
     }
 
     if (!is_dir)
     {
-        log_error("%s is not a directory", path);
+        log_warn("%s is not a directory", path);
         dirent_free(parent);
         return NULL;
     }
 
     // scan directory recursively
-    return scan_dir_r(parent);
+    return scan_dir_r(parent, 0, depth);
 }
 
-dirent_t *scan_dir_r(dirent_t *parent)
+dirent_t *scan_dir_r(dirent_t *parent, size_t depth, size_t max_depth)
 {
+
+    if (depth > max_depth)
+    {
+        return parent;
+    }
 
     if (parent == NULL || !parent->is_dir || parent->path == NULL)
     {
@@ -65,7 +77,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
     if (find_handle == INVALID_HANDLE_VALUE)
     {
         log_error("Failed to open directory %s", parent->path);
-        return NULL;
+        return parent;
     }
 
     do
@@ -87,31 +99,32 @@ dirent_t *scan_dir_r(dirent_t *parent)
         bool is_dir = false;
         if (is_directory(full_path, &is_dir) != CREN_OK)
         {
-            log_error("Failed to check if %s is a directory", full_path);
+            log_warn("Failed to check if %s is a directory", full_path);
             free(full_path);
             return NULL;
         }
 
-        dirent_t *entry = dirent_init(parent, full_path, is_dir, get_mtime(full_path));
-        if (entry == NULL)
+        dirent_t *child = dirent_init(parent, full_path, is_dir, get_mtime(full_path));
+        if (child == NULL)
         {
             log_error("Failed to initialize dirent for %s", full_path);
             free(full_path);
             return NULL;
         }
 
-        // add entry to parent
-        if (add_child(parent, entry) != CREN_OK)
+        // add child to parent
+        if (add_child(parent, child) != CREN_OK)
         {
             log_error("Failed to add child to parent");
+            dirent_free(child);
             free(full_path);
             return NULL;
         }
 
         // scan recursively if directory
-        if (is_dir && scan_dir_r(entry) == NULL)
+        if (is_dir && scan_dir_r(child, depth + 1, max_depth) == NULL)
         {
-            log_error("Failed to scan directory %s", full_path);
+            log_warn("Failed to scan directory %s", full_path);
             free(full_path);
             return NULL;
         }
@@ -127,7 +140,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
     if (dir == NULL)
     {
         log_error("Failed to open directory %s", parent->path);
-        return NULL;
+        return parent;
     }
 
     while ((entry = readdir(dir)) != NULL)
@@ -149,10 +162,7 @@ dirent_t *scan_dir_r(dirent_t *parent)
         bool is_dir = false;
         if (is_directory(full_path, &is_dir) != CREN_OK)
         {
-            log_error("Failed to check if %s is a directory", full_path);
-            free(full_path);
-            closedir(dir);
-            return NULL;
+            log_warn("Failed to check if %s is a directory", full_path);
         }
 
         dirent_t *child = dirent_init(parent, full_path, is_dir, get_mtime(full_path));
@@ -168,15 +178,16 @@ dirent_t *scan_dir_r(dirent_t *parent)
         if (add_child(parent, child) != CREN_OK)
         {
             log_error("Failed to add child to parent");
+            dirent_free(child);
             free(full_path);
             closedir(dir);
             return NULL;
         }
 
         // scan recursively if directory
-        if (is_dir && scan_dir_r(child) == NULL)
+        if (is_dir && scan_dir_r(child, depth + 1, max_depth) == NULL)
         {
-            log_error("Failed to scan directory %s", full_path);
+            log_warn("Failed to scan directory %s", full_path);
             free(full_path);
             closedir(dir);
             return NULL;
@@ -370,4 +381,25 @@ time_t get_mtime(const char *path)
 
     return statbuf.st_mtime;
 #endif
+}
+
+string_t *dirent_filename(const dirent_t *entry)
+{
+    if (entry == NULL || entry->path == NULL)
+    {
+        return NULL;
+    }
+
+    const char *last_slash = strrchr(entry->path, '/');
+    if (last_slash == NULL)
+    {
+        last_slash = strrchr(entry->path, '\\');
+    }
+
+    if (last_slash == NULL)
+    {
+        return string_from_cstr(entry->path);
+    }
+
+    return string_from_cstr(last_slash + 1);
 }
