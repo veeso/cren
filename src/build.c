@@ -1,11 +1,15 @@
 #include <stdbool.h>
+
+#ifdef __STDC_NO_THREADS__
+#include <lib/tinycthread.h>
+#else
 #include <threads.h>
+#endif // __STDC_NO_THREADS__
 
 #include <build.h>
 #include <build/environment.h>
 #include <cren.h>
 #include <lib/log.h>
-#include <lib/tinycthread.h>
 #include <utils/cmd.h>
 #include <utils/fs.h>
 #include <utils/paths.h>
