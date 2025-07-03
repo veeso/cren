@@ -12,3 +12,8 @@ The following options can be provided:
 - `--bin` - Create a binary package
 - `--lib` - Create a library package
 - `-L --language <language>` - Specify the language of the package. Default is c11
+
+Package names must follow the following rules:
+
+- Must start with a letter
+- Can only contain letters, numbers, and underscores
