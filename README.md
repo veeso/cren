@@ -25,12 +25,12 @@ Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed t
 
 ## 🛠️ Available Commands
 
-- `cren new`: Initialize a new project with a predefined directory structure.
-- `cren build`: Compile your project effortlessly.
-- `cren run`: Run compiled project.
-- `cren test`: Run integrated tests written directly in your source code.
-- `cren lint`: Analyze your code for potential issues.
-- `cren format`: Automatically format your code based on specified guidelines.
+- [x] `cren new`: Initialize a new project with a predefined directory structure.
+- [x] `cren build`: Compile your project effortlessly.
+- [ ] `cren run`: Run compiled project.
+- [ ] `cren test`: Run integrated tests written directly in your source code.
+- [ ] `cren lint`: Analyze your code for potential issues.
+- [ ] `cren format`: Automatically format your code based on specified guidelines.
 
 ## 🎯 Why Cren?
 
