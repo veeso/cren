@@ -27,10 +27,12 @@ struct cren_manifest_dependencies_t
 struct cren_manifest_dependency_t
 {
     string_t *name;
+    string_t *path;
     string_t *git;
     string_t *link;
     bool optional;
-    string_list_t *defines;
+    bool default_features;
+    string_list_t *features;
     platform_t **platforms;
     size_t platforms_len;
 };

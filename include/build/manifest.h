@@ -6,9 +6,9 @@
 #include <build.h>
 #include <manifest.h>
 
-typedef struct build_from_manifest_t build_from_manifest_t;
+typedef struct manifest_build_config_t manifest_build_config_t;
 
-struct build_from_manifest_t
+struct manifest_build_config_t
 {
     /// @brief Build with all features
     bool all_features;
@@ -36,14 +36,14 @@ struct build_from_manifest_t
     string_t *manifest_path;
 };
 
-build_from_manifest_t *build_from_manifest_init(void);
+manifest_build_config_t *build_from_manifest_init(void);
 
-void build_from_manifest_free(build_from_manifest_t *args);
+void manifest_build_config_free(manifest_build_config_t *args);
 
-/// @brief Make a build object from a manifest.
+/// @brief Get build configuration from manifest.
 /// @param manifest
 /// @param args
 /// @return The build object or NULL on failure.
-build_t *build_from_manifest(const cren_manifest_t *manifest, const build_from_manifest_t *args);
+build_cfg_t *build_config_from_manifest(const cren_manifest_t *manifest, const manifest_build_config_t *args);
 
 #endif // CREN_BUILD_MANIFEST_H

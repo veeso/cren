@@ -168,10 +168,12 @@ The dependencies section allows you to specify all the dependencies for your pac
 
 Each dependency must be identified by its `name` and may contain these fields:
 
+- `path`: path to the dependency, relative to the manifest file
 - `git`: URL to git to download the dependency
 - `link`: link option for the compiler (e.g. `-lm`)
 - `optional`: makes the dependency to be feature-gated. (See [features](#features)).
-- `defines`: a list of defines to build the library
+- `features`: a list of features to be enabled for the dependency
+- `default-features`: a boolean to specify whether the default features should be enabled or not (if unspecified it defaults to `true`).
 - `platforms`: a list of platforms where the dependency will be used for. It is a list of triplets (e.g. `x86_64-unknown-linux-gnu`) or aliases (e.g. `linux`). See [Platforms](#platforms).
 
 ### Platforms

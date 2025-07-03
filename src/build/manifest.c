@@ -7,22 +7,22 @@
 #include <utils/fs.h>
 #include <utils/paths.h>
 
-int configure_include_dirs(build_t *build_args, const string_t *project_dir);
-int configure_target_dir(build_t *build_args, const build_from_manifest_t *args, const string_t *project_dir);
-int configure_source_files(build_t *build_args, const build_from_manifest_t *args, const cren_manifest_t *manifest, const string_t *project_dir);
-int add_source_files(build_t *build_args, const dirent_t *source_files);
-int configure_defines(build_t *build_args, cren_manifest_feature_t **features, size_t len);
-int configure_targets(build_t *build_args, const build_from_manifest_t *args, const cren_manifest_t *manifest, const char *project_dir);
-int configure_links(build_t *build_args, cren_manifest_dependency_t **dependencies, size_t len);
-int get_enabled_feature(const build_from_manifest_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len);
-int get_enabled_dependencies(const build_from_manifest_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len);
+int configure_include_dirs(build_cfg_t *build_args, const string_t *project_dir);
+int configure_target_dir(build_cfg_t *build_args, const manifest_build_config_t *args, const string_t *project_dir);
+int configure_source_files(build_cfg_t *build_args, const manifest_build_config_t *args, const cren_manifest_t *manifest, const string_t *project_dir);
+int add_source_files(build_cfg_t *build_args, const dirent_t *source_files);
+int configure_defines(build_cfg_t *build_args, cren_manifest_feature_t **features, size_t len);
+int configure_targets(build_cfg_t *build_args, const manifest_build_config_t *args, const cren_manifest_t *manifest, const char *project_dir);
+int configure_links(build_cfg_t *build_args, cren_manifest_dependency_t **dependencies, size_t len);
+int get_enabled_feature(const manifest_build_config_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len);
+int get_enabled_dependencies(const manifest_build_config_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len);
 bool is_platform_enabled(platform_t *local, platform_t **platforms, size_t len);
 
-build_t *build_from_manifest(const cren_manifest_t *manifest, const build_from_manifest_t *args)
+build_cfg_t *build_config_from_manifest(const cren_manifest_t *manifest, const manifest_build_config_t *args)
 {
     log_debug("Initializing build args");
     string_t *project_dir = NULL;
-    build_t *build_args = build_init();
+    build_cfg_t *build_args = build_init();
     cren_manifest_feature_t **enabled_features = NULL;
     size_t enabled_features_len = 0;
     cren_manifest_dependency_t **enabled_dependencies = NULL;
@@ -146,9 +146,9 @@ cleanup:
     return build_args;
 }
 
-build_from_manifest_t *build_from_manifest_init(void)
+manifest_build_config_t *build_from_manifest_init(void)
 {
-    build_from_manifest_t *args = (build_from_manifest_t *)malloc(sizeof(build_from_manifest_t));
+    manifest_build_config_t *args = (manifest_build_config_t *)malloc(sizeof(manifest_build_config_t));
     if (args == NULL)
     {
         return NULL;
@@ -170,7 +170,7 @@ build_from_manifest_t *build_from_manifest_init(void)
     return args;
 }
 
-void build_from_manifest_free(build_from_manifest_t *args)
+void manifest_build_config_free(manifest_build_config_t *args)
 {
     if (args == NULL)
     {
@@ -186,7 +186,7 @@ void build_from_manifest_free(build_from_manifest_t *args)
     free(args);
 }
 
-int configure_include_dirs(build_t *build_args, const string_t *project_dir)
+int configure_include_dirs(build_cfg_t *build_args, const string_t *project_dir)
 {
     build_args->include_dirs = string_list_init();
     if (build_args->include_dirs == NULL)
@@ -210,7 +210,7 @@ int configure_include_dirs(build_t *build_args, const string_t *project_dir)
     return CREN_OK;
 }
 
-int configure_target_dir(build_t *build_args, const build_from_manifest_t *args, const string_t *project_dir)
+int configure_target_dir(build_cfg_t *build_args, const manifest_build_config_t *args, const string_t *project_dir)
 {
     log_debug("Configuring target dir");
     if (args->target_dir != NULL)
@@ -248,7 +248,7 @@ int configure_target_dir(build_t *build_args, const build_from_manifest_t *args,
     return CREN_OK;
 }
 
-int configure_defines(build_t *build_args, cren_manifest_feature_t **features, size_t len)
+int configure_defines(build_cfg_t *build_args, cren_manifest_feature_t **features, size_t len)
 {
     log_debug("Configuring defines");
     build_args->defines = string_list_init();
@@ -276,7 +276,7 @@ int configure_defines(build_t *build_args, cren_manifest_feature_t **features, s
     return CREN_OK;
 }
 
-int get_enabled_feature(const build_from_manifest_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len)
+int get_enabled_feature(const manifest_build_config_t *args, const cren_manifest_t *manifest, cren_manifest_feature_t ***enabled_features, size_t *len)
 {
     // get enabled features
     int rc = CREN_OK;
@@ -377,7 +377,7 @@ cleanup:
     return rc;
 }
 
-int get_enabled_dependencies(const build_from_manifest_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len)
+int get_enabled_dependencies(const manifest_build_config_t *args, const cren_manifest_t *manifest, cren_manifest_dependency_t ***dependencies, size_t *len, cren_manifest_feature_t **enabled_features, size_t enabled_features_len)
 {
     // get enabled features
     int rc = CREN_OK;
@@ -468,7 +468,7 @@ cleanup:
     return rc;
 }
 
-int configure_targets(build_t *build_args, const build_from_manifest_t *args, const cren_manifest_t *manifest, const char *project_dir)
+int configure_targets(build_cfg_t *build_args, const manifest_build_config_t *args, const cren_manifest_t *manifest, const char *project_dir)
 {
     // bins enabled
     if (args->all_targets || args->bins)
@@ -523,7 +523,7 @@ int configure_targets(build_t *build_args, const build_from_manifest_t *args, co
     return CREN_OK;
 }
 
-int configure_source_files(build_t *build_args, const build_from_manifest_t *args, const cren_manifest_t *manifest, const string_t *project_dir)
+int configure_source_files(build_cfg_t *build_args, const manifest_build_config_t *args, const cren_manifest_t *manifest, const string_t *project_dir)
 {
     if (build_args->targets_len == 0)
     {
@@ -556,7 +556,7 @@ int configure_source_files(build_t *build_args, const build_from_manifest_t *arg
     return rc;
 }
 
-int add_source_files(build_t *build_args, const dirent_t *source_files)
+int add_source_files(build_cfg_t *build_args, const dirent_t *source_files)
 {
     // iterate over source files
     for (size_t i = 0; i < source_files->children_count; i++)
@@ -596,7 +596,7 @@ int add_source_files(build_t *build_args, const dirent_t *source_files)
     return CREN_OK;
 }
 
-int configure_links(build_t *build_args, cren_manifest_dependency_t **dependencies, size_t len)
+int configure_links(build_cfg_t *build_args, cren_manifest_dependency_t **dependencies, size_t len)
 {
     if (build_args->links == NULL)
     {

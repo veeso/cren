@@ -180,6 +180,16 @@ int serialize_dependency(cren_manifest_dependency_t *dependency, FILE *file)
         first = 0;
     }
 
+    if (dependency->path != NULL)
+    {
+        if (!first)
+        {
+            print(file, ", ");
+        }
+        print(file, "path = \"%s\"", dependency->path->data);
+        first = 0;
+    }
+
     if (dependency->link != NULL)
     {
         if (!first)
@@ -200,22 +210,32 @@ int serialize_dependency(cren_manifest_dependency_t *dependency, FILE *file)
         first = 0;
     }
 
-    if (dependency->defines != NULL)
+    if (dependency->features != NULL)
     {
         if (!first)
         {
             print(file, ", ");
         }
-        print(file, "defines = [");
-        for (int i = 0; i < dependency->defines->nitems; i++)
+        print(file, "features = [");
+        for (int i = 0; i < dependency->features->nitems; i++)
         {
-            print(file, "\"%s\"", dependency->defines->items[i]->data);
-            if (i < dependency->defines->nitems - 1)
+            print(file, "\"%s\"", dependency->features->items[i]->data);
+            if (i < dependency->features->nitems - 1)
             {
                 print(file, ", ");
             }
         }
         print(file, "]");
+    }
+
+    if (dependency->default_features)
+    {
+        if (!first)
+        {
+            print(file, ", ");
+        }
+        print(file, "default-features = true");
+        first = 0;
     }
 
     if (dependency->platforms != NULL)

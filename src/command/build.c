@@ -1,6 +1,7 @@
 #include <stdbool.h>
 
 #include <build.h>
+#include <build/compile.h>
 #include <build/manifest.h>
 #include <command/build.h>
 #include <cren.h>
@@ -11,14 +12,14 @@
 #include <utils/paths.h>
 
 void log_opts(const args_build_t *args);
-build_from_manifest_t *build_from_manifest_from_args(const args_build_t *args);
+manifest_build_config_t *build_from_manifest_from_args(const args_build_t *args);
 
 int command_build(const args_build_t *args)
 {
     int rc = CREN_OK;
     cren_manifest_t *manifest = NULL;
-    build_t *build_args = NULL;
-    build_from_manifest_t *manifest_build_args = NULL;
+    build_cfg_t *build_args = NULL;
+    manifest_build_config_t *manifest_build_args = NULL;
     // log
     log_opts(args);
     // load manifest
@@ -38,7 +39,7 @@ int command_build(const args_build_t *args)
         goto cleanup;
     }
     // load build options
-    build_args = build_from_manifest(manifest, manifest_build_args);
+    build_args = build_config_from_manifest(manifest, manifest_build_args);
     if (build_args == NULL)
     {
         log_error("Error initializing build args");
@@ -55,14 +56,14 @@ cleanup:
     if (build_args)
         build_free(build_args);
     if (manifest_build_args)
-        build_from_manifest_free(manifest_build_args);
+        manifest_build_config_free(manifest_build_args);
 
     return rc;
 }
 
-build_from_manifest_t *build_from_manifest_from_args(const args_build_t *args)
+manifest_build_config_t *build_from_manifest_from_args(const args_build_t *args)
 {
-    build_from_manifest_t *build_args = build_from_manifest_init();
+    manifest_build_config_t *build_args = build_from_manifest_init();
     if (build_args == NULL)
     {
         log_error("Error initializing build args");
@@ -91,7 +92,7 @@ build_from_manifest_t *build_from_manifest_from_args(const args_build_t *args)
             if (feature == NULL)
             {
                 log_error("Error cloning feature");
-                build_from_manifest_free(build_args);
+                manifest_build_config_free(build_args);
                 return NULL;
             }
             string_list_push(build_args->features, feature);
