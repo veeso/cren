@@ -51,4 +51,9 @@ int cren_manifest_write(cren_manifest_t *manifest, FILE *file);
 /// @param manifest
 void cren_manifest_free(cren_manifest_t *manifest);
 
+/// @brief Validate the package name
+/// @param package_name
+/// @return `CREN_OK` on valid name
+int cren_manifest_validate_name(const char *package_name);
+
 #endif // CREN_MANIFEST_H

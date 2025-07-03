@@ -5,6 +5,7 @@
 
 #include <stdbool.h>
 
+#include <build/environment.h>
 #include <build/source.h>
 #include <manifest/package/language.h>
 #include <utils/string.h>
@@ -62,5 +63,12 @@ int build_add_target(build_t *build, const char *target, const char *src_path, c
 /// @param build The build object.
 /// @return CREN_OK on success, CREN_NOK on failure.
 int build_compile(build_t *build);
+
+/// @brief build provided project.
+/// @param build
+/// @param env
+/// @param progress_steps
+/// @return CREN_OK on success, CREN_NOK on failure.
+int build_project(const build_t *build, const build_environment_t *env, const size_t progress_steps);
 
 #endif // CREN_BUILD_H

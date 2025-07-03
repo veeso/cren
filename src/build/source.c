@@ -29,6 +29,7 @@ source_t *source_init(const char *src, const char *target_dir)
 
     // get object file name
     string_t *object_filename = source_path_in_src(src);
+    bool is_in_src_root = (object_filename == NULL);
     if (object_filename == NULL)
     {
         // it's okay, just set empty (it means that the source file is in the root of src)
@@ -46,7 +47,10 @@ source_t *source_init(const char *src, const char *target_dir)
     }
 
     // push object file name
-    string_append(object_filename, "/");
+    if (!is_in_src_root)
+    {
+        string_append(object_filename, "/");
+    }
     string_append(object_filename, src_filename->data);
     string_free(src_filename);
 
@@ -118,7 +122,7 @@ string_t *source_path_in_src(const char *src)
     string_t *source_dir = parent_dir(source_path->data);
     if (source_dir == NULL)
     {
-        log_error("Failed to get source directory.");
+        log_debug("Failed to get source directory.");
         string_free(source_path);
         return NULL;
     }
