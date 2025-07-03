@@ -122,7 +122,7 @@ string_t *source_path_in_src(const char *src)
     string_t *source_dir = parent_dir(source_path->data);
     if (source_dir == NULL)
     {
-        log_error("Failed to get source directory.");
+        log_debug("Failed to get source directory.");
         string_free(source_path);
         return NULL;
     }

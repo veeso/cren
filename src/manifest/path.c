@@ -67,7 +67,7 @@ string_t *find_manifest_path_in(const char *path)
         string_t *parent = parent_dir(path);
         if (parent == NULL)
         {
-            log_error("Failed to find parent directory");
+            log_debug("Failed to find parent directory");
             return NULL;
         }
         string_t *res = find_manifest_path_in(parent->data);

@@ -33,7 +33,7 @@ string_t *parent_dir(const char *path)
     // check if slash was found
     if (last_slash == 0)
     {
-        log_error("Failed to find parent directory");
+        log_debug("Failed to find parent directory");
         return NULL;
     }
 

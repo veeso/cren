@@ -4,6 +4,7 @@
 #include <lib/log.h>
 #include <manifest.h>
 #include <manifest/path.h>
+#include <utils/chars.h>
 
 cren_manifest_t *cren_manifest_init(void)
 {
@@ -102,6 +103,14 @@ cren_manifest_t *cren_manifest_load(const char *path)
         goto cleanup;
     }
 
+    // check manifest package name
+    if (cren_manifest_validate_name(manifest->package->name->data) != CREN_OK)
+    {
+        log_fatal("Invalid package name: %s", manifest->package->name->data);
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
 cleanup:
     if (cren_manifest_path)
         string_free(cren_manifest_path);
@@ -116,4 +125,37 @@ cleanup:
     }
 
     return manifest;
+}
+
+int cren_manifest_validate_name(const char *package_name)
+{
+    // Validate package name according to Cren's rules
+    // - Must start with a letter
+    // - Can contain letters, numbers,  and underscores
+
+    if (package_name == NULL || package_name[0] == '\0')
+    {
+        log_error("Package name cannot be empty");
+        return CREN_NOK;
+    }
+
+    if (!is_alpha(package_name[0]))
+    {
+        log_error("Package name must start with a letter");
+        return CREN_NOK;
+    }
+
+    for (size_t i = 0; package_name[i] != '\0'; i++)
+    {
+        char c = package_name[i];
+        if (!is_alpha(c) && !is_digit(c) && c != '_')
+        {
+            log_error("Package name can only contain letters, numbers, and underscores");
+            return CREN_NOK;
+        }
+    }
+
+    log_debug("Package name '%s' is valid", package_name);
+
+    return CREN_OK;
 }

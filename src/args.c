@@ -36,6 +36,7 @@ args_t *args_parse_cmd(int argc, char **argv)
     } cmds[] = {
         {"build", ARGS_CMD_BUILD, args_parse_build},
         {"clean", ARGS_CMD_CLEAN, args_parse_clean},
+        {"init", ARGS_CMD_NEW, args_parse_new},
         {"manifest", ARGS_CMD_MANIFEST, args_parse_manifest},
         {"new", ARGS_CMD_NEW, args_parse_new},
     };
@@ -495,8 +496,9 @@ void usage_default(void)
     printf("%sCommands:%s\n", COLOR_HEADER, COLOR_RESET);
     printf("  %sbuild\t\t\t\t\t%sBuild package\n", COLOR_OPT, COLOR_TEXT);
     printf("  %sclean\t\t\t\t\t%sClean target directory\n", COLOR_OPT, COLOR_TEXT);
-    printf("  %snew\t\t\t\t\t%sCreate a new Cren package\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %sinit\t\t\t\t\t%sCreate a new Cren package\n", COLOR_OPT, COLOR_TEXT);
     printf("  %smanifest\t\t\t\t%sManage package manifest\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %snew\t\t\t\t\t%sCreate a new Cren package\n", COLOR_OPT, COLOR_TEXT);
     puts("");
 }
 

@@ -24,6 +24,15 @@ int command_new(const args_new_t *args)
     string_t *wrkdir = NULL;
     string_t *project_dir = NULL;
     string_t *main_src = NULL;
+
+    // check package name
+    if (cren_manifest_validate_name(args->package->data) != CREN_OK)
+    {
+        log_error("Invalid package name: %s", args->package->data);
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
     if (args->package == NULL || args->package->length == 0)
     {
         log_error("Package name is required");
@@ -125,6 +134,7 @@ int init_manifest(const args_new_t *args, string_t *project_dir, string_t *main_
     string_t *manifest_path = NULL;
     cren_manifest_target_cfg_t *cfg = NULL;
     FILE *manifest_file = NULL;
+
     // make manifest path
     manifest_path = string_clone(project_dir);
     if (manifest_path == NULL)

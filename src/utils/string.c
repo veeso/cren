@@ -20,7 +20,7 @@ string_t *string_clone(const string_t *string)
 {
     if (string == NULL)
     {
-        log_error("Attempted to clone a NULL string");
+        log_debug("Attempted to clone a NULL string");
         return NULL;
     }
     string_t *new_string = string_init();
