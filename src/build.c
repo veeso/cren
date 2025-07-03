@@ -24,9 +24,13 @@ typedef struct build_object_args_t
     size_t progress_steps;
 } build_object_args_t;
 
+int build_target_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, target_t **targets, size_t targets_len, size_t progress_steps);
 int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len, size_t progress_steps);
 int build_object(void *args);
-int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t *target, const size_t progress_steps);
+int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
+int link_static(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
+int link_shared(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
+int link_binary(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
 string_t *compile_object_command(const build_object_args_t *args);
 build_compiler_t *get_build_compiler(const build_t *build, const build_environment_t *env);
 bool should_build_object(const source_t *source);
@@ -91,7 +95,7 @@ void build_free(build_t *build)
     {
         for (size_t i = 0; i < build->targets_len; i++)
         {
-            source_free(build->targets[i]);
+            target_free(build->targets[i]);
         }
         free(build->targets);
     }
@@ -128,9 +132,9 @@ int build_add_source(build_t *build, const char *src)
     return CREN_OK;
 }
 
-int build_add_target(build_t *build, const char *target, const char *src_path, const char *project_dir)
+int build_add_target(build_t *build, const char *target_name, const char *src_path, const char *project_dir, target_type_t type)
 {
-    if (build == NULL || build->target_dir == NULL || target == NULL || src_path == NULL || project_dir == NULL)
+    if (build == NULL || build->target_dir == NULL || target_name == NULL || src_path == NULL || project_dir == NULL)
     {
         log_error("Attempted to add a target file to a NULL build object.");
         return CREN_NOK;
@@ -139,23 +143,23 @@ int build_add_target(build_t *build, const char *target, const char *src_path, c
     string_t *source_path = string_from_cstr(project_dir);
     string_append_path(source_path, src_path);
 
-    source_t *source = target_init(source_path->data, build->target_dir->data, target);
+    target_t *target = target_init(source_path->data, build->target_dir->data, target_name, type);
     string_free(source_path);
-    if (source == NULL)
+    if (target == NULL)
     {
         log_error("Failed to initialize source object.");
         return CREN_NOK;
     }
 
-    build->targets = realloc(build->targets, sizeof(source_t *) * (build->targets_len + 1));
+    build->targets = realloc(build->targets, sizeof(target_t *) * (build->targets_len + 1));
     if (build->targets == NULL)
     {
         log_error("Failed to reallocate memory for targets.");
-        source_free(source);
+        target_free(target);
         return CREN_NOK;
     }
 
-    build->targets[build->targets_len] = source;
+    build->targets[build->targets_len] = target;
     build->targets_len++;
 
     return CREN_OK;
@@ -246,7 +250,7 @@ int build_project(const build_t *build, const build_environment_t *env, const si
     }
 
     // build targets
-    if (build_objects(build, env, objects_dir, build->targets, build->targets_len, progress_steps) != CREN_OK)
+    if (build_target_objects(build, env, objects_dir, build->targets, build->targets_len, progress_steps) != CREN_OK)
     {
         log_error("Failed to build targets.");
         rc = CREN_NOK;
@@ -266,6 +270,52 @@ int build_project(const build_t *build, const build_environment_t *env, const si
 
 cleanup:
     string_free(objects_dir);
+
+    return rc;
+}
+
+int build_target_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, target_t **targets, size_t targets_len, size_t progress_steps)
+{
+    // convert targets to sources
+    int rc = CREN_OK;
+    source_t **sources = malloc(sizeof(source_t *) * targets_len);
+    size_t sources_len = 0;
+    if (sources == NULL)
+    {
+        log_error("Failed to allocate memory for sources.");
+        return CREN_NOK;
+    }
+
+    for (size_t i = 0; i < targets_len; i++)
+    {
+        sources[i] = source_from_target(targets[i]);
+        if (sources[i] == NULL)
+        {
+            log_error("Failed to convert target %s to source.", targets[i]->target_name->data);
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+        sources_len++;
+    }
+
+    // build objects
+    if (build_objects(build, env, objects_dir, sources, sources_len, progress_steps) != CREN_OK)
+    {
+        log_error("Failed to build objects for targets.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+cleanup:
+    // clean all sources
+    for (size_t i = 0; i < sources_len; i++)
+    {
+        if (sources[i] != NULL)
+        {
+            source_free(sources[i]);
+        }
+    }
+    free(sources);
 
     return rc;
 }
@@ -510,13 +560,334 @@ string_t *compile_object_command(const build_object_args_t *args)
     return command;
 }
 
-int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t *target, const size_t progress_steps)
+int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
+{
+    // if target is a binary use compiler path, otherwise use linker path
+    switch (target->type)
+    {
+    case TARGET_TYPE_EXECUTABLE:
+        return link_binary(build, env, objects_dir, target, progress_steps);
+    case TARGET_TYPE_LIBRARY:
+        if (link_static(build, env, objects_dir, target, progress_steps) != CREN_OK)
+        {
+            log_error("Failed to link static library %s", target->target_name->data);
+            return CREN_NOK;
+        }
+        return link_shared(build, env, objects_dir, target, progress_steps);
+    }
+
+    log_error("Unknown target type %d for target %s", target->type, target->target_name->data);
+    return CREN_NOK;
+}
+
+int link_static(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
+{
+    int rc = CREN_OK;
+    int exit_rc = 0;
+
+    string_t *target_path = NULL;
+    string_t *target_name = NULL;
+    build_compiler_t *ar = env->ar;
+
+    string_t *command = string_from_cstr(ar->path->data);
+    if (command == NULL)
+    {
+        log_error("Failed to create command string.");
+        return CREN_NOK;
+    }
+
+    if (target->target_name == NULL)
+    {
+        log_error("Target name is NULL.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    target_name = string_clone(target->target_name);
+    if (target_name == NULL)
+    {
+        log_error("Failed to clone target name.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // append '.a' or '.lib' extension based on compiler family
+    if (ar->family == COMPILER_FAMILY_GCC)
+    {
+        string_append(target_name, ".a");
+    }
+    else
+    {
+        string_append(target_name, ".lib");
+    }
+
+    // print progress
+    print_line_and_progress(
+        ++build_progress,
+        progress_steps,
+        "Building objects",
+        "%sLinking (static)%s %s",
+        COLOR_HEADER,
+        COLOR_RESET,
+        target_name->data);
+
+    // make command
+    target_path = string_clone(build->target_dir);
+    if (target_path == NULL)
+    {
+        log_error("Failed to clone target path.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    string_append_path(target_path, target_name->data);
+
+    string_append(command, " ");
+
+    if (ar->family == COMPILER_FAMILY_MSVC)
+    {
+        // MSVC uses /OUT: for outputs
+        string_append(command, "/OUT:");
+        string_append(command, target_path->data);
+    }
+    else
+    {
+        string_append(command, "rcs ");
+        string_append(command, target_path->data);
+    }
+
+    // push objects
+    for (size_t i = 0; i < build->sources_len; i++)
+    {
+        string_t *object_path = string_clone(objects_dir);
+        if (object_path == NULL)
+        {
+            log_error("Failed to clone object path.");
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+        string_append_path(object_path, build->sources[i]->obj->data);
+
+        string_append(command, " ");
+        string_append(command, object_path->data);
+
+        string_free(object_path);
+    }
+
+    // push object for target
+    string_t *target_object_path = string_clone(objects_dir);
+    if (target_object_path == NULL)
+    {
+        log_error("Failed to clone target object path.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+    string_append_path(target_object_path, target->obj->data);
+
+    string_append(command, " ");
+    string_append(command, target_object_path->data);
+
+    // free
+    string_free(target_object_path);
+
+    // execute
+    log_info("LINK %s", command->data);
+    exit_rc = cmd_exec(command->data);
+
+cleanup:
+    string_free(target_name);
+    string_free(command);
+    string_free(target_path);
+
+    if (rc != CREN_OK)
+    {
+        log_error("Failed to link static target %s", target->target_name->data);
+    }
+
+    if (exit_rc != 0)
+    {
+        log_error("Failed to link static target %s", target->target_name->data);
+        rc = CREN_NOK;
+    }
+
+    return rc;
+}
+
+int link_shared(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
+{
+    int rc = CREN_OK;
+    int exit_rc = 0;
+
+    string_t *target_path = NULL;
+    string_t *target_name = NULL;
+    build_compiler_t *compiler = get_build_compiler(build, env);
+
+    string_t *command = string_from_cstr(compiler->path->data);
+    if (command == NULL)
+    {
+        log_error("Failed to create command string.");
+        return CREN_NOK;
+    }
+
+    if (target->target_name == NULL)
+    {
+        log_error("Target name is NULL.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    target_name = string_clone(target->target_name);
+    if (target_name == NULL)
+    {
+        log_error("Failed to clone target name.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // append '.a' or '.lib' extension based on compiler family
+    if (compiler->family == COMPILER_FAMILY_GCC)
+    {
+        string_append(target_name, ".so");
+    }
+    else
+    {
+        string_append(target_name, ".dll");
+    }
+
+    char option_symbol = '-';
+    if (compiler->family == COMPILER_FAMILY_MSVC)
+    {
+        option_symbol = '/';
+    }
+
+    target_path = string_clone(build->target_dir);
+    if (target_path == NULL)
+    {
+        log_error("Failed to clone target path.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    string_append_path(target_path, target_name->data);
+
+    // push command
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "o ");
+    string_append(command, target_path->data);
+
+    // Wall
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "Wall");
+
+    // push standard
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "std=");
+    string_append(command, language_to_string(build->language));
+
+    // push shared library option
+    if (compiler->family == COMPILER_FAMILY_GCC)
+    {
+        string_append(command, " ");
+        string_append_char(command, option_symbol);
+        string_append(command, "shared");
+    }
+    else if (compiler->family == COMPILER_FAMILY_MSVC)
+    {
+        // MSVC uses /DLL for shared libraries
+        string_append(command, " ");
+        string_append_char(command, option_symbol);
+        string_append(command, "DLL");
+    }
+
+    // push dependencies
+    for (size_t i = 0; i < build->links->nitems; i++)
+    {
+        string_append(command, " ");
+        string_append_char(command, option_symbol);
+        string_append(command, "l");
+        string_append(command, build->links->items[i]->data);
+    }
+
+    // link libc
+    string_append(command, " ");
+    string_append_char(command, option_symbol);
+    string_append(command, "lc");
+
+    // release opts
+    if (build->release)
+    {
+        append_release_opts(command, compiler);
+    }
+
+    // push objects
+    for (size_t i = 0; i < build->sources_len; i++)
+    {
+        string_t *object_path = string_clone(objects_dir);
+        if (object_path == NULL)
+        {
+            log_error("Failed to clone object path.");
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+        string_append_path(object_path, build->sources[i]->obj->data);
+
+        string_append(command, " ");
+        string_append(command, object_path->data);
+
+        string_free(object_path);
+    }
+    // push object for target
+    string_t *target_object_path = string_clone(objects_dir);
+    if (target_object_path == NULL)
+    {
+        log_error("Failed to clone target object path.");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+    string_append_path(target_object_path, target->obj->data);
+
+    string_append(command, " ");
+    string_append(command, target_object_path->data);
+
+    // free
+    string_free(target_object_path);
+
+    // execute
+    log_info("LINK %s", command->data);
+    exit_rc = cmd_exec(command->data);
+
+cleanup:
+
+    string_free(target_name);
+    string_free(command);
+    string_free(target_path);
+
+    if (rc != CREN_OK)
+    {
+        log_error("Failed to link shared target %s", target->target_name->data);
+        return CREN_NOK;
+    }
+
+    if (exit_rc != 0)
+    {
+        log_error("Failed to link shared target %s", target->target_name->data);
+        rc = CREN_NOK;
+    }
+
+    return rc;
+}
+
+int link_binary(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
 {
     int rc = CREN_OK;
     int exit_rc = 0;
 
     string_t *target_path = NULL;
     build_compiler_t *compiler = get_build_compiler(build, env);
+
     string_t *command = string_from_cstr(compiler->path->data);
     if (command == NULL)
     {
@@ -547,7 +918,6 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     }
 
     // make command
-
     target_path = string_clone(build->target_dir);
     if (target_path == NULL)
     {
@@ -562,7 +932,7 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     string_append(command, " ");
     string_append_char(command, option_symbol);
     string_append(command, "o ");
-    string_append(command, target_path->data); // TODO: build library if target is a library
+    string_append(command, target_path->data);
 
     // Wall
     string_append(command, " ");
@@ -629,6 +999,7 @@ int link_target(const build_t *build, const build_environment_t *env, const stri
     string_free(target_object_path);
 
     // execute
+    log_info("LINK %s", command->data);
     exit_rc = cmd_exec(command->data);
 
 cleanup:
