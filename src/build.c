@@ -28,9 +28,8 @@ int build_target_objects(const build_t *build, const build_environment_t *env, c
 int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len, size_t progress_steps);
 int build_object(void *args);
 int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
-int link_static(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
-int link_shared(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
-int link_binary(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
+int archive_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
+int link_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps);
 string_t *compile_object_command(const build_object_args_t *args);
 build_compiler_t *get_build_compiler(const build_t *build, const build_environment_t *env);
 bool should_build_object(const source_t *source);
@@ -234,6 +233,11 @@ cleanup:
     return rc;
 }
 
+/// @brief Build the project.
+/// @param build
+/// @param env
+/// @param progress_steps
+/// @return CREN_OK on success, CREN_NOK on failure.
 int build_project(const build_t *build, const build_environment_t *env, const size_t progress_steps)
 {
     // make objects dir
@@ -274,6 +278,14 @@ cleanup:
     return rc;
 }
 
+/// @brief Build the target objects from the provided targets.
+/// @param build
+/// @param env
+/// @param objects_dir
+/// @param targets
+/// @param targets_len
+/// @param progress_steps
+/// @return CREN_OK on success, CREN_NOK on failure.
 int build_target_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, target_t **targets, size_t targets_len, size_t progress_steps)
 {
     // convert targets to sources
@@ -320,6 +332,14 @@ cleanup:
     return rc;
 }
 
+/// @brief Builds the object files for the provided sources. Each object is built in a separate thread.
+/// @param build
+/// @param env
+/// @param objects_dir
+/// @param sources
+/// @param sources_len
+/// @param progress_steps
+/// @return CREN_OK on success, CREN_NOK on failure.
 int build_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len, const size_t progress_steps)
 {
     int rc = CREN_OK;
@@ -419,6 +439,9 @@ cleanup:
     return rc;
 }
 
+/// @brief Builds an object file from a source file.
+/// @param ctx Context containing the build information. It is a `build_object_args_t` structure.
+/// @return CREN_OK on success, CREN_NOK on failure.
 int build_object(void *ctx)
 {
     string_t *command = NULL;
@@ -490,6 +513,9 @@ cleanup:
     return rc;
 }
 
+/// @brief Compose the command to compile an object file from a source file.
+/// @param args
+/// @return A string containing the command to compile the object file, or NULL on failure.
 string_t *compile_object_command(const build_object_args_t *args)
 {
     string_t *object_path = string_clone(args->objects_dir);
@@ -560,27 +586,34 @@ string_t *compile_object_command(const build_object_args_t *args)
     return command;
 }
 
+/// @brief Links the target. If the target is a library, it archives the objects first; in any case, it links the objects.
+/// @param build
+/// @param env
+/// @param objects_dir
+/// @param target
+/// @param progress_steps
+/// @return CREN_OK on success, CREN_NOK on failure.
 int link_target(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
 {
-    // if target is a binary use compiler path, otherwise use linker path
-    switch (target->type)
+    // if target is a library, archive objects
+    if (target->type == TARGET_TYPE_LIBRARY && archive_objects(build, env, objects_dir, target, progress_steps) != CREN_OK)
     {
-    case TARGET_TYPE_EXECUTABLE:
-        return link_binary(build, env, objects_dir, target, progress_steps);
-    case TARGET_TYPE_LIBRARY:
-        if (link_static(build, env, objects_dir, target, progress_steps) != CREN_OK)
-        {
-            log_error("Failed to link static library %s", target->target_name->data);
-            return CREN_NOK;
-        }
-        return link_shared(build, env, objects_dir, target, progress_steps);
+        log_error("Failed to link static library %s", target->target_name->data);
+        return CREN_NOK;
     }
 
-    log_error("Unknown target type %d for target %s", target->type, target->target_name->data);
-    return CREN_NOK;
+    // in any case, link objects
+    return link_objects(build, env, objects_dir, target, progress_steps);
 }
 
-int link_static(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
+/// @brief Builds the static library from the objects.
+/// @param build
+/// @param env
+/// @param objects_dir
+/// @param target
+/// @param progress_steps
+/// @return CREN_OK on success, CREN_NOK on failure.
+int archive_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
 {
     int rc = CREN_OK;
     int exit_rc = 0;
@@ -713,14 +746,21 @@ cleanup:
     return rc;
 }
 
-int link_shared(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
+/// @brief Links the target. If the target is a library, it archives the objects first; in any case, it links the objects.
+/// @param build
+/// @param env
+/// @param objects_dir
+/// @param target
+/// @param progress_steps
+/// @return
+int link_objects(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
 {
     int rc = CREN_OK;
     int exit_rc = 0;
 
     string_t *target_path = NULL;
-    string_t *target_name = NULL;
     build_compiler_t *compiler = get_build_compiler(build, env);
+    string_t *target_name = NULL;
 
     string_t *command = string_from_cstr(compiler->path->data);
     if (command == NULL)
@@ -728,175 +768,16 @@ int link_shared(const build_t *build, const build_environment_t *env, const stri
         log_error("Failed to create command string.");
         return CREN_NOK;
     }
-
     if (target->target_name == NULL)
     {
         log_error("Target name is NULL.");
         rc = CREN_NOK;
         goto cleanup;
     }
-
     target_name = string_clone(target->target_name);
     if (target_name == NULL)
     {
         log_error("Failed to clone target name.");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
-    // append '.a' or '.lib' extension based on compiler family
-    if (compiler->family == COMPILER_FAMILY_GCC)
-    {
-        string_append(target_name, ".so");
-    }
-    else
-    {
-        string_append(target_name, ".dll");
-    }
-
-    char option_symbol = '-';
-    if (compiler->family == COMPILER_FAMILY_MSVC)
-    {
-        option_symbol = '/';
-    }
-
-    target_path = string_clone(build->target_dir);
-    if (target_path == NULL)
-    {
-        log_error("Failed to clone target path.");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
-    string_append_path(target_path, target_name->data);
-
-    // push command
-    string_append(command, " ");
-    string_append_char(command, option_symbol);
-    string_append(command, "o ");
-    string_append(command, target_path->data);
-
-    // Wall
-    string_append(command, " ");
-    string_append_char(command, option_symbol);
-    string_append(command, "Wall");
-
-    // push standard
-    string_append(command, " ");
-    string_append_char(command, option_symbol);
-    string_append(command, "std=");
-    string_append(command, language_to_string(build->language));
-
-    // push shared library option
-    if (compiler->family == COMPILER_FAMILY_GCC)
-    {
-        string_append(command, " ");
-        string_append_char(command, option_symbol);
-        string_append(command, "shared");
-    }
-    else if (compiler->family == COMPILER_FAMILY_MSVC)
-    {
-        // MSVC uses /DLL for shared libraries
-        string_append(command, " ");
-        string_append_char(command, option_symbol);
-        string_append(command, "DLL");
-    }
-
-    // push dependencies
-    for (size_t i = 0; i < build->links->nitems; i++)
-    {
-        string_append(command, " ");
-        string_append_char(command, option_symbol);
-        string_append(command, "l");
-        string_append(command, build->links->items[i]->data);
-    }
-
-    // link libc
-    string_append(command, " ");
-    string_append_char(command, option_symbol);
-    string_append(command, "lc");
-
-    // release opts
-    if (build->release)
-    {
-        append_release_opts(command, compiler);
-    }
-
-    // push objects
-    for (size_t i = 0; i < build->sources_len; i++)
-    {
-        string_t *object_path = string_clone(objects_dir);
-        if (object_path == NULL)
-        {
-            log_error("Failed to clone object path.");
-            rc = CREN_NOK;
-            goto cleanup;
-        }
-        string_append_path(object_path, build->sources[i]->obj->data);
-
-        string_append(command, " ");
-        string_append(command, object_path->data);
-
-        string_free(object_path);
-    }
-    // push object for target
-    string_t *target_object_path = string_clone(objects_dir);
-    if (target_object_path == NULL)
-    {
-        log_error("Failed to clone target object path.");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-    string_append_path(target_object_path, target->obj->data);
-
-    string_append(command, " ");
-    string_append(command, target_object_path->data);
-
-    // free
-    string_free(target_object_path);
-
-    // execute
-    log_info("LINK %s", command->data);
-    exit_rc = cmd_exec(command->data);
-
-cleanup:
-
-    string_free(target_name);
-    string_free(command);
-    string_free(target_path);
-
-    if (rc != CREN_OK)
-    {
-        log_error("Failed to link shared target %s", target->target_name->data);
-        return CREN_NOK;
-    }
-
-    if (exit_rc != 0)
-    {
-        log_error("Failed to link shared target %s", target->target_name->data);
-        rc = CREN_NOK;
-    }
-
-    return rc;
-}
-
-int link_binary(const build_t *build, const build_environment_t *env, const string_t *objects_dir, const target_t *target, const size_t progress_steps)
-{
-    int rc = CREN_OK;
-    int exit_rc = 0;
-
-    string_t *target_path = NULL;
-    build_compiler_t *compiler = get_build_compiler(build, env);
-
-    string_t *command = string_from_cstr(compiler->path->data);
-    if (command == NULL)
-    {
-        log_error("Failed to create command string.");
-        return CREN_NOK;
-    }
-    if (target->target_name == NULL)
-    {
-        log_error("Target name is NULL.");
         rc = CREN_NOK;
         goto cleanup;
     }
@@ -926,13 +807,44 @@ int link_binary(const build_t *build, const build_environment_t *env, const stri
         goto cleanup;
     }
 
-    string_append_path(target_path, target->target_name->data);
+    // append '.so' or '.dll' extension based on compiler family if the target is a library
+    if (target->type == TARGET_TYPE_LIBRARY)
+    {
+        if (compiler->family == COMPILER_FAMILY_GCC)
+        {
+            string_append(target_name, ".so");
+        }
+        else if (compiler->family == COMPILER_FAMILY_MSVC)
+        {
+            string_append(target_name, ".dll");
+        }
+    }
+
+    string_append_path(target_path, target_name->data);
 
     // push command
     string_append(command, " ");
     string_append_char(command, option_symbol);
     string_append(command, "o ");
     string_append(command, target_path->data);
+
+    // if the target is a library, push shared option
+    if (target->type == TARGET_TYPE_LIBRARY)
+    {
+        if (compiler->family == COMPILER_FAMILY_GCC)
+        {
+            string_append(command, " ");
+            string_append_char(command, option_symbol);
+            string_append(command, "shared");
+        }
+        else if (compiler->family == COMPILER_FAMILY_MSVC)
+        {
+            // MSVC uses /DLL for shared libraries
+            string_append(command, " ");
+            string_append_char(command, option_symbol);
+            string_append(command, "DLL");
+        }
+    }
 
     // Wall
     string_append(command, " ");
@@ -1006,6 +918,7 @@ cleanup:
 
     string_free(command);
     string_free(target_path);
+    string_free(target_name);
 
     if (rc != CREN_OK)
     {
@@ -1021,6 +934,10 @@ cleanup:
     return rc;
 }
 
+/// @brief Appends the release options to the command string based on the compiler family.
+/// @param command The command string to append the options to.
+/// @param compiler The compiler to use for building the project.
+/// @note For MSVC, it appends `/O2 /GL /Gy /Ot`; for GCC, it appends `-O3 -march=native -s -flto`.
 void append_release_opts(string_t *command, const build_compiler_t *compiler)
 {
 
@@ -1034,6 +951,9 @@ void append_release_opts(string_t *command, const build_compiler_t *compiler)
     }
 }
 
+/// @brief Tells whether an object file should be built based on the source file's modification time.
+/// @param source
+/// @return true if the object file should be built, false if it is up to date.
 bool should_build_object(const source_t *source)
 {
     // stat object and source
@@ -1059,6 +979,11 @@ bool should_build_object(const source_t *source)
     return true;
 }
 
+/// @brief Gets the compiler to use for building the project based on the language.
+/// If the language is C, it returns the C compiler; if it is C++, it returns the C++ compiler.
+/// @param build
+/// @param env
+/// @return The compiler to use for building the project.
 build_compiler_t *get_build_compiler(const build_t *build, const build_environment_t *env)
 {
     if (language_is_c(build->language))
@@ -1071,6 +996,10 @@ build_compiler_t *get_build_compiler(const build_t *build, const build_environme
     }
 }
 
+/// @brief Advances the build progress for building an object file.
+/// @param build
+/// @param source
+/// @param progress_steps
 void advance_build_object_progress(const build_t *build, const source_t *source, const size_t progress_steps)
 {
     // lock
@@ -1090,13 +1019,28 @@ void advance_build_object_progress(const build_t *build, const source_t *source,
     mtx_unlock(&build_objects_mutex);
 }
 
+/// @brief Get the total number of progress steps for the build process.
+/// @param build
+/// @return The total number of progress steps for the build process.
 size_t get_progress_steps(const build_t *build)
 {
     size_t steps = 0;
 
     steps += build->sources_len;
-    steps += build->targets_len;
-    steps += 1; // for linking
+
+    // for each target, add the number of target it has
+    for (size_t i = 0; i < build->targets_len; i++)
+    {
+        target_t *target = build->targets[i];
+        if (target->type == TARGET_TYPE_LIBRARY)
+        {
+            steps += 2; // for libraries we count two steps: one for archiving and one for linking
+        }
+        else
+        {
+            steps += 1; // for executable targets, we just count it as one step
+        }
+    }
 
     return steps;
 }
