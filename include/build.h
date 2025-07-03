@@ -7,6 +7,7 @@
 
 #include <build/environment.h>
 #include <build/source.h>
+#include <build/target.h>
 #include <manifest/package/language.h>
 #include <utils/string.h>
 #include <utils/string_list.h>
@@ -22,7 +23,7 @@ struct build_t
     /// @brief Amount of source files
     size_t sources_len;
     /// @brief targets
-    source_t **targets;
+    target_t **targets;
     /// @brief Amount of targets
     size_t targets_len;
     /// @brief defines
@@ -57,7 +58,7 @@ int build_add_source(build_t *build, const char *src);
 /// @param src path
 /// @param project dir
 /// @return CREN_OK on success, CREN_NOK on failure.
-int build_add_target(build_t *build, const char *target, const char *src_path, const char *project_dir);
+int build_add_target(build_t *build, const char *target, const char *src_path, const char *project_dir, target_type_t type);
 
 /// @brief compile the project.
 /// @param build The build object.

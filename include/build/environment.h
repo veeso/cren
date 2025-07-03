@@ -26,6 +26,7 @@ struct build_environment_t
 {
     build_compiler_t *cc;
     build_compiler_t *cxx;
+    build_compiler_t *ar;
     string_t *ld;
 };
 

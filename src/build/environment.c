@@ -4,6 +4,7 @@
 
 #define ENV_CC "CC"
 #define ENV_CXX "CXX"
+#define ENV_AR "AR"
 #define ENV_LD "LD"
 
 #define CC_GCC "gcc"       // GNU Compiler
@@ -62,9 +63,14 @@
 #define LD_ZIG "zig"      // Zig integrato con LLVM Linker
 #define LD_EMCC "emcc"    // Emscripten Linker (WebAssembly)
 
+#define AR_GCC "ar"        // GNU Archiver
+#define AR_CLANG "llvm-ar" // LLVM Archiver
+#define AR_MSVC "lib"      // Microsoft Library Manager
+
 build_compiler_t *compiler_init(const char *path, build_compiler_family_t family);
 build_compiler_t *get_cc(void);
 build_compiler_t *get_cxx(void);
+build_compiler_t *get_ar(void);
 string_t *get_ld(void);
 
 build_compiler_t *compiler_init(const char *path, build_compiler_family_t family)
@@ -97,6 +103,7 @@ void build_environment_free(build_environment_t *env)
     {
         compiler_free(env->cc);
         compiler_free(env->cxx);
+        compiler_free(env->ar);
         string_free(env->ld);
         free(env);
     }
@@ -130,6 +137,8 @@ build_environment_t *build_environment_init(void)
     env->cc = get_cc();
     // get the compiler CXX
     env->cxx = get_cxx();
+    // get the archiver AR
+    env->ar = get_ar();
     // get the linker LD
     env->ld = env_get(ENV_LD);
     if (env->ld == NULL)
@@ -152,6 +161,12 @@ build_environment_t *build_environment_init(void)
         build_environment_free(env);
         return NULL;
     }
+    if (env->ar == NULL)
+    {
+        log_error("No archiver found");
+        build_environment_free(env);
+        return NULL;
+    }
 
     if (env->cc != NULL)
     {
@@ -164,6 +179,10 @@ build_environment_t *build_environment_init(void)
     if (env->ld != NULL)
     {
         log_info("LD: %s", env->ld->data);
+    }
+    if (env->ar != NULL)
+    {
+        log_info("AR: %s", env->ar->path->data);
     }
 
     return env;
@@ -274,6 +293,44 @@ build_compiler_t *get_cxx(void)
         build_compiler_t *compiler = compiler_init(cxx->data, compilers[i].family);
         string_free(cxx);
 
+        return compiler;
+    }
+
+    return NULL;
+}
+
+build_compiler_t *get_ar(void)
+{
+    string_t *env_cc = env_get(ENV_AR);
+    if (env_cc != NULL)
+    {
+        build_compiler_t *compiler = compiler_init(env_cc->data, COMPILER_FAMILY_GCC);
+        string_free(env_cc);
+        return compiler;
+    }
+
+    // all compilers array
+    static const struct
+    {
+        const char *name;
+        build_compiler_family_t family;
+    } compilers[] = {
+        {AR_GCC, COMPILER_FAMILY_GCC},
+        {AR_CLANG, COMPILER_FAMILY_GCC},
+        {AR_MSVC, COMPILER_FAMILY_MSVC}};
+
+    // get the compiler from the environment
+    for (size_t i = 0; i < 3; i++)
+    {
+        string_t *ar = env_get_from_path(compilers[i].name);
+        if (ar == NULL)
+        {
+            continue;
+        }
+        log_info("Found %s in PATH", ar->data);
+
+        build_compiler_t *compiler = compiler_init(ar->data, compilers[i].family);
+        string_free(ar);
         return compiler;
     }
 

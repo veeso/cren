@@ -480,7 +480,7 @@ int configure_targets(build_t *build_args, const build_from_manifest_t *args, co
             if (args->bin == NULL || strcmp(args->bin->data, manifest->targets->bin[i]->name->data) == 0)
             {
                 cren_manifest_target_cfg_t *cfg = manifest->targets->bin[i];
-                if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir) != CREN_OK)
+                if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir, TARGET_TYPE_EXECUTABLE) != CREN_OK)
                 {
                     log_error("Error adding target %s", manifest->targets->bin[i]->name->data);
                     return CREN_NOK;
@@ -499,7 +499,7 @@ int configure_targets(build_t *build_args, const build_from_manifest_t *args, co
             if (args->example == NULL || strcmp(args->example->data, manifest->targets->examples[i]->name->data) == 0)
             {
                 cren_manifest_target_cfg_t *cfg = manifest->targets->examples[i];
-                if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir) != CREN_OK)
+                if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir, TARGET_TYPE_EXECUTABLE) != CREN_OK)
                 {
                     log_error("Error adding target %s", manifest->targets->examples[i]->name->data);
                     return CREN_NOK;
@@ -513,7 +513,7 @@ int configure_targets(build_t *build_args, const build_from_manifest_t *args, co
     {
         log_debug("Adding lib");
         cren_manifest_target_cfg_t *cfg = manifest->targets->lib;
-        if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir) != CREN_OK)
+        if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir, TARGET_TYPE_LIBRARY) != CREN_OK)
         {
             log_error("Error adding target %s", manifest->targets->lib->name->data);
             return CREN_NOK;
