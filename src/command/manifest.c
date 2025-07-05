@@ -21,7 +21,27 @@ int manifest_check(const args_manifest_t *args)
 {
     int rc = CREN_OK;
 
-    cren_manifest_t *manifest = cren_manifest_load(args->path != NULL ? args->path->data : NULL);
+    string_t *manifest_filepath = NULL;
+    cren_manifest_t *manifest = NULL;
+
+    if (args->path != NULL)
+    {
+        manifest_filepath = string_clone(args->path);
+    }
+    else
+    {
+        manifest_filepath = manifest_path();
+    }
+
+    if (manifest_filepath == NULL)
+    {
+        log_error("Error getting manifest path");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // load manifest
+    manifest = cren_manifest_load(manifest_filepath);
     if (manifest == NULL)
     {
         log_error("Failed to load manifest");
@@ -32,7 +52,12 @@ int manifest_check(const args_manifest_t *args)
 
     puts("Manifest OK");
 
-    cren_manifest_free(manifest);
+cleanup:
+    if (manifest_filepath != NULL)
+        string_free(manifest_filepath);
+
+    if (manifest != NULL)
+        cren_manifest_free(manifest);
 
     return rc;
 }

@@ -32,6 +32,35 @@ void string_list_free(string_list_t *list)
     log_trace("Freed string list");
 }
 
+string_list_t *string_list_clone(const string_list_t *list)
+{
+    if (list == NULL)
+    {
+        log_trace("Attempted to clone a NULL string list");
+        return NULL;
+    }
+
+    string_list_t *new_list = string_list_init();
+    if (new_list == NULL)
+    {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < list->nitems; i++)
+    {
+        if (string_list_push(new_list, string_clone(list->items[i])) != CREN_OK)
+        {
+            log_fatal("Failed to push string to cloned list");
+            string_list_free(new_list);
+            return NULL;
+        }
+    }
+
+    log_trace("Cloned string list with %zu items", new_list->nitems);
+
+    return new_list;
+}
+
 int string_list_push(string_list_t *list, string_t *str)
 {
     string_t **new_items = (string_t **)realloc(list->items, (list->nitems + 1) * sizeof(string_t *));

@@ -56,6 +56,11 @@ dirent_t *scan_dir_with_depth(const char *path, size_t depth);
 /// @return dirent_t or NULL if doesn't exist
 dirent_t *dirent_stat(const char *path);
 
+/// @brief Check if a file exists
+/// @param path
+/// @return true if the file exists, false otherwise
+bool file_exists(const char *path);
+
 /// @brief Get the filename of a dirent_t
 /// @param entry
 /// @return The filename

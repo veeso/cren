@@ -17,6 +17,8 @@ typedef struct build_cfg_t build_cfg_t;
 
 struct build_cfg_t
 {
+    /// @brief Project directory
+    string_t *project_dir;
     /// @brief Language standard
     language_t language;
     /// @brief Source files without main files
@@ -31,6 +33,8 @@ struct build_cfg_t
     string_list_t *defines;
     /// @brief include dirs
     string_list_t *include_dirs;
+    /// @brief libraries objects
+    string_list_t *libraries;
     /// @brief target dir
     string_t *target_dir;
     /// @brief links
@@ -44,8 +48,9 @@ struct build_cfg_t
 };
 
 /// @brief Initialize the build object.
+/// @param project_dir The project directory.
 /// @return The build object.
-build_cfg_t *build_init(void);
+build_cfg_t *build_init(const string_t *project_dir);
 
 /// @brief Free the build object.
 /// @param build The build object to free.
@@ -64,14 +69,5 @@ int build_add_source(build_cfg_t *build, const char *src);
 /// @param project dir
 /// @return CREN_OK on success, CREN_NOK on failure.
 int build_add_target(build_cfg_t *build, const char *target, const char *src_path, const char *project_dir, target_type_t type);
-
-/// @brief Add a build dependency.
-/// @param build The build object.
-/// @param uri The URI of the dependency, which can be a local path or a Git
-/// repository URL.
-/// @param type The type of the dependency, which can be either a local path or a
-/// Git repository.
-/// @return CREN_OK on success, CREN_NOK on failure.
-int build_add_dependency(build_cfg_t *build, const char *uri, build_dependency_type_t type);
 
 #endif // CREN_BUILD_H

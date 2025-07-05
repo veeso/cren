@@ -20,10 +20,37 @@ int command_build(const args_build_t *args)
     cren_manifest_t *manifest = NULL;
     build_cfg_t *build_args = NULL;
     manifest_build_config_t *manifest_build_args = NULL;
+    string_t *project_dir = NULL;
+    string_t *manifest_filepath = NULL;
     // log
     log_opts(args);
+
+    if (args->manifest_path == NULL)
+    {
+        manifest_filepath = manifest_path();
+    }
+    else
+    {
+        manifest_filepath = string_clone(args->manifest_path);
+    }
+
+    if (manifest_filepath == NULL)
+    {
+        log_error("Failed to get manifest path");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    project_dir = get_project_dir(manifest_filepath->data);
+    if (project_dir == NULL)
+    {
+        log_error("Failed to get project directory from manifest path: %s", manifest_filepath->data);
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
     // load manifest
-    manifest = cren_manifest_load(args->manifest_path != NULL ? args->manifest_path->data : NULL);
+    manifest = cren_manifest_load(manifest_filepath);
     if (manifest == NULL)
     {
         log_error("Error loading manifest");
@@ -39,7 +66,7 @@ int command_build(const args_build_t *args)
         goto cleanup;
     }
     // load build options
-    build_args = build_config_from_manifest(manifest, manifest_build_args);
+    build_args = build_config_from_manifest(manifest, manifest_build_args, project_dir);
     if (build_args == NULL)
     {
         log_error("Error initializing build args");
@@ -48,7 +75,7 @@ int command_build(const args_build_t *args)
     }
 
     // Build the project
-    rc = build_compile(build_args);
+    rc = build_compile(build_args, manifest_build_args);
 
 cleanup:
     if (manifest)
@@ -57,6 +84,10 @@ cleanup:
         build_free(build_args);
     if (manifest_build_args)
         manifest_build_config_free(manifest_build_args);
+    if (project_dir)
+        string_free(project_dir);
+    if (manifest_filepath)
+        string_free(manifest_filepath);
 
     return rc;
 }

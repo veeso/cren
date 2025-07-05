@@ -44,6 +44,6 @@ void manifest_build_config_free(manifest_build_config_t *args);
 /// @param manifest
 /// @param args
 /// @return The build object or NULL on failure.
-build_cfg_t *build_config_from_manifest(const cren_manifest_t *manifest, const manifest_build_config_t *args);
+build_cfg_t *build_config_from_manifest(const cren_manifest_t *manifest, const manifest_build_config_t *args, const string_t *project_dir);
 
 #endif // CREN_BUILD_MANIFEST_H

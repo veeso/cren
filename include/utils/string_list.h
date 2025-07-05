@@ -23,6 +23,11 @@ string_list_t *string_list_init(void);
 /// @param list
 void string_list_free(string_list_t *list);
 
+/// @brief clone a char list
+/// @param list
+/// @return a new char list with the same items
+string_list_t *string_list_clone(const string_list_t *list);
+
 /// @brief push item to list
 /// @param list
 /// @param str

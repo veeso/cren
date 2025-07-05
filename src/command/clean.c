@@ -2,6 +2,7 @@
 #include <cren.h>
 #include <lib/log.h>
 #include <manifest.h>
+#include <manifest/path.h>
 #include <utils/fs.h>
 #include <utils/paths.h>
 #include <utils/terminal.h>
@@ -22,8 +23,25 @@ int command_clean(const args_clean_t *args)
     cren_manifest_t *manifest = NULL;
     string_t *dir_to_clean = NULL;
     dirent_t *target_dirent = NULL;
+    string_t *manifest_filepath = NULL;
+    if (args->manifest_path != NULL)
+    {
+        manifest_filepath = string_clone(args->manifest_path);
+    }
+    else
+    {
+        manifest_filepath = manifest_path();
+    }
+
+    if (manifest_filepath == NULL)
+    {
+        log_error("Error getting manifest path");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
     // load manifest
-    manifest = cren_manifest_load(args->manifest_path != NULL ? args->manifest_path->data : NULL);
+    manifest = cren_manifest_load(manifest_filepath);
     if (manifest == NULL)
     {
         log_error("Error loading manifest");
@@ -88,6 +106,7 @@ cleanup:
     print_outcome("Finished", "cren clean");
 
     string_free(dir_to_clean);
+    string_free(manifest_filepath);
     cren_manifest_free(manifest);
     dirent_free(target_dirent);
 
