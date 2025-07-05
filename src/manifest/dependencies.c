@@ -58,10 +58,12 @@ cren_manifest_dependency_t *cren_manifest_dependency_init(void)
     }
 
     dependency->name = NULL;
+    dependency->path = NULL;
     dependency->git = NULL;
     dependency->link = NULL;
     dependency->optional = false;
-    dependency->defines = NULL;
+    dependency->default_features = true; // Default to true
+    dependency->features = NULL;
     dependency->platforms = NULL;
     dependency->platforms_len = 0;
 
@@ -97,9 +99,10 @@ void cren_manifest_dependency_free(cren_manifest_dependency_t *dependency)
     }
 
     string_free(dependency->name);
+    string_free(dependency->path);
     string_free(dependency->git);
     string_free(dependency->link);
-    string_list_free(dependency->defines);
+    string_list_free(dependency->features);
     for (size_t i = 0; i < dependency->platforms_len; i++)
     {
         platform_free(dependency->platforms[i]);
@@ -139,6 +142,17 @@ cren_manifest_dependency_t *cren_manifest_dependency_clone(cren_manifest_depende
         }
     }
 
+    if (dependency->path != NULL)
+    {
+        clone->path = string_clone(dependency->path);
+        if (clone->path == NULL)
+        {
+            log_error("Failed to clone feature path");
+            cren_manifest_dependency_free(clone);
+            return NULL;
+        }
+    }
+
     if (dependency->git != NULL)
     {
         clone->git = string_clone(dependency->git);
@@ -163,25 +177,25 @@ cren_manifest_dependency_t *cren_manifest_dependency_clone(cren_manifest_depende
 
     clone->optional = dependency->optional;
 
-    if (dependency->defines != NULL)
+    if (dependency->features != NULL)
     {
-        clone->defines = string_list_init();
-        if (clone->defines == NULL)
+        clone->features = string_list_init();
+        if (clone->features == NULL)
         {
             log_error("Failed to clone feature defines");
             cren_manifest_dependency_free(clone);
             return NULL;
         }
-        for (size_t i = 0; i < dependency->defines->nitems; i++)
+        for (size_t i = 0; i < dependency->features->nitems; i++)
         {
-            string_t *define = string_clone(dependency->defines->items[i]);
+            string_t *define = string_clone(dependency->features->items[i]);
             if (define == NULL)
             {
                 log_error("Failed to clone feature define");
                 cren_manifest_dependency_free(clone);
                 return NULL;
             }
-            string_list_push(clone->defines, define);
+            string_list_push(clone->features, define);
         }
     }
 

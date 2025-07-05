@@ -245,6 +245,21 @@ dirent_t *dirent_stat(const char *path)
 #endif
 }
 
+bool file_exists(const char *path)
+{
+    dirent_t *entry = dirent_stat(path);
+    if (entry == NULL)
+    {
+        log_trace("File %s does not exist", path);
+        return false;
+    }
+
+    bool exists = entry->is_dir ? false : true; // If it's a directory, it doesn't count as a file
+    dirent_free(entry);
+    log_trace("File %s exists: %s", path, exists ? "true" : "false");
+    return exists;
+}
+
 int add_child(dirent_t *parent, dirent_t *child)
 {
     size_t new_count = parent->children_count + 1;

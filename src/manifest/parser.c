@@ -31,16 +31,20 @@ const char *KEY_TARGETS_REQUIRED_FEATURES = "required-features";
 
 const char *KEY_DEPENDENCIES = "dependencies";
 const char *KEY_DEV_DEPENDENCIES = "dev-dependencies";
+const char *KEY_DEPENDENCY_PATH = "path";
 const char *KEY_DEPENDENCY_GIT = "git";
 const char *KEY_DEPENDENCY_LINK = "link";
 const char *KEY_DEPENDENCY_OPTIONAL = "optional";
+const char *KEY_DEPENDENCY_DEFAULT_FEATURES = "default-features";
 const char *KEY_DEPENDENCY_PLATFORMS = "platforms";
+const char *KEY_DEPENDENCY_FEATURES = "features";
 
 const char *KEY_FEATURES_DEFAULT = "default";
 const char *KEY_FEATURES_DEFINES = "defines";
 const char *KEY_FEATURES_DEPENDENCIES = "dependencies";
 
 // declare functions
+int cren_manifest_parse_edition(toml_table_t *manifest, edition_t *edition, char *error, size_t error_sz);
 int cren_manifest_parse_package(toml_table_t *manifest, cren_manifest_package_t *manifest_package, char *error, size_t error_sz);
 int cren_manifest_parse_targets(toml_table_t *manifest, cren_manifest_targets_t *targets, char *error, size_t error_sz);
 int cren_manifest_parse_dependencies(toml_table_t *manifest, cren_manifest_dependencies_t *dependencies, char *error, size_t error_sz);
@@ -74,7 +78,21 @@ int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size
         return CREN_NOK;
     }
 
-    // TODO: parse edition first for future compatibility
+    // Parse edition first to dispatch to the correct resolver (RFU)
+    edition_t edition = MANIFEST_EDITION_UNKNOWN;
+    if (cren_manifest_parse_edition(toml, &edition, error, error_sz) != CREN_OK)
+    {
+        toml_free(toml);
+        return CREN_NOK;
+    }
+
+    // Currently we just return error if edition is not supported; in the future we'll dispatch to the correct resolver
+    if (edition != MANIFEST_EDITION_ONE)
+    {
+        parse_error(error, error_sz, "Unsupported manifest edition");
+        toml_free(toml);
+        return CREN_NOK;
+    }
 
     // parse `package`
     if (cren_manifest_parse_package(toml, manifest->package, error, error_sz) != CREN_OK)
@@ -106,6 +124,37 @@ int cren_manifest_parse(cren_manifest_t *manifest, FILE *file, char *error, size
 
     toml_free(toml);
     log_info("Cren.toml manifest parsed successfully");
+
+    return CREN_OK;
+}
+
+/// @brief Parse the edition from the manifest
+/// @param manifest
+/// @param edition
+/// @param error
+/// @param error_sz
+/// @return CREN_OK on success, CREN_NOK on failure
+int cren_manifest_parse_edition(toml_table_t *manifest, edition_t *edition, char *error, size_t error_sz)
+{
+    log_debug("Parsing `package` table");
+    if (manifest == NULL)
+    {
+        parse_error(error, error_sz, "One or more arguments are NULL");
+        return CREN_NOK;
+    }
+    toml_table_t *package = toml_table_table(manifest, KEY_PACKAGE);
+    if (package == NULL)
+    {
+        parse_error(error, error_sz, "`package` table not found");
+        return CREN_NOK;
+    }
+
+    // Parse `edition`
+    if (get_edition(package, KEY_PACKAGE_EDITION, edition) != CREN_OK)
+    {
+        parse_error(error, error_sz, "`edition` key not found in `package` table");
+        return CREN_NOK;
+    }
 
     return CREN_OK;
 }
@@ -695,6 +744,13 @@ int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependenc
 
     dependency->name = key;
     log_debug("Parsing dependency `%s`", key->data);
+
+    if (get_string(table, KEY_DEPENDENCY_PATH, &dependency->path, false) != CREN_OK)
+    {
+        parse_error(error, error_sz, "Invalid `path` found in dependency table");
+        return CREN_NOK;
+    }
+
     if (get_string(table, KEY_DEPENDENCY_GIT, &dependency->git, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `git` found in dependency table");
@@ -704,6 +760,20 @@ int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependenc
     if (get_string(table, KEY_DEPENDENCY_LINK, &dependency->link, false) != CREN_OK)
     {
         parse_error(error, error_sz, "Invalid `link` found in dependency table");
+        return CREN_NOK;
+    }
+
+    // check if `path`, `git` and `link` are all NULL
+    if (dependency->path == NULL && dependency->git == NULL && dependency->link == NULL)
+    {
+        parse_error(error, error_sz, "At least one of `path`, `git` or `link` must be specified in dependency table");
+        return CREN_NOK;
+    }
+
+    // check if more than one of `path`, `git` or `link` is specified
+    if ((dependency->path != NULL && dependency->git != NULL) || (dependency->path != NULL && dependency->link != NULL) || (dependency->git != NULL && dependency->link != NULL))
+    {
+        parse_error(error, error_sz, "Ambiguous dependency: only one of `path`, `git` or `link` can be specified in dependency table");
         return CREN_NOK;
     }
 
@@ -717,6 +787,24 @@ int parse_dependency(toml_table_t *table, string_t *key, cren_manifest_dependenc
     {
         log_debug("`optional` not found in dependency table");
         dependency->optional = false;
+    }
+
+    toml_value_t default_features_value = toml_table_bool(table, KEY_DEPENDENCY_DEFAULT_FEATURES);
+    if (default_features_value.ok)
+    {
+        log_debug("Found `default-features` in dependency table");
+        dependency->default_features = default_features_value.u.b;
+    }
+    else
+    {
+        log_debug("`default-features` not found in dependency table");
+        dependency->default_features = true; // default to true if not specified
+    }
+
+    if (get_string_list(table, KEY_DEPENDENCY_FEATURES, &dependency->features, false) != CREN_OK)
+    {
+        parse_error(error, error_sz, "Invalid `features` found in dependency table");
+        return CREN_NOK;
     }
 
     string_list_t *platforms_str = NULL;

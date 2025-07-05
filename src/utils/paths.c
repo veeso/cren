@@ -20,13 +20,19 @@ string_t *parent_dir(const char *path)
     }
 
     // find last slash
+    bool found_any_non_slash = false;
     size_t last_slash = 0;
     for (size_t i = len - 1; i > 0; i--)
     {
-        if (path[i] == '/' || path[i] == '\\')
+        bool is_slash = (path[i] == '/' || path[i] == '\\');
+        if (is_slash && found_any_non_slash)
         {
             last_slash = i;
             break;
+        }
+        else if (!is_slash)
+        {
+            found_any_non_slash = true;
         }
     }
 
@@ -218,4 +224,71 @@ string_t *target_release_dir(void)
     string_append_path(target_dir_path, TARGET_DIR_RELEASE);
 
     return target_dir_path;
+}
+
+string_t *to_absolute_path(const string_t *path, const string_t *base_path)
+{
+    if (path == NULL || base_path == NULL)
+    {
+        log_error("Path or base path is NULL");
+        return NULL;
+    }
+
+    log_debug("Converting path '%s' to absolute path with base '%s'", path->data, base_path->data);
+
+    // Check if the path is already absolute
+    if (path->data[0] == '/' || path->data[0] == '\\')
+    {
+        return string_clone(path);
+    }
+
+    string_t *absolute_path = string_clone(base_path);
+    if (absolute_path == NULL)
+    {
+        log_error("Failed to clone base path");
+        return NULL;
+    }
+
+    // iterate over the path components
+    const char *path_data = path->data;
+    // strtok to split the path by '/' or '\\'
+#ifndef _WIN32
+    const char *separator = "/";
+#else
+    const char *separator = "\\";
+#endif
+    char *token = strtok((char *)path_data, separator);
+    while (token != NULL)
+    {
+        // check the token if it is '.' or '..'
+        if (strcmp(token, ".") == 0)
+        {
+            // skip '.' as it refers to the current directory
+        }
+        else if (strcmp(token, "..") == 0)
+        {
+            // go up one directory
+            string_t *parent = parent_dir(absolute_path->data);
+            if (parent == NULL)
+            {
+                log_error("Failed to get parent directory");
+                string_free(absolute_path);
+                return NULL;
+            }
+            log_debug("Going up one directory from %s to %s", absolute_path->data, parent->data);
+
+            string_free(absolute_path);
+            absolute_path = parent;
+        }
+        else
+        {
+            // append the token to the absolute path
+            log_debug("Appending token '%s' to absolute path '%s'", token, absolute_path->data);
+            string_append_path(absolute_path, token);
+        }
+        // Get the next token
+        token = strtok(NULL, separator);
+    }
+
+    return absolute_path;
 }

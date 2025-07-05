@@ -5,6 +5,7 @@
 
 #include <stdbool.h>
 
+#include <build/build_dependency.h>
 #include <build/environment.h>
 #include <build/source.h>
 #include <build/target.h>
@@ -12,10 +13,12 @@
 #include <utils/string.h>
 #include <utils/string_list.h>
 
-typedef struct build_t build_t;
+typedef struct build_cfg_t build_cfg_t;
 
-struct build_t
+struct build_cfg_t
 {
+    /// @brief Project directory
+    string_t *project_dir;
     /// @brief Language standard
     language_t language;
     /// @brief Source files without main files
@@ -30,27 +33,34 @@ struct build_t
     string_list_t *defines;
     /// @brief include dirs
     string_list_t *include_dirs;
+    /// @brief libraries objects
+    string_list_t *libraries;
     /// @brief target dir
     string_t *target_dir;
     /// @brief links
     string_list_t *links;
+    /// @brief Build dependencies
+    build_dependency_t **dependencies;
+    /// @brief Amount of dependencies
+    size_t dependencies_len;
     /// @brief Release build
     bool release;
 };
 
 /// @brief Initialize the build object.
+/// @param project_dir The project directory.
 /// @return The build object.
-build_t *build_init(void);
+build_cfg_t *build_init(const string_t *project_dir);
 
 /// @brief Free the build object.
 /// @param build The build object to free.
-void build_free(build_t *build);
+void build_free(build_cfg_t *build);
 
 /// @brief Add a source file to the build.
 /// @param build
 /// @param src
 /// @return CREN_OK on success, CREN_NOK on failure.
-int build_add_source(build_t *build, const char *src);
+int build_add_source(build_cfg_t *build, const char *src);
 
 /// @brief Add a target file to the build.
 /// @param build
@@ -58,18 +68,6 @@ int build_add_source(build_t *build, const char *src);
 /// @param src path
 /// @param project dir
 /// @return CREN_OK on success, CREN_NOK on failure.
-int build_add_target(build_t *build, const char *target, const char *src_path, const char *project_dir, target_type_t type);
-
-/// @brief compile the project.
-/// @param build The build object.
-/// @return CREN_OK on success, CREN_NOK on failure.
-int build_compile(build_t *build);
-
-/// @brief build provided project.
-/// @param build
-/// @param env
-/// @param progress_steps
-/// @return CREN_OK on success, CREN_NOK on failure.
-int build_project(const build_t *build, const build_environment_t *env, const size_t progress_steps);
+int build_add_target(build_cfg_t *build, const char *target, const char *src_path, const char *project_dir, target_type_t type);
 
 #endif // CREN_BUILD_H

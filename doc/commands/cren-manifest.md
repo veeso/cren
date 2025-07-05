@@ -12,4 +12,3 @@ Check the manifest file for errors.
 $ cren manifest check
  
 ```
-

@@ -52,36 +52,19 @@ void cren_manifest_free(cren_manifest_t *manifest)
     log_trace("Manifest freed");
 }
 
-cren_manifest_t *cren_manifest_load(const char *path)
+cren_manifest_t *cren_manifest_load(const string_t *path)
 {
     int rc = CREN_OK;
-    string_t *cren_manifest_path = NULL;
     FILE *file = NULL;
     cren_manifest_t *manifest = NULL;
-    // get cren manifest or use provided arg
-    if (path == NULL)
-    {
-        cren_manifest_path = manifest_path();
-    }
-    else
-    {
-        cren_manifest_path = string_from_cstr(path);
-    }
 
-    if (cren_manifest_path == NULL)
-    {
-        log_fatal("Failed to get cren manifest path");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
-    log_info("Checking cren manifest: %.*s", cren_manifest_path->length, cren_manifest_path->data);
+    log_info("Checking cren manifest: %.*s", path->length, path->data);
 
     // open file
-    file = fopen(cren_manifest_path->data, "r");
+    file = fopen(path->data, "r");
     if (file == NULL)
     {
-        log_fatal("Failed to open cren manifest: %.*s", cren_manifest_path->length, cren_manifest_path->data);
+        log_fatal("Failed to open cren manifest: %.*s", path->length, path->data);
         rc = CREN_NOK;
         goto cleanup;
     }
@@ -112,8 +95,7 @@ cren_manifest_t *cren_manifest_load(const char *path)
     }
 
 cleanup:
-    if (cren_manifest_path)
-        string_free(cren_manifest_path);
+
     if (file)
         fclose(file);
 
