@@ -46,6 +46,7 @@ size_t get_progress_steps(const build_cfg_t *build);
 void append_release_opts(string_t *command, const build_compiler_t *compiler);
 
 #define OBJECTS_DIR "objects"
+#define DEPS_DIR "deps"
 
 // mutex for build objects
 mtx_t build_objects_mutex;
@@ -343,6 +344,12 @@ build_cfg_t *configure_dependency_build(const build_cfg_t *project_build, const 
     {
         log_error("Failed to clone target directory for dependency %s", dep->name->data);
         goto cleanup;
+    }
+    // push 'deps' if target_dir doesn't end with it
+    if (!str_ends_with(dep_manifest_build_config->target_dir->data, DEPS_DIR))
+    {
+        // append DEPS_DIR to target_dir
+        string_append_path(dep_manifest_build_config->target_dir, DEPS_DIR);
     }
 
     // load the manifest into the dependency build configuration
