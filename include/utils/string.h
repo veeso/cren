@@ -54,6 +54,10 @@ void string_append_char(string_t *string, char data);
 /// @param data
 void string_append_path(string_t *string, const char *data);
 
+/// @brief convert a string to uppercase
+/// @param string
+void string_to_upper(string_t *string);
+
 bool str_ends_with(const char *str, const char *suffix);
 
 #endif // UTILS_STRING_H
