@@ -172,6 +172,25 @@ void string_append_path(string_t *string, const char *data)
     string_append(string, data);
 }
 
+void string_to_upper(string_t *string)
+{
+    if (string == NULL)
+    {
+        log_error("Attempted to convert a NULL string to uppercase");
+        return;
+    }
+
+    for (size_t i = 0; i < string->length; i++)
+    {
+        if (string->data[i] >= 'a' && string->data[i] <= 'z')
+        {
+            string->data[i] -= ('a' - 'A');
+        }
+    }
+
+    log_trace("Converted string to uppercase: %s", string->data);
+}
+
 bool str_ends_with(const char *str, const char *suffix)
 {
     if (!str || !suffix)

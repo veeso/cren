@@ -26,4 +26,6 @@ struct args_new_t
     language_t language;
 };
 
+void args_new_free(args_new_t *args);
+
 #endif // CREN_ARGS_INIT_H

@@ -9,3 +9,4 @@ This chapter covers the available commands on Cren.
 - [cren init](./cren-new.md) (equivalent to `cren new`)
 - [cren manifest](./cren-manifest.md)
 - [cren new](./cren-new.md)
+- [cren run](./cren-run.md)

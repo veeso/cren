@@ -14,10 +14,11 @@
 
 args_t *args_init(void);
 args_verbose_t get_verbosity(const char *optarg);
-static int args_parse_build(args_t *args, char **argv);
-static int args_parse_clean(args_t *args, char **argv);
-static int args_parse_manifest(args_t *args, char **argv);
-static int args_parse_new(args_t *args, char **argv);
+static int args_parse_build(args_t *args, int argc, char **argv);
+static int args_parse_clean(args_t *args, int argc, char **argv);
+static int args_parse_manifest(args_t *args, int argc, char **argv);
+static int args_parse_new(args_t *args, int argc, char **argv);
+static int args_parse_run(args_t *args, int argc, char **argv);
 void usage_build(void);
 void usage_clean(void);
 void usage_manifest(void);
@@ -32,13 +33,14 @@ args_t *args_parse_cmd(int argc, char **argv)
     {
         char name[16];
         args_cmd_t cmd;
-        int (*parse)(args_t *args, char **);
+        int (*parse)(args_t *args, int argc, char **);
     } cmds[] = {
         {"build", ARGS_CMD_BUILD, args_parse_build},
         {"clean", ARGS_CMD_CLEAN, args_parse_clean},
         {"init", ARGS_CMD_NEW, args_parse_new},
         {"manifest", ARGS_CMD_MANIFEST, args_parse_manifest},
         {"new", ARGS_CMD_NEW, args_parse_new},
+        {"run", ARGS_CMD_RUN, args_parse_run},
     };
     const int ncmds = sizeof(cmds) / sizeof(*cmds);
 
@@ -104,7 +106,7 @@ opt_parse_end:
         size_t max_len = cmdlen > 16 ? 16 : cmdlen;
         if (strncmp(subargv[0], cmds[i].name, max_len) == 0)
         {
-            if (cmds[i].parse(args, subargv) != CREN_OK)
+            if (cmds[i].parse(args, argc - options.optind, subargv) != CREN_OK)
             {
                 args->cmd = ARGS_CMD_UNKNOWN;
                 return args;
@@ -161,31 +163,37 @@ args_t *args_init(void)
     args->new_cmd.package_type = INIT_PACKAGE_TYPE_LIB;
     args->new_cmd.language = C11;
 
+    // run
+    args->run_cmd.all_features = false;
+    args->run_cmd.no_default_features = false;
+    args->run_cmd.release = false;
+    args->run_cmd.bin = NULL;
+    args->run_cmd.example = NULL;
+    args->run_cmd.target_dir = NULL;
+    args->run_cmd.features = NULL;
+    args->run_cmd.manifest_path = NULL;
+    args->run_cmd.args = NULL;
+
     return args;
 }
 
 void args_free(args_t *args)
 {
     // build
-    string_free(args->build_cmd.bin);
-    string_free(args->build_cmd.example);
-    string_free(args->build_cmd.target_dir);
-    string_list_free(args->build_cmd.features);
-
+    args_build_free(&args->build_cmd);
     // clean
-    string_free(args->clean_cmd.manifest_path);
-    string_free(args->clean_cmd.target_dir);
-
+    args_clean_free(&args->clean_cmd);
     // manifest
-    string_free(args->manifest_cmd.path);
-
+    args_manifest_free(&args->manifest_cmd);
     // new
-    string_free(args->new_cmd.package);
+    args_new_free(&args->new_cmd);
+    // run
+    args_run_free(&args->run_cmd);
 
     free(args);
 }
 
-static int args_parse_build(args_t *args, char **argv)
+static int args_parse_build(args_t *args, int argc, char **argv)
 {
 
     // parse options
@@ -270,7 +278,7 @@ static int args_parse_build(args_t *args, char **argv)
     return CREN_OK;
 }
 
-static int args_parse_clean(args_t *args, char **argv)
+static int args_parse_clean(args_t *args, int argc, char **argv)
 {
 
     // parse options
@@ -313,7 +321,7 @@ static int args_parse_clean(args_t *args, char **argv)
     return CREN_OK;
 }
 
-static int args_parse_manifest(args_t *args, char **argv)
+static int args_parse_manifest(args_t *args, int argc, char **argv)
 {
     // get command
     static const struct
@@ -374,7 +382,7 @@ static int args_parse_manifest(args_t *args, char **argv)
     return CREN_OK;
 }
 
-static int args_parse_new(args_t *args, char **argv)
+static int args_parse_new(args_t *args, int argc, char **argv)
 {
     const struct optparse_long longopts[] =
         {
@@ -427,6 +435,120 @@ static int args_parse_new(args_t *args, char **argv)
     }
 
     args->new_cmd.package = string_from_cstr(subargv[0]);
+
+    return CREN_OK;
+}
+
+static int args_parse_run(args_t *args, int argc, char **argv)
+{
+
+    size_t run_argc = 0;
+    bool found_dashdash = false;
+    for (run_argc = 0; run_argc < argc; run_argc++)
+    {
+        if (strcmp(argv[run_argc], "--") == 0)
+        {
+            found_dashdash = true;
+            break;
+        }
+    }
+
+    char **run_argv = (char **)malloc(sizeof(char *) * (run_argc + 1));
+    if (run_argv == NULL)
+    {
+        printf("Failed to allocate memory for run arguments\n");
+        return CREN_NOK;
+    }
+
+    for (size_t i = 0; i < run_argc; i++)
+    {
+        run_argv[i] = argv[i];
+    }
+    run_argv[run_argc] = NULL; // NULL-terminate the array
+
+    // parse options
+    const struct optparse_long longopts[] =
+        {
+            {"help", 'h', OPTPARSE_NONE},
+            {"release", 'r', OPTPARSE_NONE},
+            {"bin", 'b', OPTPARSE_REQUIRED},
+            {"example", 'e', OPTPARSE_REQUIRED},
+            {"features", 'F', OPTPARSE_REQUIRED},
+            {"all-features", OPT_ALL_FEATURES, OPTPARSE_NONE},
+            {"no-default-features", OPT_NO_DEFAULT_FEATURES, OPTPARSE_NONE},
+            {"target-dir", 't', OPTPARSE_REQUIRED},
+            {"manifest-path", OPT_MANIFEST_PATH, OPTPARSE_REQUIRED},
+            {"args", '-', OPTPARSE_NONE},
+            {0}};
+    ;
+
+    struct optparse options;
+    optparse_init(&options, run_argv);
+    options.permute = 0;
+
+    int option;
+    while ((option = optparse_long(&options, longopts, NULL)) != -1)
+    {
+        switch (option)
+        {
+        case 'h':
+            args->help = true;
+            free(run_argv);
+            return CREN_OK;
+        case 'r':
+            args->run_cmd.release = true;
+            break;
+        case 'b':
+            args->run_cmd.bin = string_from_cstr(options.optarg);
+            break;
+        case 'e':
+            args->run_cmd.example = string_from_cstr(options.optarg);
+            break;
+        case 'F':
+            args->run_cmd.features = string_list_from_cstr(options.optarg, ",");
+            break;
+        case OPT_ALL_FEATURES:
+            args->run_cmd.all_features = true;
+            break;
+        case OPT_NO_DEFAULT_FEATURES:
+            args->run_cmd.no_default_features = true;
+            break;
+        case OPT_MANIFEST_PATH:
+            args->run_cmd.manifest_path = string_from_cstr(options.optarg);
+            break;
+        case 't':
+            args->run_cmd.target_dir = string_from_cstr(options.optarg);
+            break;
+        default:
+            printf("Unknown option: %c\n", option);
+            free(run_argv);
+            return CREN_NOK;
+        }
+    }
+
+    free(run_argv);
+
+    if (found_dashdash)
+    {
+        run_argc++; // skip the "--" argument
+        args->run_cmd.args = string_list_init();
+        if (args->run_cmd.args == NULL)
+        {
+            printf("Failed to initialize bin args list\n");
+            return CREN_NOK;
+        }
+
+        for (int i = run_argc; i < argc; i++)
+        {
+            string_t *arg = string_from_cstr(argv[i]);
+            if (arg == NULL)
+            {
+                printf("Failed to create string from argument: %s\n", argv[i]);
+                return CREN_NOK;
+            }
+            string_list_push(args->run_cmd.args, arg);
+        }
+    }
 
     return CREN_OK;
 }

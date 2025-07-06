@@ -429,9 +429,20 @@ int init_main_include_c(const args_new_t *args, FILE *file)
 {
     log_debug("Init main include c");
 
+    // make name for include guard UPPERCASE
+    string_t *include_guard = string_clone(args->package);
+    if (include_guard == NULL)
+    {
+        log_error("Failed to clone package name for include guard");
+        return CREN_NOK;
+    }
+
+    // convert to uppercase
+    string_to_upper(include_guard);
+
     // write include guard
-    fprintf(file, "#ifndef %s_H\n", args->package->data);
-    fprintf(file, "#define %s_H\n\n", args->package->data);
+    fprintf(file, "#ifndef %s_H\n", include_guard->data);
+    fprintf(file, "#define %s_H\n\n", include_guard->data);
 
     if (args->package_type == INIT_PACKAGE_TYPE_LIB)
     {
@@ -440,7 +451,7 @@ int init_main_include_c(const args_new_t *args, FILE *file)
     }
 
     // write include guard end
-    fprintf(file, "#endif // %s_H\n", args->package->data);
+    fprintf(file, "#endif // %s_H\n", include_guard->data);
 
     return CREN_OK;
 }
@@ -449,9 +460,20 @@ int init_main_include_cpp(const args_new_t *args, FILE *file)
 {
     log_debug("Init main include cpp");
 
+    // make name for include guard UPPERCASE
+    string_t *include_guard = string_clone(args->package);
+    if (include_guard == NULL)
+    {
+        log_error("Failed to clone package name for include guard");
+        return CREN_NOK;
+    }
+
+    // convert to uppercase
+    string_to_upper(include_guard);
+
     // write include guard
-    fprintf(file, "#ifndef %s_HPP\n", args->package->data);
-    fprintf(file, "#define %s_HPP\n\n", args->package->data);
+    fprintf(file, "#ifndef %s_HPP\n", include_guard->data);
+    fprintf(file, "#define %s_HPP\n\n", include_guard->data);
 
     if (args->package_type == INIT_PACKAGE_TYPE_LIB)
     {
@@ -460,7 +482,7 @@ int init_main_include_cpp(const args_new_t *args, FILE *file)
     }
 
     // write include guard end
-    fprintf(file, "#endif // %s_HPP\n", args->package->data);
+    fprintf(file, "#endif // %s_HPP\n", include_guard->data);
 
     return CREN_OK;
 }
