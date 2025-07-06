@@ -23,6 +23,7 @@ void usage_build(void);
 void usage_clean(void);
 void usage_manifest(void);
 void usage_new(void);
+void usage_run(void);
 void usage_default(void);
 
 args_t *args_parse_cmd(int argc, char **argv)
@@ -595,6 +596,9 @@ void usage(const args_t *args)
     case ARGS_CMD_NEW:
         usage_new();
         break;
+    case ARGS_CMD_RUN:
+        usage_run();
+        break;
     default:
         usage_default();
         break;
@@ -621,6 +625,7 @@ void usage_default(void)
     printf("  %sinit\t\t\t\t\t%sCreate a new Cren package\n", COLOR_OPT, COLOR_TEXT);
     printf("  %smanifest\t\t\t\t%sManage package manifest\n", COLOR_OPT, COLOR_TEXT);
     printf("  %snew\t\t\t\t\t%sCreate a new Cren package\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %srun\t\t\t\t\t%sRun a binary or example from the local package\n", COLOR_OPT, COLOR_TEXT);
     puts("");
 }
 
@@ -714,5 +719,27 @@ void usage_new(void)
     printf("  %sc++17\n%s", COLOR_OPT, COLOR_RESET);
     printf("  %sc++20\n%s", COLOR_OPT, COLOR_RESET);
     printf("  %sc++26\n%s", COLOR_OPT, COLOR_RESET);
+    puts("");
+}
+
+void usage_run(void)
+{
+    puts("Run a binary or example of the local package");
+    puts("");
+
+    printf("%sUsage: %scren run %s[OPTIONS] -- [ARGS]...\n", COLOR_HEADER, COLOR_OPT, COLOR_ARG);
+    puts("");
+
+    printf("%sOptions:%s\n", COLOR_HEADER, COLOR_RESET);
+    printf("  %s-r, --release\t\t\t\t%sRelease build\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-b, --bin %s<TARGET>\t\t\t%sRun binary target\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-e, --example %s<TARGET>\t\t%sRun example target\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-F, --features %s<FEATURES>\t\t%sComma separated list of features to activate\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s--all-features\t\t\t%sBuild with all features\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s--no-default-features\t\t\t%sDo not build with default features\n", COLOR_OPT, COLOR_TEXT);
+    printf("  %s-t, --target-dir %s<TARGET_DIR>\t\t%sSet target directory\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s--manifest-path %s<PATH>\t\t%sPath to manifest file\n", COLOR_OPT, COLOR_ARG, COLOR_TEXT);
+    printf("  %s-h, --help\t\t\t\t%sPrint help\n", COLOR_OPT, COLOR_TEXT);
+
     puts("");
 }
