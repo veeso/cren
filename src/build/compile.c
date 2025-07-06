@@ -7,6 +7,7 @@
 #endif // __STDC_NO_THREADS__
 
 #include <build/compile.h>
+#include <build/dependency_output.h>
 #include <build/manifest.h>
 #include <build/uri_loader.h>
 #include <cren.h>
@@ -26,10 +27,11 @@ typedef struct build_object_args_t
     size_t progress_steps;
 } build_object_args_t;
 
-int build_compile_project(build_cfg_t *project_build, const manifest_build_config_t *manifest_build_config, const build_environment_t *build_env, bool dependency);
+int build_compile_project(build_cfg_t *project_build, const manifest_build_config_t *manifest_build_config, const build_environment_t *build_env, dependency_outputs_t *outputs);
+int build_compile_project_dependencies(build_cfg_t *project_build, build_cfg_t **dependencies, manifest_build_config_t **dependencies_manifests_cfg, const size_t dependencies_len, const build_environment_t *build_env, dependency_outputs_t *outputs);
 int configure_dependencies_build(const build_cfg_t *project_build, const manifest_build_config_t *manifest_build_config, build_cfg_t ***dependencies, manifest_build_config_t ***dependencies_manifests_cfg, size_t *dependencies_len);
 build_cfg_t *configure_dependency_build(const build_cfg_t *project_build, const manifest_build_config_t *manifest_build_config, const build_dependency_t *dep, manifest_build_config_t **dep_manifest_cfg);
-int build_project(const build_cfg_t *build, const build_environment_t *env, const size_t progress_steps);
+int build_project(const build_cfg_t *build, const build_environment_t *env, const size_t progress_steps, const string_t *objects_dir);
 int build_target_objects(const build_cfg_t *build, const build_environment_t *env, const string_t *objects_dir, target_t **targets, size_t targets_len, size_t progress_steps);
 int build_objects(const build_cfg_t *build, const build_environment_t *env, const string_t *objects_dir, source_t **sources, size_t sources_len, size_t progress_steps);
 int build_object(void *args);
@@ -42,7 +44,6 @@ bool should_build_object(const source_t *source);
 void advance_build_object_progress(const build_cfg_t *build, const source_t *source, const size_t progress_steps);
 size_t get_progress_steps(const build_cfg_t *build);
 void append_release_opts(string_t *command, const build_compiler_t *compiler);
-string_t *get_lib_path(const build_environment_t *env, const build_cfg_t *build, const target_t *target);
 
 #define OBJECTS_DIR "objects"
 
@@ -55,16 +56,21 @@ int build_progress = 0;
 int build_compile(build_cfg_t *project_build, const manifest_build_config_t *manifest_build_config)
 {
     // get build env
+    int rc = CREN_OK;
     build_environment_t *build_env = build_environment_init();
     if (build_env == NULL)
     {
         log_error("Failed to initialize build environment.");
-        return CREN_NOK;
+        rc = CREN_NOK;
+        goto cleanup;
     }
 
-    const int rc = build_compile_project(project_build, manifest_build_config, build_env, false);
+    rc = build_compile_project(project_build, manifest_build_config, build_env, NULL);
 
-    build_environment_free(build_env);
+cleanup:
+
+    if (build_env != NULL)
+        build_environment_free(build_env);
 
     return rc;
 }
@@ -74,8 +80,9 @@ int build_compile(build_cfg_t *project_build, const manifest_build_config_t *man
 /// @param manifest_build_config
 /// @param dependency
 /// @return
-int build_compile_project(build_cfg_t *project_build, const manifest_build_config_t *manifest_build_config, const build_environment_t *build_env, bool dependency)
+int build_compile_project(build_cfg_t *project_build, const manifest_build_config_t *manifest_build_config, const build_environment_t *build_env, dependency_outputs_t *outputs)
 {
+    bool is_dependency = outputs != NULL;
     // init vars
     int rc = CREN_OK;
     string_t *objects_dir = NULL;
@@ -83,10 +90,23 @@ int build_compile_project(build_cfg_t *project_build, const manifest_build_confi
     size_t dependencies_len = 0;
     manifest_build_config_t **dependencies_manifests_cfg = NULL;
 
+    objects_dir = string_clone(project_build->target_dir);
+    string_append_path(objects_dir, OBJECTS_DIR);
+
     if (project_build == NULL)
     {
         log_error("Attempted to compile a NULL build object.");
         return CREN_NOK;
+    }
+
+    // if outputs is not NULL, fill it with the includes and objects
+    if (outputs != NULL)
+    {
+        if ((rc = dependency_outputs_insert(outputs, project_build, build_env, objects_dir)) != CREN_OK)
+        {
+            log_error("Failed to insert dependency outputs.");
+            goto cleanup;
+        }
     }
 
     log_info("Compiling project...");
@@ -97,56 +117,26 @@ int build_compile_project(build_cfg_t *project_build, const manifest_build_confi
         log_error("Failed to configure dependencies build.");
         goto cleanup;
     }
-    // add include dirs from dependencies
-    for (size_t i = 0; i < dependencies_len; i++)
-    {
-        build_cfg_t *dep = dependencies[i];
-        if (dep->include_dirs != NULL && dep->include_dirs->nitems > 0)
-        {
-            for (size_t j = 0; j < dep->include_dirs->nitems; j++)
-            {
-                string_t *include_dir = string_clone(dep->include_dirs->items[j]);
-                string_list_push(project_build->include_dirs, include_dir);
-                log_debug("Adding include dir from dependency %s: %s", dep->project_dir->data, dep->include_dirs->items[j]->data);
-            }
-        }
-        // push library artifacts to the project build
-        for (size_t i = 0; i < dep->targets_len; i++)
-        {
-            const target_t *target = dep->targets[i];
-            string_t *lib_path = get_lib_path(build_env, dep, target);
-            log_debug("Adding library artifact from dependency %s: %s", dep->project_dir->data, lib_path->data);
-            string_list_push(project_build->libraries, lib_path);
-        }
-    }
 
     size_t progress_steps = get_progress_steps(project_build);
-    // for each dependency
-    for (size_t i = 0; i < dependencies_len; i++)
-    {
-        progress_steps += get_progress_steps(dependencies[i]);
-    }
 
     // build dependencies
-    for (size_t i = 0; i < dependencies_len; i++)
+    if ((rc = build_compile_project_dependencies(
+             project_build, dependencies, dependencies_manifests_cfg, dependencies_len, build_env, outputs)) != CREN_OK)
     {
-        const manifest_build_config_t *dep_manifest_build_config = dependencies_manifests_cfg[i];
-        if ((rc = build_compile_project(dependencies[i], dep_manifest_build_config, build_env, true)) != CREN_OK)
-        {
-            log_error("Failed to build dependency.");
-            goto cleanup;
-        }
+        log_error("Failed to compile project dependencies.");
+        goto cleanup;
     }
 
     // build project
-    if ((rc = build_project(project_build, build_env, progress_steps)) != CREN_OK)
+    if ((rc = build_project(project_build, build_env, progress_steps, objects_dir)) != CREN_OK)
     {
         log_error("Failed to build project.");
         goto cleanup;
     }
 
     // Build OK
-    if (!dependency)
+    if (!is_dependency)
         print_outcome("Finished", "cren build");
 
 cleanup:
@@ -165,6 +155,95 @@ cleanup:
         free(dependencies);
         free(dependencies_manifests_cfg);
     }
+
+    return rc;
+}
+
+/// @brief Build and compile the dependencies of a project. It also adds the outputs to the project build.
+/// @param project_build
+/// @param dependencies
+/// @param dependencies_manifests_cfg
+/// @param dependencies_len
+/// @param build_env
+/// @param outputs
+/// @return CREN_OK on success, CREN_NOK on failure.
+int build_compile_project_dependencies(build_cfg_t *project_build, build_cfg_t **dependencies, manifest_build_config_t **dependencies_manifests_cfg, const size_t dependencies_len, const build_environment_t *build_env, dependency_outputs_t *outputs)
+{
+    int rc = CREN_OK;
+
+    for (size_t i = 0; i < dependencies_len; i++)
+    {
+        // prepare dependency output
+        dependency_outputs_t *dependency_outputs = dependency_outputs_init();
+        if (dependency_outputs == NULL)
+        {
+            log_error("Failed to initialize dependency outputs.");
+            rc = CREN_NOK;
+            goto cleanup;
+        }
+        const manifest_build_config_t *dep_manifest_build_config = dependencies_manifests_cfg[i];
+        if ((rc = build_compile_project(dependencies[i], dep_manifest_build_config, build_env, dependency_outputs)) != CREN_OK)
+        {
+            log_error("Failed to build dependency.");
+            goto cleanup;
+        }
+        // concatenate dependency outputs
+        if (outputs != NULL)
+        {
+            if ((rc = dependency_outputs_concat(outputs, dependency_outputs)) != CREN_OK)
+            {
+                log_error("Failed to concatenate dependency outputs.");
+                dependency_outputs_free(dependency_outputs);
+                goto cleanup;
+            }
+        }
+
+        // add dependency outputs to project build
+        for (size_t i = 0; i < dependency_outputs->includes->nitems; i++)
+        {
+            string_t *include = string_clone(dependency_outputs->includes->items[i]);
+            if (include == NULL)
+            {
+                log_error("Failed to clone include %s from dependency outputs.", dependency_outputs->includes->items[i]->data);
+                dependency_outputs_free(dependency_outputs);
+                rc = CREN_NOK;
+                goto cleanup;
+            }
+            log_debug("Adding include %s from dependency outputs.", include->data);
+            if (string_list_push(project_build->include_dirs, include) != CREN_OK)
+            {
+                log_error("Failed to add include %s to project build.", include->data);
+                dependency_outputs_free(dependency_outputs);
+                rc = CREN_NOK;
+                goto cleanup;
+            }
+        }
+
+        for (size_t i = 0; i < dependency_outputs->objects->nitems; i++)
+        {
+            string_t *object = string_clone(dependency_outputs->objects->items[i]);
+            if (object == NULL)
+            {
+                log_error("Failed to clone object %s from dependency outputs.", dependency_outputs->objects->items[i]->data);
+                dependency_outputs_free(dependency_outputs);
+                rc = CREN_NOK;
+                goto cleanup;
+            }
+            log_debug("Adding object %s from dependency outputs.", object->data);
+            if (string_list_push(project_build->objects, object) != CREN_OK)
+            {
+                log_error("Failed to add object %s to project build.", object->data);
+                dependency_outputs_free(dependency_outputs);
+                rc = CREN_NOK;
+                goto cleanup;
+            }
+        }
+
+        // free dependency outputs
+        dependency_outputs_free(dependency_outputs);
+    }
+
+cleanup:
 
     return rc;
 }
@@ -310,12 +389,10 @@ cleanup:
 /// @param env
 /// @param progress_steps
 /// @return CREN_OK on success, CREN_NOK on failure.
-int build_project(const build_cfg_t *build, const build_environment_t *env, const size_t progress_steps)
+int build_project(const build_cfg_t *build, const build_environment_t *env, const size_t progress_steps, const string_t *objects_dir)
 {
     // make objects dir
     int rc = CREN_OK;
-    string_t *objects_dir = string_clone(build->target_dir);
-    string_append_path(objects_dir, OBJECTS_DIR);
 
     // build objects
     if (build_objects(build, env, objects_dir, build->sources, build->sources_len, progress_steps) != CREN_OK)
@@ -345,7 +422,6 @@ int build_project(const build_cfg_t *build, const build_environment_t *env, cons
     }
 
 cleanup:
-    string_free(objects_dir);
 
     return rc;
 }
@@ -590,8 +666,7 @@ cleanup:
 /// @return A string containing the command to compile the object file, or NULL on failure.
 string_t *compile_object_command(const build_object_args_t *args)
 {
-    string_t *object_path = string_clone(args->objects_dir);
-    string_append_path(object_path, args->source->obj->data);
+    string_t *object_path = get_object_path(args->objects_dir, args->source->obj);
     if (object_path == NULL)
     {
         log_error("Failed to create object path.");
@@ -741,14 +816,13 @@ int archive_objects(const build_cfg_t *build, const build_environment_t *env, co
     // push objects
     for (size_t i = 0; i < build->sources_len; i++)
     {
-        string_t *object_path = string_clone(objects_dir);
+        string_t *object_path = get_object_path(objects_dir, build->sources[i]->obj);
         if (object_path == NULL)
         {
             log_error("Failed to clone object path.");
             rc = CREN_NOK;
             goto cleanup;
         }
-        string_append_path(object_path, build->sources[i]->obj->data);
 
         string_append(command, " ");
         string_append(command, object_path->data);
@@ -757,25 +831,24 @@ int archive_objects(const build_cfg_t *build, const build_environment_t *env, co
     }
 
     // push object for target
-    string_t *target_object_path = string_clone(objects_dir);
+    string_t *target_object_path = get_object_path(objects_dir, target->obj);
     if (target_object_path == NULL)
     {
         log_error("Failed to clone target object path.");
         rc = CREN_NOK;
         goto cleanup;
     }
-    string_append_path(target_object_path, target->obj->data);
 
     string_append(command, " ");
     string_append(command, target_object_path->data);
 
-    // push static library objects
+    // push dependency objects
     // NOTE: this MUST come AFTER the objects
-    for (size_t i = 0; i < build->libraries->nitems; i++)
+    for (size_t i = 0; i < build->objects->nitems; i++)
     {
-        string_t *lib_path = build->libraries->items[i];
+        string_t *object_path = build->objects->items[i];
         string_append(command, " ");
-        string_append(command, lib_path->data);
+        string_append(command, object_path->data);
     }
 
     // free
@@ -937,14 +1010,13 @@ int link_objects(const build_cfg_t *build, const build_environment_t *env, const
     // push objects
     for (size_t i = 0; i < build->sources_len; i++)
     {
-        string_t *object_path = string_clone(objects_dir);
+        string_t *object_path = get_object_path(objects_dir, build->sources[i]->obj);
         if (object_path == NULL)
         {
             log_error("Failed to clone object path.");
             rc = CREN_NOK;
             goto cleanup;
         }
-        string_append_path(object_path, build->sources[i]->obj->data);
 
         string_append(command, " ");
         string_append(command, object_path->data);
@@ -967,9 +1039,9 @@ int link_objects(const build_cfg_t *build, const build_environment_t *env, const
 
     // push static library objects
     // NOTE: this MUST come AFTER the objects
-    for (size_t i = 0; i < build->libraries->nitems; i++)
+    for (size_t i = 0; i < build->objects->nitems; i++)
     {
-        string_t *lib_path = build->libraries->items[i];
+        string_t *lib_path = build->objects->items[i];
         string_append(command, " ");
         string_append(command, lib_path->data);
     }
@@ -1110,50 +1182,4 @@ size_t get_progress_steps(const build_cfg_t *build)
     }
 
     return steps;
-}
-
-/// @brief Get static library target path.
-/// @param build
-/// @param target
-/// @return static library target path or NULL if the target is not a library.
-string_t *get_lib_path(const build_environment_t *env, const build_cfg_t *build, const target_t *target)
-{
-    string_t *target_path = string_clone(build->target_dir);
-    if (target_path == NULL)
-    {
-        log_error("Failed to clone target directory.");
-        return NULL;
-    }
-    string_t *target_name = NULL;
-    build_compiler_t *ar = env->ar;
-
-    if (target->target_name == NULL)
-    {
-        log_error("Target name is NULL.");
-        string_free(target_path);
-        return NULL;
-    }
-
-    target_name = string_clone(target->target_name);
-    if (target_name == NULL)
-    {
-        log_error("Failed to clone target name.");
-        string_free(target_path);
-        return NULL;
-    }
-
-    // append '.a' or '.lib' extension based on compiler family
-    if (ar->family == COMPILER_FAMILY_GCC)
-    {
-        string_append(target_name, ".a");
-    }
-    else
-    {
-        string_append(target_name, ".lib");
-    }
-
-    string_append_path(target_path, target_name->data);
-    string_free(target_name);
-
-    return target_path;
 }

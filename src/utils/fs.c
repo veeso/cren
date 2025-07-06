@@ -8,9 +8,10 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #else
-#include <unistd.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #endif
 
 char *get_current_dir(void)
@@ -53,6 +54,13 @@ int make_dir(const char *path)
 #else
     if (mkdir(path, 0755) == -1)
     {
+        // check if already exists
+        if (errno == EEXIST)
+        {
+            log_debug("Directory %s already exists", path);
+            return CREN_OK;
+        }
+
         log_warn("Failed to create directory %s", path);
         return CREN_NOK;
     }
