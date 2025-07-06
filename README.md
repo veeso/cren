@@ -25,12 +25,15 @@ Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed t
 
 ## 🛠️ Available Commands
 
-- [x] `cren new`: Initialize a new project with a predefined directory structure.
-- [x] `cren build`: Compile your project effortlessly.
-- [ ] `cren run`: Run compiled project.
-- [ ] `cren test`: Run integrated tests written directly in your source code.
-- [ ] `cren lint`: Analyze your code for potential issues.
+- [x] [cren build](./doc/commands/cren-build.md): Compile your project effortlessly.
+- [x] [cren clean](./doc/commands/cren-clean.md): Remove build artifacts and temporary files.
+- [x] [cren manifest](./doc/commands/cren-manifest.md): Manage your project's manifest file.
+- [x] [cren new](./doc/commands/cren-new.md): Initialize a new project with a predefined directory structure.
+- [x] [cren run](./doc/commands/cren-run.md): Run compiled project.
 - [ ] `cren format`: Automatically format your code based on specified guidelines.
+- [ ] `cren lint`: Analyze your code for potential issues.
+- [ ] `cren publish`: Publish your project to a registry for sharing with others.
+- [ ] `cren test`: Run test units and integration tests written directly in your source code.
 
 ## 🎯 Why Cren?
 
@@ -42,6 +45,7 @@ Cren is built for developers who want a streamlined workflow for C projects. By 
 - Parallelized test execution.
 - Support for custom build pipelines and hooks.
 - Integration with popular CI/CD systems.
+- Registry for sharing and discovering C libraries.
 
 ## 🛑 Requirements
 

@@ -9,6 +9,7 @@
 #include <args/clean.h>
 #include <args/manifest.h>
 #include <args/new.h>
+#include <args/run.h>
 
 typedef enum args_verbose_t
 {
@@ -45,6 +46,7 @@ struct args_t
     args_clean_t clean_cmd;
     args_manifest_t manifest_cmd;
     args_new_t new_cmd;
+    args_run_t run_cmd;
 
     // options
     args_verbose_t verbose;

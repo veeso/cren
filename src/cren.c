@@ -9,6 +9,7 @@
 #include <command/clean.h>
 #include <command/manifest.h>
 #include <command/new.h>
+#include <command/run.h>
 #include <cren.h>
 #include <lib/log.h>
 
@@ -66,6 +67,9 @@ int main(int argc, char **argv)
     break;
   case ARGS_CMD_NEW:
     rc = command_new(&args->new_cmd);
+    break;
+  case ARGS_CMD_RUN:
+    rc = command_run(&args->run_cmd);
     break;
   default:
     rc = CREN_OK;

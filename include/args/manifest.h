@@ -20,4 +20,6 @@ struct args_manifest_t
     string_t *path;
 };
 
+void args_manifest_free(args_manifest_t *args);
+
 #endif // CREN_ARGS_MANIFEST_H

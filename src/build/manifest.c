@@ -1,4 +1,5 @@
 
+#include <build/compile.h>
 #include <build/manifest.h>
 #include <cren.h>
 #include <lib/log.h>
@@ -687,4 +688,51 @@ int configure_build_dependencies(build_cfg_t *build_args, cren_manifest_dependen
     }
 
     return CREN_OK;
+}
+
+int load_manifest_and_build(const manifest_build_config_t *args, const string_t *manifest_filepath)
+{
+    int rc = CREN_OK;
+    cren_manifest_t *manifest = NULL;
+    build_cfg_t *build_args = NULL;
+    string_t *project_dir = NULL;
+
+    project_dir = get_project_dir(manifest_filepath->data);
+    if (project_dir == NULL)
+    {
+        log_error("Failed to get project directory from manifest path: %s", manifest_filepath->data);
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // load manifest
+    manifest = cren_manifest_load(manifest_filepath);
+    if (manifest == NULL)
+    {
+        log_error("Error loading manifest");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // load build options
+    build_args = build_config_from_manifest(manifest, args, project_dir);
+    if (build_args == NULL)
+    {
+        log_error("Error initializing build args");
+        rc = CREN_NOK;
+        goto cleanup;
+    }
+
+    // Build the project
+    rc = build_compile(build_args, args);
+
+cleanup:
+    if (manifest)
+        cren_manifest_free(manifest);
+    if (build_args)
+        build_free(build_args);
+    if (project_dir)
+        string_free(project_dir);
+
+    return rc;
 }

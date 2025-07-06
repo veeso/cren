@@ -1,17 +1,17 @@
-// Build command arguments
+// Run command arguments
 
-#ifndef CREN_ARGS_BUILD_H
-#define CREN_ARGS_BUILD_H
+#ifndef CREN_ARGS_RUN_H
+#define CREN_ARGS_RUN_H
 
 #include <stdbool.h>
 
 #include <utils/string_list.h>
 #include <utils/string.h>
 
-/// @brief Build command arguments
-typedef struct args_build_t args_build_t;
+/// @brief Run command arguments
+typedef struct args_run_t args_run_t;
 
-struct args_build_t
+struct args_run_t
 {
     /// @brief Build with all features
     bool all_features;
@@ -19,14 +19,6 @@ struct args_build_t
     bool no_default_features;
     /// @brief Release build
     bool release;
-    /// @brief Build all targets
-    bool all_targets;
-    /// @brief Build bins
-    bool bins;
-    /// @brief Build examples
-    bool examples;
-    /// @brief Build libs
-    bool lib;
     /// @brief Build binary target
     string_t *bin;
     /// @brief Build example target
@@ -37,8 +29,10 @@ struct args_build_t
     string_list_t *features;
     /// @brief manifest path
     string_t *manifest_path;
+    /// @brief Additional arguments to pass to the binary
+    string_list_t *args;
 };
 
-void args_build_free(args_build_t *args);
+void args_run_free(args_run_t *args);
 
-#endif // CREN_ARGS_BUILD_H
+#endif // CREN_ARGS_RUN_H

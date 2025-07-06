@@ -17,10 +17,7 @@ manifest_build_config_t *build_from_manifest_from_args(const args_build_t *args)
 int command_build(const args_build_t *args)
 {
     int rc = CREN_OK;
-    cren_manifest_t *manifest = NULL;
-    build_cfg_t *build_args = NULL;
     manifest_build_config_t *manifest_build_args = NULL;
-    string_t *project_dir = NULL;
     string_t *manifest_filepath = NULL;
     // log
     log_opts(args);
@@ -41,22 +38,6 @@ int command_build(const args_build_t *args)
         goto cleanup;
     }
 
-    project_dir = get_project_dir(manifest_filepath->data);
-    if (project_dir == NULL)
-    {
-        log_error("Failed to get project directory from manifest path: %s", manifest_filepath->data);
-        rc = CREN_NOK;
-        goto cleanup;
-    }
-
-    // load manifest
-    manifest = cren_manifest_load(manifest_filepath);
-    if (manifest == NULL)
-    {
-        log_error("Error loading manifest");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
     // build from manifest
     manifest_build_args = build_from_manifest_from_args(args);
     if (manifest_build_args == NULL)
@@ -65,27 +46,13 @@ int command_build(const args_build_t *args)
         rc = CREN_NOK;
         goto cleanup;
     }
-    // load build options
-    build_args = build_config_from_manifest(manifest, manifest_build_args, project_dir);
-    if (build_args == NULL)
-    {
-        log_error("Error initializing build args");
-        rc = CREN_NOK;
-        goto cleanup;
-    }
 
     // Build the project
-    rc = build_compile(build_args, manifest_build_args);
+    rc = load_manifest_and_build(manifest_build_args, manifest_filepath);
 
 cleanup:
-    if (manifest)
-        cren_manifest_free(manifest);
-    if (build_args)
-        build_free(build_args);
     if (manifest_build_args)
         manifest_build_config_free(manifest_build_args);
-    if (project_dir)
-        string_free(project_dir);
     if (manifest_filepath)
         string_free(manifest_filepath);
 
