@@ -35,8 +35,8 @@ build_cfg_t *build_init(const string_t *project_dir)
         build_free(build);
         return NULL;
     }
-    build->libraries = string_list_init();
-    if (build->libraries == NULL)
+    build->objects = string_list_init();
+    if (build->objects == NULL)
     {
         log_error("Failed to initialize libraries.");
         build_free(build);
@@ -65,7 +65,7 @@ void build_free(build_cfg_t *build)
     string_free(build->project_dir);
     string_list_free(build->defines);
     string_list_free(build->include_dirs);
-    string_list_free(build->libraries);
+    string_list_free(build->objects);
     string_free(build->target_dir);
     string_list_free(build->links);
 

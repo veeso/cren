@@ -34,7 +34,7 @@ struct build_cfg_t
     /// @brief include dirs
     string_list_t *include_dirs;
     /// @brief libraries objects
-    string_list_t *libraries;
+    string_list_t *objects;
     /// @brief target dir
     string_t *target_dir;
     /// @brief links
