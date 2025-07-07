@@ -579,7 +579,6 @@ int get_string_list(toml_table_t *table, const char *key, string_list_t **dest, 
         if (string_list_push(*dest, item) != CREN_OK)
         {
             log_error("Error adding string at index %d", i);
-            free(value.u.s);
             return CREN_NOK;
         }
     }
