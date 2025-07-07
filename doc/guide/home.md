@@ -1,6 +1,6 @@
 # Cren Home
 
-The **Cren home" functions as a download and source cache. When building a package, Cren
+The "Cren home" functions as a download and source cache. When building a package, Cren
 stores downloaded build dependencies in the Cren home. You can alter the location of the
 Cren home by setting the `CREN_HOME` environmental variable. The home package provides an
 API for getting this location if you need this information inside your Rust crate. By default,

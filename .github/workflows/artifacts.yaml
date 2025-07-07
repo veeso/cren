@@ -1,0 +1,88 @@
+name: "Build Artifacts"
+
+on:
+  workflow_dispatch:
+
+env:
+  CREN_VERSION: "0.1.0"
+
+jobs:
+  build-binaries:
+    name: Build - ${{ matrix.platform.release_for }}
+    strategy:
+      matrix:
+        platform:
+          - release_for: "MacOS-x86_64"
+            os: macos-latest
+            target: x864_64-apple-darwin
+
+          - release_for: "MacOS-aarch64"
+            os: macos-latest
+            target: aarch64-apple-darwin
+        
+          - release_for: "Linux-x86_64"
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          
+          - release_for: "Linux-aarch64"
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          
+          - release_for: "Windows-x86_64"
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies (Linux)
+        if: matrix.platform.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update || true
+          sudo apt-get install -y cmake ninja-build gcc g++ || true
+
+      - name: Install dependencies (macOS)
+        if: matrix.platform.os == 'macos-latest'
+        run: |
+          brew install cmake ninja
+
+      - name: Install dependencies (Windows)
+        if: matrix.platform.os == 'windows-latest'
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+
+      - name: Setup build directory (Windows)
+        if: matrix.platform.os == 'windows-latest'
+        run: cmake -B build -S . -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Setup build directory (Linux/macOS)
+        if: matrix.platform.os != 'windows-latest'
+        run: cmake -B build -S . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Prepare artifact files
+        if: matrix.platform.os != 'windows-latest'
+        run: |
+          mkdir -p ./artifact
+          mv build/cren ./artifact/cren
+          tar -czf ./artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz -C ./artifact cren
+
+      - name: Prepare artifact files (Windows)
+        if: matrix.platform.os == 'windows-latest'
+        run: |
+          mkdir -p .\artifact
+          mv build\Release\cren.exe .\artifact\cren.exe
+          tar -czf .\artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz -C .\artifact cren.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          retention-days: 3
+          name: cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}
+          path: artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz
+

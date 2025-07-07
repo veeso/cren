@@ -5,14 +5,14 @@ To start a new package with Cren, use `cren new`:
 In case you want to initialize a bin package use:
 
 ```sh
-$ cren new hello_world --bin
+$ cren new --bin hello_world
  
 ```
 
 where `hello_world` is the package name, otherwise if you want a library use:
 
 ```sh
-$ cren new libfoo --lib
+$ cren new --lib libfoo
  
 ```
 
