@@ -7,7 +7,11 @@ build_dependency_t *build_dependency_init(const string_t *name, const string_t *
     {
         return NULL;
     }
-    dependency->name = string_clone(name);
+    dependency->name = NULL;
+    dependency->uri = NULL;
+    dependency->features = NULL;
+
+        dependency->name = string_clone(name);
     if (dependency->name == NULL)
     {
         build_dependency_free(dependency);
@@ -35,8 +39,11 @@ void build_dependency_free(build_dependency_t *dependency)
         return;
     }
 
-    string_free(dependency->name);
-    string_free(dependency->uri);
-    string_list_free(dependency->features);
+    if (dependency->name != NULL)
+        string_free(dependency->name);
+    if (dependency->uri != NULL)
+        string_free(dependency->uri);
+    if (dependency->features != NULL)
+        string_list_free(dependency->features);
     free(dependency);
 }

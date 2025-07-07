@@ -94,7 +94,7 @@ string_list_t *string_list_from_cstr(const char *data, const char *delim)
         string_list_free(list);
         return NULL;
     }
-    strncpy(data_copy, data, data_len);
+    strncpy(data_copy, data, data_len + 1);
     data_copy[data_len] = '\0';
 
     char *token = strtok(data_copy, delim);

@@ -63,7 +63,7 @@ string_t *string_from_cstr(const char *data)
         return NULL;
     }
 
-    strncpy(string->data, data, data_len);
+    strncpy(string->data, data, data_len + 1);
     string->data[data_len] = '\0';
     string->length = data_len;
 

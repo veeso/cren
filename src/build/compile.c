@@ -773,6 +773,7 @@ int archive_objects(const build_cfg_t *build, const build_environment_t *env, co
     int exit_rc = 0;
 
     build_compiler_t *ar = env->ar;
+    string_t *command = NULL;
     string_t *target_path = get_lib_path(env, build, target);
     if (target_path == NULL)
     {
@@ -781,7 +782,7 @@ int archive_objects(const build_cfg_t *build, const build_environment_t *env, co
         goto cleanup;
     }
 
-    string_t *command = string_from_cstr(ar->path->data);
+    command = string_from_cstr(ar->path->data);
     if (command == NULL)
     {
         log_error("Failed to create command string.");
@@ -866,8 +867,10 @@ int archive_objects(const build_cfg_t *build, const build_environment_t *env, co
     exit_rc = cmd_exec(command->data);
 
 cleanup:
-    string_free(command);
-    string_free(target_path);
+    if (command != NULL)
+        string_free(command);
+    if (target_path != NULL)
+        string_free(target_path);
 
     if (rc != CREN_OK)
     {

@@ -13,9 +13,22 @@ Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed t
 > [!CAUTION]
 > Project is in early development stage. Use at your own risk.
 > Currently only the new, manifest and build commands are implemented.
-> Dependencies are not yet supported.
 
-## 🚀 Key Features
+## Getting Started
+
+You can install Cren by running the following command:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSfL https://get.cren.cc | sh
+```
+
+Alternatively, you can download the latest release binary from the [releases page](https://github.com/veeso/cren/releases).
+
+### Requirements
+
+- A modern C compiler (e.g., GCC, Clang).
+
+## Key Features
 
 - **Dependency Management**: Initial support for linked libraries (`-lm`, `-lz`, etc.), with future plans for full builds of external dependencies.
 - **Simplified Build Process**: Compile your projects with a single command, no need to write `Makefile`s manually.
@@ -23,7 +36,7 @@ Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed t
 - **Linting and Formatting**: Ensure consistent code style with dedicated commands.
 - **Centralized Configuration**: Describe your project and dependencies in a simple `Cren.toml` file.
 
-## 🛠️ Available Commands
+## Available Commands
 
 - [x] [cren build](./doc/commands/cren-build.md): Compile your project effortlessly.
 - [x] [cren clean](./doc/commands/cren-clean.md): Remove build artifacts and temporary files.
@@ -35,22 +48,17 @@ Cren is a tool inspired by [Cargo](https://doc.rust-lang.org/cargo/), designed t
 - [ ] `cren publish`: Publish your project to a registry for sharing with others.
 - [ ] `cren test`: Run test units and integration tests written directly in your source code.
 
-## 🎯 Why Cren?
+## Why Cren?
 
 Cren is built for developers who want a streamlined workflow for C projects. By combining modern practices with the simplicity of a single tool, Cren bridges the gap between traditional C workflows and the convenience of modern build systems.
 
-## 🔮 Future Plans
+## Future Plans
 
 - Full build support for external dependencies.
 - Parallelized test execution.
 - Support for custom build pipelines and hooks.
 - Integration with popular CI/CD systems.
 - Registry for sharing and discovering C libraries.
-
-## 🛑 Requirements
-
-- A modern C compiler (e.g., GCC, Clang).
-- Make or CMake (optional for advanced builds).
 
 ## 🌟 Cren Book
 
