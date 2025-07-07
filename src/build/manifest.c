@@ -463,14 +463,31 @@ cleanup:
 
 int configure_targets(build_cfg_t *build_args, const manifest_build_config_t *args, const cren_manifest_t *manifest, const char *project_dir)
 {
-    // bins enabled
+    // if all targets or bins is set, configure targets
+    // bins
+    log_debug("Adding bins");
     if (args->all_targets || args->bins)
     {
-        log_debug("Adding bins");
+        log_debug("Adding all bins");
+        // add all targets
+        for (size_t i = 0; i < manifest->targets->bin_len; i++)
+        {
+            cren_manifest_target_cfg_t *cfg = manifest->targets->bin[i];
+            if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir, TARGET_TYPE_EXECUTABLE) != CREN_OK)
+            {
+                log_error("Error adding target %s", manifest->targets->bin[i]->name->data);
+                return CREN_NOK;
+            }
+            log_debug("Added target %s", cfg->name->data);
+        }
+    }
+    else if (args->bin != NULL)
+    {
+        log_debug("Adding specific bin: %s", args->bin->data);
         for (size_t i = 0; i < manifest->targets->bin_len; i++)
         {
             // check if target is enabled
-            if (args->bin == NULL || strcmp(args->bin->data, manifest->targets->bin[i]->name->data) == 0)
+            if (strcmp(args->bin->data, manifest->targets->bin[i]->name->data) == 0)
             {
                 cren_manifest_target_cfg_t *cfg = manifest->targets->bin[i];
                 if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir, TARGET_TYPE_EXECUTABLE) != CREN_OK)
@@ -478,18 +495,36 @@ int configure_targets(build_cfg_t *build_args, const manifest_build_config_t *ar
                     log_error("Error adding target %s", manifest->targets->bin[i]->name->data);
                     return CREN_NOK;
                 }
+                log_debug("Added target %s", cfg->name->data);
+                break; // only one bin is allowed
             }
         }
     }
 
-    // examples enabled
-    if (args->all_targets || args->examples)
+    // examples
+    log_debug("Adding examples");
+    if (args->examples || args->all_targets)
     {
-        log_debug("Adding examples");
+        log_debug("Adding all examples");
+        // add all examples
+        for (size_t i = 0; i < manifest->targets->examples_len; i++)
+        {
+            cren_manifest_target_cfg_t *cfg = manifest->targets->examples[i];
+            if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir, TARGET_TYPE_EXECUTABLE) != CREN_OK)
+            {
+                log_error("Error adding target %s", manifest->targets->examples[i]->name->data);
+                return CREN_NOK;
+            }
+            log_debug("Added target %s", cfg->name->data);
+        }
+    }
+    else if (args->example != NULL)
+    {
+        log_debug("Adding specific example: %s", args->example->data);
         for (size_t i = 0; i < manifest->targets->examples_len; i++)
         {
             // check if target is enabled
-            if (args->example == NULL || strcmp(args->example->data, manifest->targets->examples[i]->name->data) == 0)
+            if (strcmp(args->example->data, manifest->targets->examples[i]->name->data) == 0)
             {
                 cren_manifest_target_cfg_t *cfg = manifest->targets->examples[i];
                 if (build_add_target(build_args, cfg->name->data, cfg->path->data, project_dir, TARGET_TYPE_EXECUTABLE) != CREN_OK)
@@ -497,6 +532,8 @@ int configure_targets(build_cfg_t *build_args, const manifest_build_config_t *ar
                     log_error("Error adding target %s", manifest->targets->examples[i]->name->data);
                     return CREN_NOK;
                 }
+                log_debug("Added target %s", cfg->name->data);
+                break; // only one example is allowed
             }
         }
     }
