@@ -81,7 +81,7 @@ string_t *source_path_in_src(const char *src)
     const char *src_dir = strstr(src, SRC_DIR);
     if (src_dir == NULL)
     {
-        log_error("Source file %s is not in src directory.", src);
+        log_debug("Source file %s is not in src directory.", src);
         return NULL;
     }
 

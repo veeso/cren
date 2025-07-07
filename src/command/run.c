@@ -116,12 +116,12 @@ manifest_build_config_t *build_from_manifest_from_run_args(const args_run_t *arg
     build_args->all_features = args->all_features;
     build_args->no_default_features = args->no_default_features;
     build_args->release = args->release;
-    build_args->bins = false;
-    build_args->examples = false;
     build_args->lib = false;
 
     build_args->bin = string_clone(args->bin);
+    build_args->bins = build_args->bin != NULL;
     build_args->example = string_clone(args->example);
+    build_args->examples = build_args->example != NULL;
     build_args->target_dir = string_clone(args->target_dir);
     build_args->manifest_path = string_clone(args->manifest_path);
 
