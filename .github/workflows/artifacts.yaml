@@ -75,9 +75,9 @@ jobs:
       - name: Prepare artifact files (Windows)
         if: matrix.platform.os == 'windows-latest'
         run: |
-          mkdir -p artifact
+          mkdir -p .\artifact
           mv build\Release\cren.exe .\artifact\cren.exe
-          tar -czf .artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz -C .\artifact cren.exe
+          tar -czf .\artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz -C .\artifact cren.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
