@@ -68,9 +68,9 @@ jobs:
       - name: Prepare artifact files
         if: matrix.platform.os != 'windows-latest'
         run: |
-          mkdir -p .artifact
-          mv build/cren .artifact/cren
-          tar -czf .artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz -C .artifact cren
+          mkdir -p ./artifact
+          mv build/cren ./artifact/cren
+          tar -czf ./artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz -C ./artifact cren
 
       - name: Prepare artifact files (Windows)
         if: matrix.platform.os == 'windows-latest'
@@ -85,5 +85,5 @@ jobs:
           if-no-files-found: error
           retention-days: 3
           name: cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}
-          path: .artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz
+          path: artifact/cren-v${{ env.CREN_VERSION }}-${{ matrix.platform.target }}.tar.gz
 
