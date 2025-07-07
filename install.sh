@@ -73,6 +73,15 @@ get_tmpfile() {
     fi
 }
 
+get_tmpdir() {
+    if has mktemp; then
+        printf "%s" "$(mktemp -d)"
+    else
+        # No really good options here--let's pick a default + hope
+        printf "/tmp/cren_${date +%Y%m%d_%H%M%S}"
+    fi
+}
+
 download() {
     output="$1"
     url="$2"
@@ -207,14 +216,17 @@ install_from_source() {
     
     # clone the repository
     info "Cloning the cren repository"
-    if ! git clone https://github.com/veeso/cren.git /tmp/cren; then
+    local tmpdir
+    tmpdir="$(get_tmpdir)"
+
+    if ! git clone https://github.com/veeso/cren.git $tmpdir; then
         error "Failed to clone the cren repository"
         exit 1
     fi
 
     # change directory to the cloned repository
-    cd /tmp/cren || {
-        error "Failed to change directory to /tmp/cren"
+    cd $tmpdir || {
+        error "Failed to change directory to $tmpdir"
         exit 1
     }
 
@@ -258,8 +270,8 @@ install_from_source() {
     # cleanup
     cd $CURRDIR
     info "Cleaning up temporary files"
-    if [ -d /tmp/cren ]; then
-        rm -rf /tmp/cren
+    if [ -d $tmpdir ]; then
+        rm -rf $tmpdir
     fi
 
     info "Installed ${BOLD}${GREEN}cren ${CREN_VERSION}${NO_COLOR} successfully at ${BOLD}${GREEN}$(which cren)${CREN_VERSION}${NO_COLOR}"
